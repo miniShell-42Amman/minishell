@@ -1,6 +1,6 @@
 CC = cc
 CFLAGE = -Wall -Wextra -Werror -I.
-RM = rm -r
+RM = rm -f
 NAME = minishell
 LIBFT_DIR = ./Libft
 LIBFT = $(LIBFT_DIR)/libft.a
@@ -12,19 +12,19 @@ OBJS = $(SRC:.c=.o)
 all: $(LIBFT) $(NAME)
 
 $(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
+	$(MAKE) -C $(LIBFT_DIR) -s
 
 $(NAME): $(LIBFT) $(OBJS)
 	$(CC) $(CFLAGE) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
 
 clean: 
 	$(RM) $(OBJS)
-	$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(LIBFT_DIR) clean -s
 
 
 fclean: clean
 	$(RM) $(NAME)
-	$(MAKE) -C $(LIBFT_DIR) fclean
+	$(MAKE) -C $(LIBFT_DIR) fclean -s
 
 re: fclean all
 

@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:10:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/01/31 21:37:17 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/01 00:31:50 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ int count_args(char *input)
     bool in_quotes = false;
     char quote_char = '\0';
 
-    for (int i = 0; input[i]; i++)
+    int i = 0;
+    while (input[i])
     {
         if ((input[i] == '"' || input[i] == '\'') && (i == 0 || input[i - 1] != '\\'))
         {
@@ -66,6 +67,7 @@ int count_args(char *input)
         }
         if (!in_quotes && (input[i] == ' ' || input[i + 1] == '\0'))
             count++;
+        i++;
     }
     return count;
 }
@@ -78,28 +80,38 @@ t_cmd parse_cmd(char *input)
     int i = 0, j = 0;
     bool in_quotes = false;
     char quote_char = '\0';
-    char buffer[1024];
+    char *buffer = malloc((ft_strlen(clean_input) + 1) * sizeof(char));
+    if (!buffer)
+        exit(1);
 
     cmd.arg_count = count_args(clean_input);
     cmd.args = malloc((cmd.arg_count + 1) * sizeof(char *));
     if (!cmd.args)
         exit(1);
 
-    for (int k = 0; clean_input[k]; k++)
+    int k = 0;
+    while (clean_input[k])
     {
+        if (clean_input[k] == '\\' && (k == 0 || clean_input[k - 1] != '\\'))
+        {
+            k++;
+            continue;
+        }
         if ((clean_input[k] == '"' || clean_input[k] == '\'') && (k == 0 || clean_input[k - 1] != '\\'))
         {
             if (!in_quotes)
             {
                 in_quotes = true;
                 quote_char = clean_input[k];
+                k++;
                 continue;
             }
             else if (clean_input[k] == quote_char)
             {
                 in_quotes = false;
+                k++;
+                continue;
             }
-            continue;
         }
 
         if (!in_quotes && clean_input[k] == ' ')
@@ -115,6 +127,7 @@ t_cmd parse_cmd(char *input)
         {
             buffer[j++] = clean_input[k];
         }
+        k++;
     }
 
     if (in_quotes)
@@ -126,9 +139,12 @@ t_cmd parse_cmd(char *input)
             free(cmd.args[i]);
         if (cmd.args)
             free(cmd.args);
+        if (buffer)
+            free(buffer);
         cmd.args = NULL;
         cmd.cmd = NULL;
         cmd.arg_count = 0;
+        
         return cmd;
     }
 
@@ -142,6 +158,8 @@ t_cmd parse_cmd(char *input)
     cmd.cmd = cmd.args[0] ? ft_strdup(cmd.args[0]) : NULL;
     if (clean_input)
         free(clean_input);
+    if (buffer)
+        free(buffer);
     return cmd;
 }
 
@@ -168,9 +186,13 @@ int main(int ac, char **av, char **env)
     // ft_bzero(&cmd, sizeof(t_cmd));
     while (1)
     {
+        char *cwd = getcwd(NULL, 0);
+        ft_printf(PURPLE "%s ", cwd);
         ft_bzero(&cmd, sizeof(t_cmd));
         
-        input = readline("minishell$ ");
+        ft_printf(YELLOW);
+        input = readline("minishell$ > ");
+        ft_printf(RESET);
         if (input == NULL)
             break;
         if (ft_strcmp(input, "exit") == 0)
@@ -184,17 +206,22 @@ int main(int ac, char **av, char **env)
             cmd = parse_cmd(input);
             if (cmd.args != NULL)
             {
-                ft_printf("cmd: %s\n", cmd.cmd);
-                for (int i = 0; i < cmd.arg_count; i++)
+                if (cmd.cmd)
+                    ft_printf("cmd: %s\n", cmd.cmd);
+                int i = 0;
+                while (i < cmd.arg_count)
                 {
                     if (cmd.args[i])
                         ft_printf("args[%d]: %s\n", i, cmd.args[i]);
+                    i++;
                 }
                 free_command(&cmd);
             }
         }
         if (input)
             free(input);
+        if (cwd)
+            free(cwd);
     }
     return 0;
 }

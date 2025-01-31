@@ -1,5 +1,5 @@
 CC = cc
-CFLAGE = -Wall -Wextra -Werror -I.
+CFLAGE = -Wall -Wextra -Werror -g -I.
 RM = rm -f
 NAME = minishell
 LIBFT_DIR = ./Libft

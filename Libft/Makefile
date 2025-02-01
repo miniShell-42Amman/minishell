@@ -38,42 +38,60 @@ SRC =	ft_atoi.c ft_bzero.c						\
 		printf/ft_printf_ptr.c						\
 		printf/ft_printf_number.c 					\
 		printf/ft_printf_hex.c						\
-		printf/ft_printf_hex_uppercase.c			\
+		printf/ft_printf_uhex.c						\
 		printf/ft_printf_char.c						\
 		get_next_line/get_next_line.c				\
-		get_next_line/get_next_line_bonus.c			\
-		dprintf/ft_dprintf.c					\
-		dprintf/ft_dprintf_unsigned.c			\
-		dprintf/ft_dprintf_string.c				\
-		dprintf/ft_dprintf_ptr.c				\
-		dprintf/ft_dprintf_number.c				\
-		dprintf/ft_dprintf_hex.c				\
-		dprintf/ft_dprintf_hex_uppercase.c		\
-		dprintf/ft_dprintf_char.c				\
-		dprintf/ft_utils.c						\
+		get_next_line/g_n_l.c						\
+		dprintf/ft_dprintf.c						\
+		dprintf/ft_dprintf_unsigned.c				\
+		dprintf/ft_dprintf_string.c					\
+		dprintf/ft_dprintf_ptr.c					\
+		dprintf/ft_dprintf_number.c					\
+		dprintf/ft_dprintf_hex.c					\
+		dprintf/ft_dprintf_uhex.c					\
+		dprintf/ft_dprintf_char.c					\
+		dprintf/ft_utils.c							\
 
 OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
 
+N		=	\033[m
+R		=	\033[0;31m
+G		=	\033[0;32m
+Y		=	\033[0;33m
+B		=	\033[0;34m
+P		=	\033[0;35m
+T		=	\033[0;36m
+
 all: $(NAME)
+	@printf "$(B)%b $(Y)%b $(B)%b$(N)\n" "###############################" "$(NAME) ready" "###"
+
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR)
-	mkdir -p $(OBJDIR)/printf
-	mkdir -p $(OBJDIR)/dprintf
-	mkdir -p $(OBJDIR)/get_next_line
+	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR)/printf
+	@mkdir -p $(OBJDIR)/dprintf
+	@mkdir -p $(OBJDIR)/get_next_line
 
 $(OBJDIR)/%.o: %.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@printf "$(B)%b $(Y)%10b $(T)%-34b $(B)%b$(N)\n" "#" "compiling" "$@" "#"
 
 $(NAME): $(OBJS)
-	$(AR) $(NAME) $(OBJS)
+	@$(AR) $(NAME) $(OBJS)
 
-clean:
-	$(RM) $(OBJS)
-	$(RM) -r $(OBJDIR)
+header:
+	@printf "$(B)%b $(Y)%b $(B)%b$(N)\n" "###################" "L I B F T" "###################"
+
+clean: header
+	@$(RM) -r $(OBJS)
+	@$(RM) -r $(OBJDIR)
+	@printf "$(B)%b $(Y)%10b $(T)%-34b $(B)%b$(N)\n" "#" "removing" "objects" "#"
+	@printf "$(B)%b $(Y)%b $(B)%b$(N)\n" "##################################" "clean done" "###"
 
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) -r $(NAME)
+	@printf "$(B)%b $(Y)%10b $(T)%-34b $(B)%b$(N)\n" "#" "removing" "$(NAME)" "#"
+	@printf "$(B)%b $(Y)%b $(B)%b$(N)\n" "#################################" "fclean done" "###"
 
 re: fclean all
 

@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/01/31 19:51:31 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/02 00:20:39 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,33 @@ typedef struct s_cmd
     char **args;
     int arg_count;
 }               t_cmd;
+
+/*
+    ! Token structures
+*/
+typedef struct s_parse_cmd
+{
+    t_cmd cmd;
+    char *clean_input;
+    char *buffer;
+    int i;
+    int j;
+    int k;
+    bool in_quotes;
+    bool token_started;
+    char quote_char;
+}       t_parse_cmd;
+
+/*
+    ! Token functions
+*/
+t_cmd parse_cmd(char *input);
+char *trim_spaces(char *str);
+int count_args(char *input);
+
+/*
+    ! Utils functions
+*/
+void free_command(t_cmd *cmd);
 
 #endif

@@ -1,30 +1,43 @@
 CC = cc
-CFLAGE = -Wall -Wextra -Werror -g -I.
+CFLAGS = -Wall -Wextra -Werror -g -I./include
 RM = rm -f
 NAME = minishell
 LIBFT_DIR = ./Libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRC = src/main.c
+SRC = src/main.c \
+	  src/token/token.c \
+	  src/utils/free.c \
+	  src/token/utils_token.c \
 
-OBJS = $(SRC:.c=.o)
+OBJ_DIR = obj
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
+
+RED = \033[0;31m
+RESET = \033[0m
 
 all: $(LIBFT) $(NAME)
 
 $(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR) -s
+	@$(MAKE) -C $(LIBFT_DIR)
+
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME): $(LIBFT) $(OBJS)
-	$(CC) $(CFLAGE) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
+	@echo "$(RED)################################################$(RESET)"
+	@echo "$(RED)#        💀💀💀 minishell ready 💀💀💀         #$(RESET)"
+	@echo "$(RED)################################################$(RESET)"
 
 clean: 
-	$(RM) $(OBJS)
-	$(MAKE) -C $(LIBFT_DIR) clean -s
-
+	@$(RM) -r $(OBJ_DIR)
+	@$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	$(RM) $(NAME)
-	$(MAKE) -C $(LIBFT_DIR) fclean -s
+	@$(RM) $(NAME)
+	@$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
 

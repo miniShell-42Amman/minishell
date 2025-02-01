@@ -6,182 +6,13 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:10:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/01 17:46:08 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/02 00:25:35 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-char ft_strtok(char *str, char *delim)
-{
-    static char *s;
-    char *p;
-    char c;
 
-    if (str != NULL)
-        s = str;
-    if (s == NULL || *s == '\0')
-        return '\0';
-    while (*s != '\0' && (p = ft_strchr(delim, *s)) != NULL)
-        s++;
-    if (*s == '\0')
-        return '\0';
-    c = *s;
-    if ((p = ft_strchr(delim, *s)) != NULL)
-        s = p;
-    else
-        s += ft_strlen(s);
-    return c;
-}
-
-char *trim_spaces(char *str)
-{
-    while (*str == ' ')
-        str++;
-
-    char *end = str + ft_strlen(str) - 1;
-    while (end > str && *end == ' ')
-        *end-- = '\0';
-
-    return str;
-}
-
-int count_args(char *input)
-{
-    int count = 0;
-    bool in_quotes = false;
-    char quote_char = '\0';
-
-    int i = 0;
-    while (input[i])
-    {
-        if ((input[i] == '"' || input[i] == '\'') && (i == 0 || input[i - 1] != '\\'))
-        {
-            if (!in_quotes)
-            {
-                in_quotes = true;
-                quote_char = input[i];
-            }
-            else if (input[i] == quote_char)
-                in_quotes = false;
-        }
-        if (!in_quotes && (input[i] == ' ' || input[i + 1] == '\0'))
-            count++;
-        i++;
-    }
-    return count;
-}
-
-t_cmd parse_cmd(char *input)
-{
-    t_cmd cmd;
-    ft_bzero(&cmd, sizeof(t_cmd));
-    char *clean_input = ft_strdup(trim_spaces(input));
-    int i = 0, j = 0;
-    bool in_quotes = false;
-    bool token_started = false;
-    char quote_char = '\0';
-
-    char *buffer = ft_calloc((ft_strlen(clean_input) + 1) , sizeof(char));
-    if (!buffer)
-        exit(1);
-
-    cmd.arg_count = count_args(clean_input);
-    cmd.args = ft_calloc((cmd.arg_count + 1) , sizeof(char *));
-    if (!cmd.args)
-        exit(1);
-
-    int k = 0;
-    while (clean_input[k])
-    {
-        if (clean_input[k] == '\\' && (k == 0 || clean_input[k - 1] != '\\'))
-        {
-            k++;
-            continue;
-        }
-        if ((clean_input[k] == '"' || clean_input[k] == '\'') && (k == 0 || clean_input[k - 1] != '\\'))
-        {
-            if (!in_quotes)
-            {
-                in_quotes = true;
-                quote_char = clean_input[k];
-                token_started = true;
-                k++;
-                continue;
-            }
-            else if (clean_input[k] == quote_char)
-            {
-                in_quotes = false;
-                k++;
-                continue;
-            }
-        }
-
-        if (!in_quotes && clean_input[k] == ' ')
-        {
-            // if (j > 0)
-            if (token_started)
-            {
-                buffer[j] = '\0';
-                cmd.args[i++] = ft_strdup(buffer);
-                j = 0;
-                token_started = false;
-            }
-            k++;
-            continue;
-        }
-        else
-        {
-            buffer[j++] = clean_input[k];
-            token_started = true;
-        }
-        k++;
-    }
-
-    if (token_started)
-    {
-        buffer[j] = '\0';
-        cmd.args[i++] = ft_strdup(buffer);
-    }
-
-    if (in_quotes)
-    {
-        ft_printf(RED "Error: " RESET "Unclosed quotes\n");
-        if (clean_input)
-            free(clean_input);
-        for (int i = 0; i < cmd.arg_count; i++)
-            free(cmd.args[i]);
-        if (cmd.args)
-            free(cmd.args);
-        if (buffer)
-            free(buffer);
-        cmd.args = NULL;
-        cmd.cmd = NULL;
-        cmd.arg_count = 0;
-        
-        return cmd;
-    }
-    
-    cmd.args[i] = NULL;
-    cmd.cmd = cmd.args[0] ? ft_strdup(cmd.args[0]) : NULL;
-    if (clean_input)
-        free(clean_input);
-    if (buffer)
-        free(buffer);
-    return cmd;
-}
-
-void free_command(t_cmd *cmd)
-{
-    if (cmd->cmd)
-        free(cmd->cmd);  
-    if (cmd->args)
-    {
-        for (int i = 0; i < cmd->arg_count; i++)
-            free(cmd->args[i]);
-        free(cmd->args);
-    }
-}
 
 int main(int ac, char **av, char **env)
 {
@@ -191,7 +22,6 @@ int main(int ac, char **av, char **env)
     char *input;
     t_cmd cmd;
 
-    // ft_bzero(&cmd, sizeof(t_cmd));
     while (1)
     {
         char *cwd = getcwd(NULL, 0);
@@ -206,6 +36,8 @@ int main(int ac, char **av, char **env)
         if (ft_strcmp(input, "exit") == 0)
         {
             free(input);
+            free_command(&cmd);
+            free(cwd);
             break;
         }
         if (*input)

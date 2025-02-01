@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:10:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/01 00:31:50 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/01 17:46:08 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,15 @@ t_cmd parse_cmd(char *input)
     char *clean_input = ft_strdup(trim_spaces(input));
     int i = 0, j = 0;
     bool in_quotes = false;
+    bool token_started = false;
     char quote_char = '\0';
-    char *buffer = malloc((ft_strlen(clean_input) + 1) * sizeof(char));
+
+    char *buffer = ft_calloc((ft_strlen(clean_input) + 1) , sizeof(char));
     if (!buffer)
         exit(1);
 
     cmd.arg_count = count_args(clean_input);
-    cmd.args = malloc((cmd.arg_count + 1) * sizeof(char *));
+    cmd.args = ft_calloc((cmd.arg_count + 1) , sizeof(char *));
     if (!cmd.args)
         exit(1);
 
@@ -103,6 +105,7 @@ t_cmd parse_cmd(char *input)
             {
                 in_quotes = true;
                 quote_char = clean_input[k];
+                token_started = true;
                 k++;
                 continue;
             }
@@ -116,18 +119,29 @@ t_cmd parse_cmd(char *input)
 
         if (!in_quotes && clean_input[k] == ' ')
         {
-            if (j > 0)
+            // if (j > 0)
+            if (token_started)
             {
                 buffer[j] = '\0';
                 cmd.args[i++] = ft_strdup(buffer);
                 j = 0;
+                token_started = false;
             }
+            k++;
+            continue;
         }
         else
         {
             buffer[j++] = clean_input[k];
+            token_started = true;
         }
         k++;
+    }
+
+    if (token_started)
+    {
+        buffer[j] = '\0';
+        cmd.args[i++] = ft_strdup(buffer);
     }
 
     if (in_quotes)
@@ -147,13 +161,7 @@ t_cmd parse_cmd(char *input)
         
         return cmd;
     }
-
-    if (j > 0)
-    {
-        buffer[j] = '\0';
-        cmd.args[i++] = ft_strdup(buffer);
-    }
-
+    
     cmd.args[i] = NULL;
     cmd.cmd = cmd.args[0] ? ft_strdup(cmd.args[0]) : NULL;
     if (clean_input)
@@ -211,7 +219,7 @@ int main(int ac, char **av, char **env)
                 int i = 0;
                 while (i < cmd.arg_count)
                 {
-                    if (cmd.args[i])
+                    if (cmd.args[i]) 
                         ft_printf("args[%d]: %s\n", i, cmd.args[i]);
                     i++;
                 }

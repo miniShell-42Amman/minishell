@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g -I./include
+CFLAGS = -Wall -Wextra -Werror -g -Iinclude -I$(LIBFT_DIR)
 RM = rm -f
 NAME = minishell
 LIBFT_DIR = ./Libft
@@ -27,9 +27,9 @@ $(OBJ_DIR)/%.o: %.c
 
 $(NAME): $(LIBFT) $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
-	@echo "$(RED)################################################$(RESET)"
-	@echo "$(RED)#        💀💀💀 minishell ready 💀💀💀         #$(RESET)"
-	@echo "$(RED)################################################$(RESET)"
+	@echo "$(RED)#################################################$(RESET)"
+	@echo "$(RED)#        💀💀💀 minishell ready 💀💀💀          #$(RESET)"
+	@echo "$(RED)#################################################$(RESET)"
 
 clean: 
 	@$(RM) -r $(OBJ_DIR)

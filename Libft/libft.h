@@ -75,5 +75,6 @@ t_list				*ft_lstmap(t_list *lst, void *(*f)(void *),
 char				**ft_free_split(char **strs);
 long				ft_atol(const char *str);
 long				ft_atol_handle(const char *str, int *valid);
+void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 
 #endif // LIBFT_H

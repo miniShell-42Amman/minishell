@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 char *trim_spaces(char *str)
 {
-    while (*str == ' ')
-        str++;
+    // while (*str == ' ')
+    //     str++;
 
-    char *end = str + ft_strlen(str) - 1;
-    while (end > str && *end == ' ')
-        *end-- = '\0';
+    // char *end = str + ft_strlen(str) - 1;
+    // while (end > str && *end == ' ')
+    //     *end-- = '\0';
 
-    return str;
+    return ft_strtrim(str, " \t\n");
 }
 
 int count_args(char *input)

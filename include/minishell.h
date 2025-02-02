@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/02 00:20:39 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/02 22:32:17 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <stdbool.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include "../Libft/libft.h"
+#include "libft.h"
 
 // typedef struct s_data
 // {
@@ -50,6 +50,7 @@ typedef struct s_cmd
 /*
     ! Token structures
 */
+
 typedef struct s_parse_cmd
 {
     t_cmd cmd;
@@ -63,6 +64,23 @@ typedef struct s_parse_cmd
     char quote_char;
 }       t_parse_cmd;
 
+typedef enum e_token_type {
+    TOKEN_COMMAND,
+    TOKEN_ARGUMENT,
+    TOKEN_REDIRECTION_IN,       //*     "<"
+    TOKEN_REDIRECTION_OUT,      //*     ">"
+    TOKEN_REDIRECTION_APPEND,   //*     ">>"
+    TOKEN_REDIRECTION_HEREDOC,  //*     "<<"
+    TOKEN_PIPE
+} t_token_type;
+
+typedef struct s_token
+{
+    char *value;
+    t_token_type type;
+}       t_token;
+
+
 /*
     ! Token functions
 */
@@ -74,5 +92,8 @@ int count_args(char *input);
     ! Utils functions
 */
 void free_command(t_cmd *cmd);
+
+
+char *expand_env_variables_in_token(char *token);
 
 #endif

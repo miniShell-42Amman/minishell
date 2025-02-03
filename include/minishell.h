@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/02 22:32:17 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/03 13:27:30 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,18 @@
 //     char *line;
 //     char **cmd;
 // }               t_data;
+
+/*
+    ! env structures
+*/
+typedef struct s_env
+{
+    char *key;
+    char *value;
+    bool in_init;
+    struct s_env *next;
+}               t_env;
+
 
 typedef struct s_cmd
 {

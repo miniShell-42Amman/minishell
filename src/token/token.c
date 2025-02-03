@@ -94,6 +94,7 @@ char *expand_env_variables_in_token(char *token) {
     result[j] = '\0';
     return result;
 }
+
 // char *expand_env_variables_in_token(char *token)
 // {
 //     if (!token)

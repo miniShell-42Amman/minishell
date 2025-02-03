@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:10:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/02 22:55:53 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/03 19:06:27 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,16 +60,86 @@ t_token *store_token(char **tokens_list, int token_count)
     }
     return new_token;
 }
+void add_node(t_env **head, t_env *new_node)
+{
+    t_env *current;
 
-int main(void)
+    if (*head == NULL)
+    {
+        *head = new_node;
+        return;
+    }
+    current = *head;
+    while (current->next != NULL)
+        current = current->next;
+    current->next = new_node;
+}
+
+void get_env(char **env)
+{
+    int i = 0;
+    t_env *env_list;
+    t_env *new_node;
+
+    while (env[i])
+    {
+        new_node = malloc(sizeof(t_env));
+        if (!new_node)
+            return;
+        int len_for_key = 0;
+        while (env[i][len_for_key]/* && env[i][len_for_key] != '='*/)
+        {
+            if (env[i][len_for_key] == '=')
+            {
+                new_node->in_init = true;
+                break;
+            }
+            len_for_key++;
+        }
+        
+        new_node->key = ft_substr(env[i], 0, len_for_key);
+        if (new_node->in_init == true)
+            new_node->value = ft_strdup(env[i] + len_for_key + 1);
+        else
+            new_node->value = NULL;
+        new_node->next = NULL;
+
+        if (new_node->key == NULL || new_node->value == NULL)
+        {
+            // Handle memory allocation failure
+            
+            free(new_node->key);
+            free(new_node->value);
+            free(new_node);
+            return;
+        }
+        add_node(&env_list, new_node);
+        i++;
+    }
+    // while (env_list)
+    // {
+    //     ft_printf("Key: %s\n", env_list->key);
+    //     ft_printf("Value: %s\n", env_list->value);
+    //     ft_printf("bool in_init: %d\n", env_list->in_init);
+    //     env_list = env_list->next;
+    // }
+}
+
+int main(int ac, char **av, char **env)
 {
     char *input;
     // char *env = getenv("PATH");
     // ft_printf("PATH: %s\n", env);
     t_cmd cmd;
     t_token *tokens_list;
+
+    (void)ac;
+    (void)av;
+    // (void)env;
+    get_env(env);    
     while (1)
     {
+        
         // ft_printf("0 Command: \n");
         // ft_printf("1 Argument: \n");
         // ft_printf("2 REDIRECTION_IN \n");

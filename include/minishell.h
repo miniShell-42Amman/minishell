@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/03 13:27:30 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/05 17:31:33 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,20 +28,9 @@
 #include <readline/history.h>
 #include "libft.h"
 
-// typedef struct s_data
-// {
-//     char **env;
-//     char **path;
-//     char *home;
-//     char *oldpwd;
-//     char *pwd;
-//     int status;
-//     char *line;
-//     char **cmd;
-// }               t_data;
-
 /*
-    ! env structures
+    ? env structures
+    *   linked list to store the environment variables
 */
 typedef struct s_env
 {
@@ -57,11 +46,28 @@ typedef struct s_cmd
     char *cmd;
     char **args;
     int arg_count;
+    
 }               t_cmd;
 
 /*
-    ! Token structures
+    ? Token structures
 */
+typedef enum e_token_type {
+    TOKEN_COMMAND,
+    TOKEN_ARGUMENT,             
+    TOKEN_REDIRECTION_IN,       //*     "<"
+    TOKEN_REDIRECTION_OUT,      //*     ">"
+    TOKEN_REDIRECTION_APPEND,   //*     ">>"
+    TOKEN_REDIRECTION_HEREDOC,  //*     "<<"
+    TOKEN_PIPE
+} t_token_type;
+
+
+typedef struct s_token
+{
+    char *value;
+    t_token_type type;
+}       t_token;
 
 typedef struct s_parse_cmd
 {
@@ -74,31 +80,24 @@ typedef struct s_parse_cmd
     bool in_quotes;
     bool token_started;
     char quote_char;
+    char    token_quote_type;
 }       t_parse_cmd;
 
-typedef enum e_token_type {
-    TOKEN_COMMAND,
-    TOKEN_ARGUMENT,
-    TOKEN_REDIRECTION_IN,       //*     "<"
-    TOKEN_REDIRECTION_OUT,      //*     ">"
-    TOKEN_REDIRECTION_APPEND,   //*     ">>"
-    TOKEN_REDIRECTION_HEREDOC,  //*     "<<"
-    TOKEN_PIPE
-} t_token_type;
 
-typedef struct s_token
-{
-    char *value;
-    t_token_type type;
-}       t_token;
 
 
 /*
     ! Token functions
 */
-t_cmd parse_cmd(char *input);
-char *trim_spaces(char *str);
+t_cmd parse_cmd(char *input, t_env *env_list);
 int count_args(char *input);
+char *expand_env_variables_in_token(char *token, t_env *env_list);
+int *ft_count_args(char *input);
+int is_valid(int *array, int token_index);
+t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
+t_token *store_token(char **tokens_list, int token_count, int *array);
+
+
 
 /*
     ! Utils functions
@@ -106,6 +105,10 @@ int count_args(char *input);
 void free_command(t_cmd *cmd);
 
 
-char *expand_env_variables_in_token(char *token);
+/*
+    ! Env functions
+*/
+t_env *save_env(char **env);
+void add_node(t_env **head, t_env *new_node);
 
 #endif

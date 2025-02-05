@@ -58,7 +58,8 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "minishell.h": "c",
-    "type_traits": "c"
+    "type_traits": "c",
+    "stdio.h": "c"
   },
   "cSpell.words": [
     "MINISHELL"

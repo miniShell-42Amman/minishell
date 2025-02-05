@@ -7,8 +7,10 @@ LIBFT = $(LIBFT_DIR)/libft.a
 
 SRC = src/main.c \
 	  src/token/token.c \
+	  src/token/store_token.c \
 	  src/utils/free.c \
 	  src/token/utils_token.c \
+	  src/env/get_env.c \
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

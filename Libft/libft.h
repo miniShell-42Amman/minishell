@@ -13,8 +13,8 @@
 #ifndef LIBFT_H
 # define LIBFT_H
 
-# include "ft_printf.h"
 # include "ft_dprintf.h"
+# include "ft_printf.h"
 # include "get_next_line.h"
 # include "get_next_line_bonus.h"
 # include <limits.h>
@@ -76,5 +76,6 @@ char				**ft_free_split(char **strs);
 long				ft_atol(const char *str);
 long				ft_atol_handle(const char *str, int *valid);
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+int					ft_isspace(int c);
 
 #endif // LIBFT_H

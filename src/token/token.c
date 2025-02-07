@@ -12,17 +12,7 @@
 
 #include "minishell.h"
 
-char *find_env_value(t_env *env_list, const char *var_name)
-{
-    t_env *current = env_list;
-    while (current)
-    {
-        if (ft_strcmp(current->key, var_name) == 0)
-            return current->value;
-        current = current->next;
-    }
-    return "";
-}
+
 
 static void init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
 {
@@ -40,75 +30,7 @@ static void init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
         exit(1);
 }
 
-char *expand_env_variables_in_token(char *token, t_env *env_list)
-{
-    if (token == NULL) return NULL;
 
-    size_t initial_size = ft_strlen(token) * 2 + 1;
-    char *result = ft_calloc(initial_size, sizeof(char));
-    if (!result) return NULL;
-
-    size_t i = 0, j = 0;
-    bool in_single_quotes = false;
-    bool in_double_quotes = false;
-    
-    while (token[i]) {
-        if (token[i] == '\'') {
-            in_single_quotes = !in_single_quotes;
-            result[j++] = token[i++];
-            continue;
-        }
-        if (token[i] == '\"') {
-            in_double_quotes = !in_double_quotes;
-            result[j++] = token[i++];
-
-            continue;
-        }
-
-        if (token[i] == '$' && !in_single_quotes) {
-            i++;
-            if (token[i] == '\0' || ft_isspace(token[i])) {
-                result[j++] = '$';
-                continue;
-            }
-            char var_name[256];
-            int k = 0;
-            while (token[i] && (ft_isalnum(token[i]) || token[i] == '_')) {
-                var_name[k++] = token[i++];
-            }
-            var_name[k] = '\0';
-            char *value = find_env_value(env_list, var_name);
-            
-            if (value) {
-                size_t value_len = ft_strlen(value);
-                if (j + value_len >= initial_size) {
-                    initial_size = j + value_len + 1;
-                    char *new_result = ft_realloc(result, j, initial_size);
-                    if (!new_result) {
-                        free(result);
-                        return NULL;
-                    }
-                    result = new_result;
-                }
-                ft_strlcpy(result + j, value, value_len + 1);
-                j += value_len;
-            }
-        } else {
-            if (j + 1 >= initial_size) {
-                initial_size *= 2;
-                char *new_result = ft_realloc(result, j, initial_size);
-                if (!new_result) {
-                    free(result);
-                    return NULL;
-                }
-                result = new_result;
-            }
-            result[j++] = token[i++];
-        }
-    }
-    result[j] = '\0';
-    return result;
-}
 
 t_cmd parse_cmd(char *input, t_env *env_list)
 {

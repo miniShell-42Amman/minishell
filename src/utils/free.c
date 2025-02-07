@@ -29,3 +29,31 @@ void free_command(t_cmd *cmd)
         free(cmd->args);
     }
 }
+
+void  free_env(t_env *env_list)
+{
+    t_env *current = env_list;
+    t_env *next;
+
+    while (current)
+    {
+        next = current->next;
+        free(current->key);
+        free(current->value);
+        free(current);
+        current = next;
+    }
+}
+void free_env_list(t_env *env_list)
+{
+    t_env *temp;
+
+    while (env_list)
+    {
+        temp = env_list;
+        env_list = env_list->next;
+        free(temp->key);
+        free(temp->value);
+        free(temp);
+    }
+}

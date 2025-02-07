@@ -11,6 +11,7 @@ SRC = src/main.c \
 	  src/utils/free.c \
 	  src/token/utils_token.c \
 	  src/env/get_env.c \
+	  src/env/expand_env_var_in_token.c \
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/05 17:31:33 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/07 21:55:24 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "libft.h"
+#include <sys/wait.h>
+#include <sys/types.h>
 
 /*
     ? env structures
@@ -83,7 +85,13 @@ typedef struct s_parse_cmd
     char    token_quote_type;
 }       t_parse_cmd;
 
-
+typedef struct s_main
+{
+    char *input;
+    t_cmd cmd;
+    t_token *tokens_list;
+    t_env *env_list;
+}      t_main;
 
 
 /*
@@ -92,7 +100,7 @@ typedef struct s_parse_cmd
 t_cmd parse_cmd(char *input, t_env *env_list);
 int count_args(char *input);
 char *expand_env_variables_in_token(char *token, t_env *env_list);
-int *ft_count_args(char *input);
+int *ft_count_token(char *input);
 int is_valid(int *array, int token_index);
 t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
 t_token *store_token(char **tokens_list, int token_count, int *array);
@@ -103,6 +111,8 @@ t_token *store_token(char **tokens_list, int token_count, int *array);
     ! Utils functions
 */
 void free_command(t_cmd *cmd);
+void  free_env(t_env *env_list);
+void free_env_list(t_env *env_list);
 
 
 /*
@@ -110,5 +120,6 @@ void free_command(t_cmd *cmd);
 */
 t_env *save_env(char **env);
 void add_node(t_env **head, t_env *new_node);
+char *find_env_value(t_env *env_list, const char *var_name);
 
 #endif

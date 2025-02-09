@@ -20,6 +20,7 @@
 # include <limits.h>
 # include <stddef.h>
 # include <stdlib.h>
+# include <stdbool.h>
 # include <unistd.h>
 
 typedef struct s_list
@@ -77,5 +78,6 @@ long				ft_atol(const char *str);
 long				ft_atol_handle(const char *str, int *valid);
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 int					ft_isspace(int c);
+int					ft_strlen_sep(char *str, int c, bool *has_value);
 
 #endif // LIBFT_H

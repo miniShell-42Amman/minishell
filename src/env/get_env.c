@@ -3,68 +3,99 @@
 /*                                                        :::      ::::::::   */
 /*   get_env.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/05 17:24:44 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/07 19:26:11 by oissa            ###   ########.fr       */
+/*   Created: 2025/02/09 22:30:22 by oissa             #+#    #+#             */
+/*   Updated: 2025/02/09 23:29:02 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void add_node(t_env **head, t_env *new_node)
+int	create_node(t_env **node)
 {
-    t_env *current;
-
-    if (*head == NULL)
-    {
-        *head = new_node;
-        return;
-    }
-    current = *head;
-    while (current->next != NULL)
-        current = current->next;
-    current->next = new_node;
+	*node = (t_env *)malloc(sizeof(t_env));
+	if (!(*node))
+		return (EXIT_FAILURE);
+	(*node)->key = NULL;
+	(*node)->value = NULL;
+	(*node)->next = NULL;
+	(*node)->has_value = true;
+	return (EXIT_SUCCESS);
 }
 
-t_env *save_env(char **env)
+int	add_node_to_env(t_env **head, t_env *new_node)
 {
-    int i = 0;
-    t_env *env_list = NULL;
-    t_env *new_node;
+	t_env	*current;
 
-    while (env[i])
-    {
-        new_node = malloc(sizeof(t_env));
-        if (!new_node)
-            return NULL;
-        int len_for_key = 0;
-        new_node->in_init = false;
-        while (env[i][len_for_key]/* && env[i][len_for_key] != '='*/)
-        {
-            if (env[i][len_for_key] == '=')
-            {
-                new_node->in_init = true;
-                break;
-            }
-            len_for_key++;
-        }
-        new_node->key = ft_substr(env[i], 0, len_for_key);
-        if (new_node->in_init == true)
-            new_node->value = ft_strdup(env[i] + len_for_key + 1);
-        else
-            new_node->value = NULL;
-        new_node->next = NULL;
+	if (create_node(&new_node) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (!*head)
+		*head = new_node;
+	current = *head;
+	while (current->next)
+		current = current->next;
+	current->next = new_node;
+	return (EXIT_SUCCESS);
+}
 
-        if (new_node->key == NULL || new_node->value == NULL)
-        {            
-            free(new_node->key);
-            free(new_node->value);
-            free(new_node);
-            return NULL;
-        }
-        add_node(&env_list, new_node);
-        i++;
-    }
-    return env_list;
+int	init_values(t_env *new_node, char **object)
+{
+	new_node->key = ft_strdup(object[0]);
+	new_node->value = ft_strdup(object[1]);
+	if (!new_node->key || !new_node->value)
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
+t_env	*clone_env(char **env)
+{
+	int		i;
+	char	*object[2];
+	t_env	*new_node;
+	t_env	*head;
+	t_env	*current;
+
+	i = -1;
+	head = NULL;
+	while (env[++i])
+	{
+		if (create_node(&new_node) == EXIT_FAILURE || splitter_object(object,
+				env[i], &new_node->has_value) == EXIT_FAILURE
+			|| init_values(new_node, object) == EXIT_FAILURE)
+		{
+			free_object(object);
+			return (NULL);
+		}
+		if (!head)
+			head = new_node;
+		else
+			current->next = new_node;
+		current = new_node;
+		free_object(object);
+	}
+	return (head);
+}
+
+int	splitter_object(char **object, char *str, bool *has_value)
+{
+	int		len_key;
+	bool	has_value_from_str;
+
+	has_value_from_str = false;
+	len_key = ft_strlen_sep(str, '=', &has_value_from_str);
+	object[0] = ft_substr(str, 0, len_key);
+	if (!object[0])
+		return (EXIT_FAILURE);
+	*has_value = has_value_from_str;
+	if (has_value_from_str)
+		object[1] = ft_substr(str, len_key + 1, ft_strlen(str) - len_key);
+	else
+		object[1] = ft_strdup("");
+	if (!object[1])
+	{
+		free(object[0]);
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
 }

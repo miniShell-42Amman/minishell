@@ -5,13 +5,17 @@ NAME = minishell
 LIBFT_DIR = ./Libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRC = src/main.c \
-	  src/token/token.c \
-	  src/token/store_token.c \
-	  src/utils/free.c \
-	  src/token/utils_token.c \
-	  src/env/get_env.c \
-	  src/env/expand_env_var_in_token.c \
+# SRC = src/main.c \
+# 	  src/token/token.c \
+# 	  src/token/store_token.c \
+# 	  src/utils/free.c \
+# 	  src/token/utils_token.c \
+# 	  src/env/get_env.c \
+# 	  src/env/expand_env_var_in_token.c \
+
+SRC = 	src/main.c \
+	   	src/env/get_env.c \
+		src/free_resources/free_env.c \
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
@@ -28,6 +32,7 @@ $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+# -lreadline 
 $(NAME): $(LIBFT) $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
 	@echo "$(RED)#################################################$(RESET)"

@@ -1,25 +1,44 @@
 {
   "version": "0.2.0",
   "configurations": [
-      {
-          "name": "(gdb) تشغيل وتصحيح",
-          "type": "cppdbg",
-          "request": "launch",
-          "program": "${workspaceFolder}/minishell", // اسم الملف القابل للتنفيذ
-          "args": [],
-          "stopAtEntry": false,
-          "cwd": "${workspaceFolder}",
-          "environment": [],
-          "externalConsole": false,
-          "MIMode": "gdb",
-          "setupCommands": [
-              {
-                  "description": "تهيئة gdb",
-                  "text": "-enable-pretty-printing",
-                  "ignoreFailures": true
-              }
-          ],
-          "preLaunchTask": "تجميع" // اسم المهمة في tasks.json
-      }
+    {
+      "name": "(gdb) تشغيل وتصحيح",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/minishell",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "تهيئة gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "تجميع"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/loay1/Desktop/42Amman/miniShell/minishell",
+      "program": "c:/Users/loay1/Desktop/42Amman/miniShell/minishell/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
   ]
 }

@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "libft.h"
 #include <readline/readline.h>
 #include <readline/history.h>
-#include "libft.h"
 #include <sys/wait.h>
 #include <sys/types.h>
 
@@ -38,7 +38,7 @@ typedef struct s_env
 {
     char *key;
     char *value;
-    bool in_init;
+    bool has_value;
     struct s_env *next;
 }               t_env;
 
@@ -93,33 +93,49 @@ typedef struct s_main
     t_env *env_list;
 }      t_main;
 
-
 /*
-    ! Token functions
+    * Functions
 */
-t_cmd parse_cmd(char *input, t_env *env_list);
-int count_args(char *input);
-char *expand_env_variables_in_token(char *token, t_env *env_list);
-int *ft_count_token(char *input);
-int is_valid(int *array, int token_index);
-t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
-t_token *store_token(char **tokens_list, int token_count, int *array);
+int create_node(t_env **node);
+int init_values(t_env *new_node, char **object);
+t_env *clone_env(char **env);
+int splitter_object(char **object, char *str, bool *has_value);
+void  free_env_list(t_env *env_list);
+int	add_node_to_env(t_env **head, t_env *new_node);
+void free_object(char **object);
 
 
 
-/*
-    ! Utils functions
-*/
-void free_command(t_cmd *cmd);
-void  free_env(t_env *env_list);
-void free_env_list(t_env *env_list);
 
 
-/*
-    ! Env functions
-*/
-t_env *save_env(char **env);
-void add_node(t_env **head, t_env *new_node);
-char *find_env_value(t_env *env_list, const char *var_name);
+
+
+// /*
+//     ! Token functions
+// */
+// t_cmd parse_cmd(char *input, t_env *env_list);
+// int count_args(char *input);
+// char *expand_env_variables_in_token(char *token, t_env *env_list);
+// int *ft_count_token(char *input);
+// int is_valid(int *array, int token_index);
+// t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
+// t_token *store_token(char **tokens_list, int token_count, int *array);
+
+
+
+// /*
+//     ! Utils functions
+// */
+// void free_command(t_cmd *cmd);
+// void  free_env(t_env *env_list);
+// void free_env_list(t_env *env_list);
+
+
+// /*
+//     ! Env functions
+// */
+// t_env *save_env(char **env);
+// void add_node(t_env **head, t_env *new_node);
+// char *find_env_value(t_env *env_list, const char *var_name);
 
 #endif

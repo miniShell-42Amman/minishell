@@ -59,7 +59,8 @@
   "files.associations": {
     "minishell.h": "c",
     "type_traits": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "libft.h": "c"
   },
   "cSpell.words": [
     "MINISHELL"

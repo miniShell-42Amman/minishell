@@ -24,6 +24,7 @@ SRC =	ft_atoi.c ft_bzero.c						\
 		ft_substr.c ft_tolower.c					\
 		ft_toupper.c ft_putnbr_fd.c					\
 		ft_striteri.c ft_atol.c						\
+		ft_strlen_sep.c								\
 		ft_realloc.c 							    \
 		ft_lstadd_back_bonus.c						\
 		ft_lstadd_front_bonus.c						\

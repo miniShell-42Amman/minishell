@@ -102,6 +102,9 @@ int count_args(char *input)
 // }
 
 
+
+// ls -la "|"  cat
+
 int *ft_count_token(char *input)
 { if (!input || input[0] == '\0')
         return NULL;
@@ -129,7 +132,7 @@ int *ft_count_token(char *input)
     int count_word = 0;
     int in_single_quotes = 0;
     int in_double_quotes = 0;
-
+    
     while (input[i] == ' ' || input[i] == '\t')
         i++;
     while (input[i])

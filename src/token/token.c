@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-
-
 static void init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
 {
     ft_bzero(parse_cmd, sizeof(t_parse_cmd));
@@ -25,12 +23,11 @@ static void init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
     if (!parse_cmd->buffer)
         exit(1);
     parse_cmd->cmd.arg_count = count_args(parse_cmd->clean_input);
-    parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 2) , sizeof(char *));
+    ft_printf("arg_count: %d\n", parse_cmd->cmd.arg_count);
+    parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 2), sizeof(char *));
     if (!parse_cmd->cmd.args)
         exit(1);
 }
-
-
 
 t_cmd parse_cmd(char *input, t_env *env_list)
 {
@@ -38,7 +35,7 @@ t_cmd parse_cmd(char *input, t_env *env_list)
     init_parse_cmd(&parse_cmd, input);
     parse_cmd.token_quote_type = '\0';
     bool token_was_single_quoted = false;
-    bool token_was_dollar_quote = false;  
+    bool token_was_dollar_quote = false;
 
     while (parse_cmd.clean_input[parse_cmd.k])
     {
@@ -68,12 +65,11 @@ t_cmd parse_cmd(char *input, t_env *env_list)
             parse_cmd.k++;
             continue;
         }
-        if (!parse_cmd.in_quotes && c == ' ')
+        if (!parse_cmd.in_quotes && (c == ' ' || c == '|'))
         {
             if (parse_cmd.token_started)
             {
                 parse_cmd.buffer[parse_cmd.j] = '\0';
-                // if (parse_cmd.token_quote_type == '\'')
                 if (token_was_single_quoted || token_was_dollar_quote)
                     parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup(parse_cmd.buffer);
                 else
@@ -83,7 +79,11 @@ t_cmd parse_cmd(char *input, t_env *env_list)
                 parse_cmd.token_started = false;
                 parse_cmd.token_quote_type = '\0';
                 token_was_single_quoted = false;
-                token_was_dollar_quote = false;  
+                token_was_dollar_quote = false;
+            }
+            if (c == '|')
+            {
+                parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup("|");
             }
             parse_cmd.k++;
             continue;
@@ -99,7 +99,6 @@ t_cmd parse_cmd(char *input, t_env *env_list)
     if (parse_cmd.token_started)
     {
         parse_cmd.buffer[parse_cmd.j] = '\0';
-        // if (parse_cmd.token_quote_type == '\'')
         if (token_was_single_quoted || token_was_dollar_quote)
             parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup(parse_cmd.buffer);
         else
@@ -117,12 +116,12 @@ t_cmd parse_cmd(char *input, t_env *env_list)
             free(parse_cmd.cmd.args);
         if (parse_cmd.buffer)
             free(parse_cmd.buffer);
-        parse_cmd.cmd.args = NULL; 
+        parse_cmd.cmd.args = NULL;
         parse_cmd.cmd.cmd = NULL;
         parse_cmd.cmd.arg_count = 0;
         return parse_cmd.cmd;
     }
-    
+
     parse_cmd.cmd.args[parse_cmd.i] = NULL;
     if (parse_cmd.cmd.args[0])
         parse_cmd.cmd.cmd = ft_strdup(parse_cmd.cmd.args[0]);
@@ -134,7 +133,6 @@ t_cmd parse_cmd(char *input, t_env *env_list)
         free(parse_cmd.buffer);
     return parse_cmd.cmd;
 }
-
 
 // t_cmd parse_cmd(char *input)
 // {
@@ -208,7 +206,7 @@ t_cmd parse_cmd(char *input, t_env *env_list)
 //             free(parse_cmd.buffer);
 //         parse_cmd.cmd.args = NULL;
 //         parse_cmd.cmd.cmd = NULL;
-//         parse_cmd.cmd.arg_count = 0;     
+//         parse_cmd.cmd.arg_count = 0;
 //         return parse_cmd.cmd;
 //     }
 //     parse_cmd.cmd.args[parse_cmd.i] = NULL;

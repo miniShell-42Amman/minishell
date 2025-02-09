@@ -6,12 +6,22 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:10:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/07 21:57:24 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/09 20:18:05 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int is_delim(char c, const char *delim)
+{
+    while (*delim)
+    {
+        if (c == *delim)
+            return 1;
+        delim++;
+    }
+    return 0;
+}
 char *ft_strtok(char *str, const char *delim)
 {
     static char *last = NULL;
@@ -22,30 +32,25 @@ char *ft_strtok(char *str, const char *delim)
     char *start = last;
     while (*last)
     {
-        const char *d = delim;
-        while (*d)
+        if (is_delim(*last, delim))
         {
-            if (*last == *d)
+            *last = '\0';
+            last++;
+            if (start == last)
             {
-                *last = '\0';
-                last++;
-                if (start == last)
-                {
-                    start++;
-                    continue;
-                }
-                return start;
+                start++;
+                continue;
             }
-            d++;
+            return start;
         }
         last++;
     }
     last = NULL;
-    free(last);
     if (start == last)
         return NULL;
     return start;
 }
+
 
 char *resolve_command_path(char *command, t_env *env_list)
 {
@@ -417,7 +422,8 @@ int main(int ac, char **av, char **env)
                 main.tokens_list = store_token(main.cmd.args, main.cmd.arg_count, array);
                 if (main.tokens_list)
                 {
-                    // for (int k = 0; k < main.cmd.arg_count; k++) {
+                    // for (int k = 0; k < main.cmd.arg_count; k++)
+                    
                     // //    if (main.tokens_list[k].value)
                     // //    {
                     // //      if (main.tokens_list[k].value != NULL)

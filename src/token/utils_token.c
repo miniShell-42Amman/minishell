@@ -25,12 +25,11 @@ int ft_is_operator(const char *str)
     return 0;
 }
  
-int count_args( char *input)
+int count_args(char *input)
 {
     int count = 0;
-    int in_single = 0, in_double = 0;
     int i = 0;
-    int len = strlen(input);
+    int len = ft_strlen(input);
 
     while (i < len)
     {
@@ -38,8 +37,15 @@ int count_args( char *input)
             i++;
         if (i >= len)
             break;
+        if (input[i] == '|')
+        {
+            count++;
+            i++;
+            continue;
+        }
         count++;
-        int word_start = i;
+        int in_single = 0;
+        int in_double = 0;
         while (i < len)
         {
             if (input[i] == '\'' && !in_double)
@@ -48,16 +54,52 @@ int count_args( char *input)
                 in_double = !in_double;
 
             if (!in_single && !in_double)
-                if (input[i] == ' ' || input[i] == '\t' || ft_is_operator(&input[i]))
+            {
+                if (input[i] == ' ' || input[i] == '\t' || input[i] == '|' || ft_is_operator(&input[i]))
                     break;
+            }
             i++;
         }
-        i++;
-        if (i - word_start == 0 && (in_single || in_double))
-            count--;
     }
     return count;
 }
+
+// int count_args( char *input)
+// {
+//     int count = 0;
+//     int in_single = 0, in_double = 0;
+//     int i = 0;
+//     int len = ft_strlen(input);
+
+//     while (i < len)
+//     {
+//         while (i < len && (input[i] == ' ' || input[i] == '\t'))
+//             i++;
+//         if (i >= len)
+//             break;
+//         count++;
+//         int word_start = i;
+//         while (i < len)
+//         {
+//             if (input[i] == '\'' && !in_double)
+//                 in_single = !in_single;
+//             else if (input[i] == '"' && !in_single)
+//                 in_double = !in_double;
+
+//             if (!in_single && !in_double)
+//                 if (input[i] == ' ' || input[i] == '\t' || ft_is_operator(&input[i]))
+//                     break;
+//             i++;
+//         }
+//         // if (i < len && input[i] == '|' && !in_single &&  !in_double)
+//         //     count++;
+//         i++;
+//         if (i - word_start == 0 && (in_single || in_double))
+//             count--;
+//         ft_printf("count: %d\n", count);
+//     }
+//     return count;
+// }
 
 
 int *ft_count_token(char *input)

@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 22:41:47 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/09 23:28:41 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/10 23:38:38 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ void	free_env_list(t_env *env_list)
 		temp = env_list->next;
 		free(env_list->key);
 		free(env_list->value);
-        free(env_list);
+		free(env_list);
 		env_list = temp;
 	}
 }
-void free_object(char **object)
+
+void	free_object(char **object)
 {
-    free(object[0]);
-    free(object[1]);
+	free(object[0]);
+	free(object[1]);
 }

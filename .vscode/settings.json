@@ -60,7 +60,18 @@
     "minishell.h": "c",
     "type_traits": "c",
     "stdio.h": "c",
-    "libft.h": "c"
+    "libft.h": "c",
+    "random": "c",
+    "queue": "c",
+    "span": "c",
+    "chrono": "c",
+    "memory": "c",
+    "utility": "c",
+    "array": "c",
+    "__tuple": "c",
+    "bitset": "c",
+    "format": "c",
+    "unordered_map": "c"
   },
   "cSpell.words": [
     "MINISHELL"

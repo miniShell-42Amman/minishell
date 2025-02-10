@@ -93,6 +93,16 @@ typedef struct s_main
     t_env *env_list;
 }      t_main;
 
+
+typedef struct s_counter {
+    int     i;
+    int     count_word;
+    int     len;
+    int     in_single;
+    int     in_double;
+    int     *array;
+    int     count;
+} t_counter;
 /*
     * Functions
 */
@@ -104,7 +114,8 @@ void  free_env_list(t_env *env_list);
 int	add_node_to_env(t_env **head, t_env *new_node);
 void free_object(char **object);
 
-
+int *ft_count_token(char *input);
+int count_args(char *input);
 
 
 

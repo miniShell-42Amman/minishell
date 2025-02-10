@@ -16,6 +16,8 @@ LIBFT = $(LIBFT_DIR)/libft.a
 SRC = 	src/main.c \
 	   	src/env/get_env.c \
 		src/free_resources/free_env.c \
+		src/token/ft_count_token.c \
+		src/token/ft_count_args.c \
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

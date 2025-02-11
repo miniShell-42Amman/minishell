@@ -26,6 +26,11 @@ void	start_tokenization(t_main *main)
         free(array);
         return;
     }
+    // while (main->cmd.args[i])
+    // {
+    //     printf("args[%d]: %s\n", i, main->cmd.args[i]);
+    //     i++;
+    // }
 	main->tokens_list = store_token(main->cmd.args, main->cmd.arg_count, array);
 	if (!main->tokens_list)
 	{

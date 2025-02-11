@@ -14,7 +14,7 @@
 
 // void free_command(t_cmd *cmd) {
 //     if (!cmd)
-//         return;
+//         return ;
 //     if (cmd->args) { // أو أي مؤشر آخر داخل cmd
 //         free(cmd->args);
 //         cmd->args = NULL;
@@ -23,31 +23,31 @@
 //     free(cmd);
 // }
 
-void free_command(t_cmd *cmd)
+void	free_command(t_cmd *cmd)
 {
-    int i;
+	int	i;
 
-    if (cmd->cmd)
-    {
-        free(cmd->cmd);
-        cmd->cmd = NULL;
-    }
-    if (cmd->args)
-    {
-        i = 0;
-        while (i < cmd->arg_count)
-        {
-            if (cmd->args[i])
-            {
-                free(cmd->args[i]);
-                cmd->args[i] = NULL;
-            }
-            i++;
-        }
-        free(cmd->args);
-        cmd->args = NULL;
-    }
-    free(cmd);
+	if (cmd->cmd)
+	{
+		free(cmd->cmd);
+		cmd->cmd = NULL;
+	}
+	if (cmd->args)
+	{
+		i = 0;
+		while (i < cmd->arg_count)
+		{
+			if (cmd->args[i])
+			{
+				free(cmd->args[i]);
+				cmd->args[i] = NULL;
+			}
+			i++;
+		}
+		free(cmd->args);
+		cmd->args = NULL;
+	}
+	free(cmd);
 }
 // void free_cmd(t_cmd *cmd)
 // {

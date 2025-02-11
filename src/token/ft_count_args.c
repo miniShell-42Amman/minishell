@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 23:19:03 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/10 23:30:32 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/12 00:38:56 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int	ft_is_operator(const char *str)
 	}
 	return (0);
 }
+
 static void	skip_whitespace(const char *input, int *i, int len)
 {
 	while (*i < len && (input[*i] == ' ' || input[*i] == '\t'))

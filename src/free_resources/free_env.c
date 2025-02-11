@@ -20,11 +20,11 @@ void	free_env_list(t_env *env_list)
 	{
 		head = env_list;
 		env_list = env_list->next;
-		if(head->key)
+		if (head->key)
 			free(head->key);
-		if(head->value)
+		if (head->value)
 			free(head->value);
-		free(head);	
+		free(head);
 	}
 	free(env_list);
 }

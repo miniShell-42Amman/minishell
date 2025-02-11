@@ -81,7 +81,7 @@ t_env	*clone_env(char **env)
 		else
 			current->next = new_node;
 		current = new_node;
-		free_object(object,NULL);
+		free_object(object, NULL);
 	}
 	return (head);
 }

@@ -81,7 +81,11 @@ typedef struct s_parse_cmd
     int k;
     bool in_quotes;
     bool token_started;
+    bool token_was_single_quoted;
+    bool token_was_dollar_quote;
+    char *trimmed_input;
     char quote_char;
+    char c;
     char    token_quote_type;
 }       t_parse_cmd;
 
@@ -116,9 +120,12 @@ void free_object(char **object);
 
 int *ft_count_token(char *input);
 int count_args(char *input);
-
-
-
+t_cmd parse_cmd(char *input, t_env *env_list);
+char *find_env_value(t_env *env_list, const char *var_name);
+char *expand_env_variables_in_token(char *token, t_env *env_list);
+void free_command(t_cmd *cmd);
+t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
+t_token *store_token(char **tokens_list, int token_count, int *array);
 
 
 // /*

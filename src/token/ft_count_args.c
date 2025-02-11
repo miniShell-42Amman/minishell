@@ -24,7 +24,6 @@ int	ft_is_operator(const char *str)
 	}
 	return (0);
 }
-
 static void	skip_whitespace(const char *input, int *i, int len)
 {
 	while (*i < len && (input[*i] == ' ' || input[*i] == '\t'))
@@ -55,7 +54,7 @@ int	count_args(char *input)
 
 	ft_bzero(&c, sizeof(t_counter));
 	c.len = ft_strlen(input);
-	while (c.i < c.count_word)
+	while (c.i < c.len)
 	{
 		skip_whitespace(input, &c.i, c.len);
 		if (c.i >= c.len)

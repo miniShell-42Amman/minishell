@@ -49,13 +49,19 @@ t_token_type determine_token_type(char *token, int token_index, t_token *tokens_
 
 static int store_token_value(t_token *new_token, char **tokens_list, int i)
 {
+    if(tokens_list[i] == NULL)
+    {
+        new_token[i].value = NULL;
+        return (EXIT_SUCCESS);
+    }
     new_token[i].value = ft_strdup(tokens_list[i]); 
-    if (new_token[i].value == NULL)
+    if (!new_token[i].value)
     {
         int j = 0;
         while (j < i)
         {
-            free(new_token[j].value);
+            if(new_token[j].value)  
+                free(new_token[j].value);
             j++;
         }
         free(new_token);
@@ -64,6 +70,23 @@ static int store_token_value(t_token *new_token, char **tokens_list, int i)
     return (EXIT_SUCCESS);
 }
 
+void	free_tokens(t_token *tokens, int token_count)
+{
+	int i = 0;
+	if (!tokens) return;
+
+	while (i < token_count)
+	{
+		if (tokens[i].value)
+		{
+			free(tokens[i].value);
+			tokens[i].value = NULL;
+		}
+		i++;
+	}
+	free(tokens);
+	tokens = NULL;
+}
 t_token *store_token(char **tokens_list, int token_count, int *array)
 {
     t_token *new_token;
@@ -82,8 +105,11 @@ t_token *store_token(char **tokens_list, int token_count, int *array)
             i++;
             continue;
         }
-        if (store_token_value(new_token, tokens_list, i) == EXIT_FAILURE)
+        if (store_token_value(new_token, tokens_list, i))
+        {
+            free_tokens(new_token, i);
             return (NULL);
+        }
         new_token[i].type = determine_token_type(tokens_list[i], i, new_token, array);
         i++;
     }

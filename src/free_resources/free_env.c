@@ -14,20 +14,27 @@
 
 void	free_env_list(t_env *env_list)
 {
-	t_env	*temp;
+	t_env	*head;
 
 	while (env_list)
 	{
-		temp = env_list->next;
-		free(env_list->key);
-		free(env_list->value);
-		free(env_list);
-		env_list = temp;
+		head = env_list;
+		env_list = env_list->next;
+		if(head->key)
+			free(head->key);
+		if(head->value)
+			free(head->value);
+		free(head);	
 	}
+	free(env_list);
 }
 
-void	free_object(char **object)
+void	free_object(char **object, t_env *head)
 {
-	free(object[0]);
-	free(object[1]);
+	if (object[0])
+		free(object[0]);
+	if (object[1])
+		free(object[1]);
+	if (head)
+		free_env_list(head);
 }

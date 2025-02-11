@@ -28,13 +28,14 @@ static int init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
         return (EXIT_FAILURE);
     }
     parse_cmd->cmd.arg_count = count_args(parse_cmd->clean_input);
-    parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 2), sizeof(char *));
+    parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 1), sizeof(char *));
     if (!parse_cmd->cmd.args)
     {
         free(parse_cmd->clean_input);
         free(parse_cmd->buffer);
         return (EXIT_FAILURE);
     }
+    parse_cmd->cmd.args[parse_cmd->cmd.arg_count] = NULL;
     return (EXIT_SUCCESS);
 }
 
@@ -142,13 +143,18 @@ static int ft_check_parse_cmd(t_parse_cmd *parse_cmd)
     return (EXIT_FAILURE);
 }
 
-t_cmd parse_cmd(char *input, t_env *env_list)
+
+t_cmd *parse_cmd(char *input, t_env *env_list)
 {
     t_parse_cmd parse_cmd;
-    if (init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE)
-        return (parse_cmd.cmd);
-    // parse_cmd.token_quote_type = '\0';
+    t_cmd *cmd_result;
 
+    cmd_result = malloc(sizeof(t_cmd));
+    if (!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE)
+    {
+        free_command(cmd_result);
+        return (NULL);    
+    }
     while (parse_cmd.clean_input[parse_cmd.k])
     {
         parse_cmd.c = parse_cmd.clean_input[parse_cmd.k];
@@ -164,38 +170,34 @@ t_cmd parse_cmd(char *input, t_env *env_list)
         if (!parse_cmd.in_quotes && (parse_cmd.c == ' ' || parse_cmd.c == '|'))
         {
             if (if_token_started(&parse_cmd, env_list) == EXIT_FAILURE)
-            {
-                ft_bzero(&parse_cmd.cmd, sizeof(t_cmd));
-                return (parse_cmd.cmd);
-            }    
+                return (NULL); 
             if (parse_cmd.c == '|')
             {
                 parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup("|");
                 if (parse_cmd.cmd.args[parse_cmd.i - 1] == NULL)
-                {
-                    ft_bzero(&parse_cmd.cmd, sizeof(t_cmd));
-                    return (parse_cmd.cmd);
-                }
+                    return (NULL);
             }
             parse_cmd.k++;
             continue;
         }
         else
         {
+            if (parse_cmd.j >= (int)(ft_strlen(parse_cmd.clean_input) + 1))
+                return (NULL);
             parse_cmd.buffer[parse_cmd.j++] = parse_cmd.c;
             parse_cmd.token_started = true;
         }
         parse_cmd.k++;
-        
     }
     if (if_token_started_too(&parse_cmd, env_list) == EXIT_FAILURE)
-        return (parse_cmd.cmd);
+        return (NULL);
     if (parse_cmd.in_quotes)
-        return (ft_free_parse_cmd(&parse_cmd));
-    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE)
     {
-        ft_bzero(&parse_cmd.cmd, sizeof(t_cmd));
-        return (parse_cmd.cmd);
+        ft_free_parse_cmd(&parse_cmd);
+        return (NULL);
     }
-    return (parse_cmd.cmd);
+    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE)
+        return (NULL);
+    *cmd_result = parse_cmd.cmd;    
+    return (cmd_result);
 }

@@ -92,7 +92,7 @@ typedef struct s_parse_cmd
 typedef struct s_main
 {
     char *input;
-    t_cmd cmd;
+    t_cmd *cmd;
     t_token *tokens_list;
     t_env *env_list;
 }      t_main;
@@ -116,17 +116,17 @@ t_env *clone_env(char **env);
 int splitter_object(char **object, char *str, bool *has_value);
 void  free_env_list(t_env *env_list);
 int	add_node_to_env(t_env **head, t_env *new_node);
-void free_object(char **object);
-
+void	free_object(char **object, t_env *head);
 int *ft_count_token(char *input);
 int count_args(char *input);
-t_cmd parse_cmd(char *input, t_env *env_list);
+t_cmd *parse_cmd(char *input, t_env *env_list);
 char *find_env_value(t_env *env_list, const char *var_name);
 char *expand_env_variables_in_token(char *token, t_env *env_list);
 void free_command(t_cmd *cmd);
 t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
 t_token *store_token(char **tokens_list, int token_count, int *array);
-
+void	free_tokens(t_token *tokens, int token_count);
+void free_cmd(t_cmd *cmd);
 
 // /*
 //     ! Token functions

@@ -71,7 +71,8 @@
     "__tuple": "c",
     "bitset": "c",
     "format": "c",
-    "unordered_map": "c"
+    "unordered_map": "c",
+    "cstdlib": "c"
   },
   "cSpell.words": [
     "MINISHELL"

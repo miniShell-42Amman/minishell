@@ -42,9 +42,18 @@ int	add_node_to_env(t_env **head, t_env *new_node)
 int	init_values(t_env *new_node, char **object)
 {
 	new_node->key = ft_strdup(object[0]);
-	new_node->value = ft_strdup(object[1]);
-	if (!new_node->key || !new_node->value)
+	if (!new_node->key)
+	{
+		free(new_node);
 		return (EXIT_FAILURE);
+	}
+	new_node->value = ft_strdup(object[1]);
+	if (!new_node->value)
+	{
+		free(new_node->key);
+		free(new_node);
+		return (EXIT_FAILURE);
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -64,7 +73,7 @@ t_env	*clone_env(char **env)
 				env[i], &new_node->has_value) == EXIT_FAILURE
 			|| init_values(new_node, object) == EXIT_FAILURE)
 		{
-			free_object(object);
+			free_object(object, head);
 			return (NULL);
 		}
 		if (!head)
@@ -72,7 +81,7 @@ t_env	*clone_env(char **env)
 		else
 			current->next = new_node;
 		current = new_node;
-		free_object(object);
+		free_object(object,NULL);
 	}
 	return (head);
 }

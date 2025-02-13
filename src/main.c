@@ -99,18 +99,24 @@ int	main(int ac, char **av, char **env)
 	}
 	while (1)
 	{
-        free_resources(&main, 0);
-        main.input = readline("\001\033[35m\002⚠️  Error404 ⚠️  >\001\033[34m\002 ");
-        if (ft_strcmp(main.input, "exit") == 0)
-        {
-            free(main.input);
-            break ;
-        }
-        add_history(main.input);
-        start_tokenization(&main);
-        free(main.input);
-        main.input = NULL;
-    }
+		main.input = readline("\001\033[35m\002⚠️  Error404 ⚠️  >\001\033[34m\002 ");
+		if (ft_strcmp(main.input, "exit") == 0)
+		{
+			if (main.input)
+			{
+				free(main.input);
+				main.input = NULL;
+			}
+			break ;
+		}
+		add_history(main.input);
+		start_tokenization(&main);
+		if (main.input)
+		{
+			free(main.input);
+			main.input = NULL;
+		}
+	}
 	free_resources(&main,1);
 	rl_clear_history();
 	return (0);

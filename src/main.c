@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-void free_reosurces(t_main *main , int flag)
+
+void free_resources(t_main *main , int flag)
 {
     if (main->input)
 		free(main->input);
@@ -29,30 +30,33 @@ void	start_tokenization(t_main *main)
 	
 	array = ft_count_token(main->input);
 	main->cmd = parse_cmd(main->input, main->env_list);
-    if (!(*main->cmd).args || !main->cmd)
-    {
-        ft_printf("Error: parse_cmd returned NULL\n");
-        free(array);
-        return;
-    }
+    //! if (!(*main->cmd).args || !main->cmd)
+    //! {
+    //!     ft_printf("Error: parse_cmd returned NULL\n");
+    //!     free(array);
+    //!     return;
+    //! }
+	if (!main->cmd)
+	{		
+		free(array);
+		return;
+	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count, array);
 	if (!main->tokens_list)
 	{
 		ft_printf("Error: store_token returned NULL\n");
-		free_reosurces(main, 0);
+		free_resources(main, 0);
 		free_command(main->cmd);
 		main->cmd = NULL;
 		free(array);
 		return;
 	}
 	// free_tokens(main->tokens_list, main->cmd->arg_count);
-	// for(int k = 0; k < (*main->cmd).arg_count; k++)
-	// {
-	// 	if (main->tokens_list[k].value)
-	// 	printf("Token[%d]: %s => %d\n", k, main->tokens_list[k].value, main->tokens_list[k].type);
-	// }
-	// free(main->tokens_list);
-	// free_command(main->cmd);
+	for(int k = 0; k < (*main->cmd).arg_count; k++)
+	{
+		if (main->tokens_list[k].value)
+		printf("Token[%d]: %s => %d\n", k, main->tokens_list[k].value, main->tokens_list[k].type);
+	}
     free(array);
 }
 
@@ -73,13 +77,18 @@ int	main(int ac, char **av, char **env)
 	}
 	while (1)
 	{
-		main.input = readline("\001\033[35m\002⚠️  Error404 ⚠️  >\001\033[34m\002 ");
+		main.input = readline("\001\033[35m\002⚠️ Error404 ⚠️ >\001\033[34m\002 ");
 		if (ft_strcmp(main.input, "exit") == 0)
 			break ;
 		add_history(main.input);
 		start_tokenization(&main);
+		if (main.input)
+		{
+			free(main.input);
+			main.input = NULL;
+		}
 	}
-	free_reosurces(&main,1);
+	free_resources(&main,1);
 	rl_clear_history();
 	return (0);
 }

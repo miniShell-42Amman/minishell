@@ -42,7 +42,7 @@ static int init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
 static t_cmd ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 {
     int i;
-    
+
     ft_printf(RED "Error: " RESET "Unclosed quotes\n");
     if (parse_cmd->clean_input)
         free(parse_cmd->clean_input);
@@ -101,7 +101,7 @@ static int if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
     return (EXIT_SUCCESS);
 }
 
-static int if_token_started_too(t_parse_cmd *parse_cmd, t_env *env_list)
+static int if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 {
     if (parse_cmd->token_started)
     {
@@ -143,6 +143,43 @@ static int ft_check_parse_cmd(t_parse_cmd *parse_cmd)
     return (EXIT_FAILURE);
 }
 
+static int check_condition(t_parse_cmd *parse_cmd)
+{
+    if (!parse_cmd->token_started && parse_cmd->c == '$' && parse_cmd->clean_input[parse_cmd->k + 1] == '"')
+    {
+        parse_cmd->token_was_dollar_quote = true;
+        parse_cmd->k++;
+        return (EXIT_SUCCESS);
+    }
+    if (ft_check_parse_cmd(parse_cmd) == EXIT_SUCCESS)
+        return (EXIT_SUCCESS);
+    return (EXIT_FAILURE);
+}
+static int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
+{
+    if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|'))
+    {
+        if (if_token_started(parse_cmd, env_list) == EXIT_FAILURE)
+            return (EXIT_FAILURE);
+        if (parse_cmd->c == '|')
+        {
+            parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup("|");
+            if (parse_cmd->cmd.args[parse_cmd->i - 1] == NULL)
+                return (EXIT_FAILURE);
+        }
+        parse_cmd->k++;
+        return (EXIT_SUCCESS);
+    }
+    else
+    {
+        if (parse_cmd->j >= (int)(ft_strlen(parse_cmd->clean_input) + 1))
+            return (EXIT_FAILURE);
+        parse_cmd->buffer[parse_cmd->j++] = parse_cmd->c;
+        parse_cmd->token_started = true;
+    }
+    parse_cmd->k++;
+    return (EXIT_SUCCESS);
+}
 
 t_cmd *parse_cmd(char *input, t_env *env_list)
 {
@@ -153,43 +190,40 @@ t_cmd *parse_cmd(char *input, t_env *env_list)
     if (!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE)
     {
         free_command(cmd_result);
-        return (NULL);    
+        return (NULL);
     }
     while (parse_cmd.clean_input[parse_cmd.k])
     {
         parse_cmd.c = parse_cmd.clean_input[parse_cmd.k];
-
-        if (!parse_cmd.token_started && parse_cmd.c == '$' && parse_cmd.clean_input[parse_cmd.k + 1] == '"')
-        {
-            parse_cmd.token_was_dollar_quote = true;
-            parse_cmd.k++;
+        if (check_condition(&parse_cmd) == EXIT_SUCCESS)
             continue;
-        }
-        if (ft_check_parse_cmd(&parse_cmd) == EXIT_SUCCESS)
-            continue;
-        if (!parse_cmd.in_quotes && (parse_cmd.c == ' ' || parse_cmd.c == '|'))
-        {
-            if (if_token_started(&parse_cmd, env_list) == EXIT_FAILURE)
-                return (NULL); 
-            if (parse_cmd.c == '|')
-            {
-                parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup("|");
-                if (parse_cmd.cmd.args[parse_cmd.i - 1] == NULL)
-                    return (NULL);
-            }
-            parse_cmd.k++;
-            continue;
-        }
-        else
-        {
-            if (parse_cmd.j >= (int)(ft_strlen(parse_cmd.clean_input) + 1))
-                return (NULL);
-            parse_cmd.buffer[parse_cmd.j++] = parse_cmd.c;
-            parse_cmd.token_started = true;
-        }
-        parse_cmd.k++;
+        // if (!parse_cmd.in_quotes && (parse_cmd.c == ' ' || parse_cmd.c == '|'))
+        // {
+        //     if (if_token_started(&parse_cmd, env_list) == EXIT_FAILURE)
+        //         return (NULL);
+        //     if (parse_cmd.c == '|')
+        //     {
+        //         parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup("|");
+        //         if (parse_cmd.cmd.args[parse_cmd.i - 1] == NULL)
+        //             return (NULL);
+        //     }
+        //     parse_cmd.k++;
+        //     continue;
+        // }
+        // else
+        // {
+        //     if (parse_cmd.j >= (int)(ft_strlen(parse_cmd.clean_input) + 1))
+        //         return (NULL);
+        //     parse_cmd.buffer[parse_cmd.j++] = parse_cmd.c;
+        //     parse_cmd.token_started = true;
+        // }
+        // parse_cmd.k++;
+        if (check_condition_too(&parse_cmd, env_list) == EXIT_FAILURE)
+            return (NULL);
+        // else if (if_token_started_three(&parse_cmd, env_list) == EXIT_SUCCESS)
+        //     continue;
     }
-    if (if_token_started_too(&parse_cmd, env_list) == EXIT_FAILURE)
+    if (if_token_started_three(&parse_cmd, env_list) == EXIT_FAILURE)
         return (NULL);
     if (parse_cmd.in_quotes)
     {
@@ -198,6 +232,6 @@ t_cmd *parse_cmd(char *input, t_env *env_list)
     }
     if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE)
         return (NULL);
-    *cmd_result = parse_cmd.cmd;    
+    *cmd_result = parse_cmd.cmd;
     return (cmd_result);
 }

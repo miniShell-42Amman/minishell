@@ -102,7 +102,7 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 	t_token	*new_token;
 	int		i;
 
-	new_token = malloc(sizeof(t_token) * token_count);
+	new_token = ft_calloc(sizeof(t_token), token_count);
 	if (!new_token)
 		return (NULL);
 	i = -1;

@@ -60,11 +60,17 @@ int	count_args(char *input)
 		skip_whitespace(input, &c.i, c.len);
 		if (c.i >= c.len)
 			break ;
+		if (input[c.i] == '|')
+		{
+			c.count++;
+			c.i++;
+			continue ;
+		}
 		c.count++;
 		c.in_single = 0;
 		c.in_double = 0;
 		handle_quotes(input, &c);
-		c.i++;
+		// c.i++;
 	}
 	return (c.count);
 }

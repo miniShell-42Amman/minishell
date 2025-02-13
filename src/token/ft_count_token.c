@@ -57,7 +57,7 @@ static void	process_token(char *input, t_counter *ct)
 				|| is_adjacent_to_quotes(input, ct->i, op_len))
 			{
 				if (!ct->array)
-					ct->array = malloc(sizeof(int) * (count_args(input) + 1));
+					ct->array = ft_calloc(sizeof(int) ,(count_args(input) + 1));
 				ct->array[ct->count++] = ct->count_word - 1;
 			}
 			ct->i += op_len;

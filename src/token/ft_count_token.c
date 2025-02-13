@@ -85,5 +85,6 @@ int	*ft_count_token(char *input)
 	}
 	if (ct.array)
 		ct.array[ct.count] = -1;
+	ft_printf("count: %d\n", ct.count_word);	
 	return (ct.array);
 }

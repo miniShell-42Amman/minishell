@@ -202,6 +202,8 @@ static int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
     return (EXIT_SUCCESS);
 }
 
+
+
 static int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
 {
     while (parse_cmd->clean_input[parse_cmd->k])
@@ -219,7 +221,6 @@ static int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
     }
     return (EXIT_SUCCESS);
 }
-
 static int handle_parse_error(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
 {
     ft_free_parse_cmd(parse_cmd);
@@ -233,16 +234,26 @@ t_cmd *parse_cmd(char *input, t_env *env_list)
     t_cmd *cmd_result;
 
     cmd_result = ft_calloc(1, sizeof(t_cmd));
-    if ((!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE) 
-            && handle_parse_error(&parse_cmd, cmd_result))
+    if (!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE)
+    {
+        free_command(cmd_result);
         return (NULL);
-    if ((parse_cmd_loop(&parse_cmd, env_list) == EXIT_FAILURE || if_token_started_three(&parse_cmd, env_list) == EXIT_FAILURE) 
-            && handle_parse_error(&parse_cmd, cmd_result))
+    }
+    if (parse_cmd_loop(&parse_cmd, env_list) == EXIT_FAILURE || if_token_started_three(&parse_cmd, env_list) == EXIT_FAILURE)
+    {
+        handle_parse_error(&parse_cmd, cmd_result);
         return (NULL);
-    if (parse_cmd.in_quotes && handle_parse_error(&parse_cmd, cmd_result))
+    }
+    if (parse_cmd.in_quotes)
+    {
+        handle_parse_error(&parse_cmd, cmd_result);
         return (NULL);
-    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE && handle_parse_error(&parse_cmd, cmd_result))
+    }
+    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE)
+    {
+        handle_parse_error(&parse_cmd, cmd_result);
         return (NULL);
+    }
     *cmd_result = parse_cmd.cmd;
     return (cmd_result);
 }

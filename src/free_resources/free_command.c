@@ -44,8 +44,11 @@ void	free_command(t_cmd *cmd)
 			}
 			i++;
 		}
-		free(cmd->args);
-		cmd->args = NULL;
+		if (cmd->args)
+		{
+			free(cmd->args);
+			cmd->args = NULL;
+		}
 	}
 	free(cmd);
 }

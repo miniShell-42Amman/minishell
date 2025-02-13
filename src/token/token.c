@@ -43,7 +43,7 @@ static t_cmd ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 {
     int i;
 
-    ft_printf(RED "Error: " RESET "Unclosed quotes\n");
+    ft_dprintf(2, RED "Error: " RESET "Unclosed quotes\n");
     if (parse_cmd->clean_input)
         free(parse_cmd->clean_input);
     i = 0;
@@ -54,6 +54,8 @@ static t_cmd ft_free_parse_cmd(t_parse_cmd *parse_cmd)
     }
     if (parse_cmd->cmd.args)
         free(parse_cmd->cmd.args);
+    if (parse_cmd->cmd.cmd)
+        free(parse_cmd->cmd.cmd);
     if (parse_cmd->buffer)
         free(parse_cmd->buffer);
     parse_cmd->cmd.args = NULL;
@@ -61,6 +63,7 @@ static t_cmd ft_free_parse_cmd(t_parse_cmd *parse_cmd)
     parse_cmd->cmd.arg_count = 0;
     return (parse_cmd->cmd);
 }
+
 static int clean_parse_cmd(t_parse_cmd *parse_cmd)
 {
     parse_cmd->cmd.args[parse_cmd->i] = NULL;
@@ -155,20 +158,38 @@ static int check_condition(t_parse_cmd *parse_cmd)
         return (EXIT_SUCCESS);
     return (EXIT_FAILURE);
 }
+
+int ft_have_operator(t_parse_cmd *parse_cmd)
+{
+    char *op;
+
+    if (parse_cmd->c == '|')
+        op = ft_strdup("|");
+    else if (parse_cmd->operator == '>')
+        op = ft_strdup(">>");
+    else if (parse_cmd->operator == '<')
+        op = ft_strdup("<<");
+    else if (parse_cmd->c == '<')
+        op = ft_strdup("<");
+    else if (parse_cmd->c == '>')
+        op = ft_strdup(">");
+    else
+        return (EXIT_SUCCESS);
+    if (!op)
+        return (EXIT_FAILURE);
+    parse_cmd->cmd.args[parse_cmd->i++] = op;
+    parse_cmd->k++;
+    return (EXIT_SUCCESS);
+}
+
 static int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
 {
-    if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|'))
+    if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|' || parse_cmd->c == '<' || parse_cmd->c == '>'))
     {
         if (if_token_started(parse_cmd, env_list) == EXIT_FAILURE)
             return (EXIT_FAILURE);
-        if (parse_cmd->c == '|')
-        {
-            parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup("|");
-            if (parse_cmd->cmd.args[parse_cmd->i - 1] == NULL)
-                return (EXIT_FAILURE);
-        }
-        parse_cmd->k++;
-        return (EXIT_SUCCESS);
+        if(ft_have_operator(parse_cmd) == EXIT_FAILURE)
+            return (EXIT_FAILURE);
     }
     else
     {
@@ -176,9 +197,34 @@ static int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
             return (EXIT_FAILURE);
         parse_cmd->buffer[parse_cmd->j++] = parse_cmd->c;
         parse_cmd->token_started = true;
+        parse_cmd->k++;
     }
-    parse_cmd->k++;
     return (EXIT_SUCCESS);
+}
+
+static int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
+{
+    while (parse_cmd->clean_input[parse_cmd->k])
+    {
+        parse_cmd->c = parse_cmd->clean_input[parse_cmd->k];
+        if (ft_is_operator(parse_cmd->clean_input + parse_cmd->k) == 2 )
+        {
+            parse_cmd->operator = parse_cmd->clean_input[++parse_cmd->k];
+        }
+        if (check_condition(parse_cmd) == EXIT_SUCCESS)
+            continue;
+        if (check_condition_too(parse_cmd, env_list) == EXIT_FAILURE)
+            return (EXIT_FAILURE);
+        parse_cmd->operator = '\0';    
+    }
+    return (EXIT_SUCCESS);
+}
+
+static int handle_parse_error(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
+{
+    ft_free_parse_cmd(parse_cmd);
+    free_command(cmd_result);
+    return (EXIT_FAILURE);
 }
 
 t_cmd *parse_cmd(char *input, t_env *env_list)
@@ -186,51 +232,16 @@ t_cmd *parse_cmd(char *input, t_env *env_list)
     t_parse_cmd parse_cmd;
     t_cmd *cmd_result;
 
-    cmd_result = malloc(sizeof(t_cmd));
-    if (!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE)
-    {
-        free_command(cmd_result);
+    cmd_result = ft_calloc(1, sizeof(t_cmd));
+    if ((!cmd_result || init_parse_cmd(&parse_cmd, input) == EXIT_FAILURE) 
+            && handle_parse_error(&parse_cmd, cmd_result))
         return (NULL);
-    }
-    while (parse_cmd.clean_input[parse_cmd.k])
-    {
-        parse_cmd.c = parse_cmd.clean_input[parse_cmd.k];
-        if (check_condition(&parse_cmd) == EXIT_SUCCESS)
-            continue;
-        // if (!parse_cmd.in_quotes && (parse_cmd.c == ' ' || parse_cmd.c == '|'))
-        // {
-        //     if (if_token_started(&parse_cmd, env_list) == EXIT_FAILURE)
-        //         return (NULL);
-        //     if (parse_cmd.c == '|')
-        //     {
-        //         parse_cmd.cmd.args[parse_cmd.i++] = ft_strdup("|");
-        //         if (parse_cmd.cmd.args[parse_cmd.i - 1] == NULL)
-        //             return (NULL);
-        //     }
-        //     parse_cmd.k++;
-        //     continue;
-        // }
-        // else
-        // {
-        //     if (parse_cmd.j >= (int)(ft_strlen(parse_cmd.clean_input) + 1))
-        //         return (NULL);
-        //     parse_cmd.buffer[parse_cmd.j++] = parse_cmd.c;
-        //     parse_cmd.token_started = true;
-        // }
-        // parse_cmd.k++;
-        if (check_condition_too(&parse_cmd, env_list) == EXIT_FAILURE)
-            return (NULL);
-        // else if (if_token_started_three(&parse_cmd, env_list) == EXIT_SUCCESS)
-        //     continue;
-    }
-    if (if_token_started_three(&parse_cmd, env_list) == EXIT_FAILURE)
+    if ((parse_cmd_loop(&parse_cmd, env_list) == EXIT_FAILURE || if_token_started_three(&parse_cmd, env_list) == EXIT_FAILURE) 
+            && handle_parse_error(&parse_cmd, cmd_result))
         return (NULL);
-    if (parse_cmd.in_quotes)
-    {
-        ft_free_parse_cmd(&parse_cmd);
+    if (parse_cmd.in_quotes && handle_parse_error(&parse_cmd, cmd_result))
         return (NULL);
-    }
-    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE)
+    if (clean_parse_cmd(&parse_cmd) == EXIT_FAILURE && handle_parse_error(&parse_cmd, cmd_result))
         return (NULL);
     *cmd_result = parse_cmd.cmd;
     return (cmd_result);

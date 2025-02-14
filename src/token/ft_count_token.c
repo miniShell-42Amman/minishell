@@ -52,17 +52,17 @@ static void	process_token(char *input, t_counter *ct)
 		op_len = get_operator_length(input, ct->i);
 		if (op_len > 0)
 		{
-			if (is_inside_quotes(ct->in_single, ct->in_double) ||
-				is_adjacent_to_quotes(input, ct->i, op_len))
+			if (is_inside_quotes(ct->in_single, ct->in_double)
+				|| is_adjacent_to_quotes(input, ct->i, op_len))
 			{
 				if (!ct->array)
 					ct->array = ft_calloc(sizeof(int), (count_args(input) + 1));
 				ct->array[ct->count++] = ct->count_word - 1;
 				ct->i += op_len;
-				continue;
+				continue ;
 			}
 			else
-				break;
+				break ;
 		}
 		ct->i++;
 	}
@@ -80,14 +80,14 @@ int	*ft_count_token(char *input)
 	{
 		skip_whitespace(input, &ct.i, ft_strlen(input));
 		if (!input[ct.i])
-			break;
+			break ;
 		op_len = get_operator_length(input, ct.i);
-		if (op_len > 0 && !is_inside_quotes(ct.in_single, ct.in_double) &&
-			!is_adjacent_to_quotes(input, ct.i, op_len))
+		if (op_len > 0 && !is_inside_quotes(ct.in_single, ct.in_double)
+			&& !is_adjacent_to_quotes(input, ct.i, op_len))
 		{
 			ct.count_word++;
 			ct.i += op_len;
-			continue;
+			continue ;
 		}
 		ct.count_word++;
 		process_token(input, &ct);

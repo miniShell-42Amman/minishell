@@ -48,7 +48,7 @@ static void	handle_quotes(char *input, t_counter *c)
 		(c->i)++;
 	}
 }
-// ls -la|ls
+
 int	count_args(char *input)
 {
 	t_counter	c;
@@ -72,4 +72,4 @@ int	count_args(char *input)
 		handle_quotes(input, &c);
 	}
 	return (c.count);
-} 
+}

@@ -125,14 +125,6 @@
 // 	return (result);
 // }
 
-#include "minishell.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-
-// نفترض وجود دوال ft_strlen, ft_calloc, ft_isspace, ft_isalnum و find_env_value.
-
-// الدالة الأولى: تمريرة لحساب الحجم النهائي بعد التوسعة
 static size_t compute_expanded_length(const char *token, t_env *env_list)
 {
     size_t len = 0;
@@ -142,15 +134,13 @@ static size_t compute_expanded_length(const char *token, t_env *env_list)
 
     while (token[i])
     {
-        // إذا وجدنا اقتباس مفرد
         if (token[i] == '\'')
         {
             in_single_quotes = !in_single_quotes;
-            len++; // نضيف علامة الاقتباس
+            len++;
             i++;
             continue;
         }
-        // إذا وجدنا اقتباس مزدوج
         if (token[i] == '\"')
         {
             in_double_quotes = !in_double_quotes;
@@ -158,56 +148,43 @@ static size_t compute_expanded_length(const char *token, t_env *env_list)
             i++;
             continue;
         }
-        // إذا وجدنا رمز الدولار للتوسعة وليس داخل اقتباس مفرد
         if (token[i] == '$' && !in_single_quotes)
         {
-            i++; // نتخطى الرمز $
-            // إذا كان الحرف التالي نهاية السلسلة أو فراغاً، نعتبر الـ $ حرفاً عاديًا
+            i++;
             if (token[i] == '\0' || ft_isspace(token[i]))
             {
                 len++; 
                 continue;
             }
-            // استخراج اسم المتغير
             size_t start = i;
             while (token[i] && (ft_isalnum(token[i]) || token[i] == '_'))
                 i++;
             size_t var_len = i - start;
             if (var_len == 0)
-            {
-                len++; // لا يوجد اسم متغير صالح، نضيف $ حرفياً
-            }
+                len++;
             else
             {
                 char var_name[var_len + 1];
                 ft_memcpy(var_name, token + start, var_len);
                 var_name[var_len] = '\0';
-                // البحث عن قيمة المتغير في قائمة البيئة
                 char *value = find_env_value(env_list, var_name);
                 if (value)
-                {
                     len += ft_strlen(value);
-                }
-                // إذا لم يُعثر على المتغير، لا نضيف شيئًا (أي يُستبدل بـ string فارغ)
             }
             continue;
         }
-        // حرف عادي يتم نسخه كما هو
         len++;
         i++;
     }
     return len;
 }
 
-// الدالة الرئيسية: توسعة المتغيرات البيئية داخل التوكن
 char *expand_env_variables_in_token(const char *token, t_env *env_list)
 {
     if (!token)
         return NULL;
 
-    // المرور الأول: حساب الحجم النهائي المطلوب بعد التوسعة
     size_t final_length = compute_expanded_length(token, env_list);
-    // تخصيص الذاكرة مرة واحدة بالحجم النهائي + 1 للمحرف '\0'
     char *result = ft_calloc(final_length + 1, sizeof(char));
     if (!result)
         return NULL;
@@ -216,7 +193,6 @@ char *expand_env_variables_in_token(const char *token, t_env *env_list)
     bool in_single_quotes = false;
     bool in_double_quotes = false;
 
-    // المرور الثاني: بناء السلسلة الموسعة
     while (token[i])
     {
         if (token[i] == '\'')
@@ -233,7 +209,7 @@ char *expand_env_variables_in_token(const char *token, t_env *env_list)
         }
         if (token[i] == '$' && !in_single_quotes)
         {
-            i++; // نتخطى رمز $
+            i++;
             if (token[i] == '\0' || ft_isspace(token[i]))
             {
                 result[j++] = '$';
@@ -244,9 +220,7 @@ char *expand_env_variables_in_token(const char *token, t_env *env_list)
                 i++;
             size_t var_len = i - start;
             if (var_len == 0)
-            {
                 result[j++] = '$';
-            }
             else
             {
                 char var_name[var_len + 1];
@@ -259,7 +233,6 @@ char *expand_env_variables_in_token(const char *token, t_env *env_list)
                     ft_memcpy(result + j, value, value_len);
                     j += value_len;
                 }
-                // إذا لم يوجد المتغير، نستبدله بسلسلة فارغة (لا نضيف شيئًا)
             }
             continue;
         }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/09 22:31:26 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 16:23:31 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/14 19:33:50 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,10 +111,7 @@ int	main(int ac, char **av, char **env)
 		free_resources(&main, 0);
 		main.input = readline("\001\033[35m\002⚠️  Error404 ⚠️  >\001\033[34m\002 ");
 		if (ft_strcmp(main.input, "exit") == 0)
-		{
-			free(main.input);
 			break ;
-		}
 		add_history(main.input);
 		start_tokenization(&main);
 		free(main.input);

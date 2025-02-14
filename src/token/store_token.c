@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   store_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 17:30:37 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 17:57:04 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/14 19:28:56 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ t_token_type	determine_token_type(char *token, int token_index,
 		return (TOKEN_REDIRECTION_APPEND);
 	else if (ft_strcmp(token, "<<") == 0 && !is_valid(array, token_index))
 		return (TOKEN_REDIRECTION_HEREDOC);
-	else if (token_index == 0 || (token_index > 0 && tokens_list[token_index
-			- 1].type == TOKEN_PIPE))
+	else if (token_index == 0 || (token_index > 0
+			&& tokens_list[token_index - 1].type == TOKEN_PIPE))
 		return (TOKEN_COMMAND);
 	else
 		return (TOKEN_ARGUMENT);
@@ -62,7 +62,6 @@ static int	store_token_value(t_token *new_token, char **tokens_list, int i)
 		return (EXIT_SUCCESS);
 	}
 	new_token[i].value = ft_strdup(tokens_list[i]);
-	// ft_printf("new_token[%d].value: %s\n", i, new_token[i].value);
 	if (!new_token[i].value)
 	{
 		j = 0;

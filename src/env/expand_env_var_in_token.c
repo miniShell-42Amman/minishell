@@ -124,6 +124,22 @@
 // 	result[j] = '\0';
 // 	return (result);
 // }
+typedef struct s_expand_env_var_in_token
+{
+    size_t len;
+    size_t i;
+    size_t j;
+    size_t final_length;
+    size_t var_len;
+    size_t value_len;
+    size_t start;
+    bool in_single_quotes;
+    bool in_double_quotes;
+    char *result;
+    char *value;
+    char *var_name;
+    
+} t_expand_env_var_in_token;
 
 static size_t compute_expanded_length(const char *token, t_env *env_list)
 {
@@ -183,61 +199,68 @@ char *expand_env_variables_in_token(const char *token, t_env *env_list)
 {
     if (!token)
         return NULL;
+    
+    t_expand_env_var_in_token t_expand;
 
-    size_t final_length = compute_expanded_length(token, env_list);
-    char *result = ft_calloc(final_length + 1, sizeof(char));
-    if (!result)
+    ft_bzero(&t_expand, sizeof(t_expand));
+
+    t_expand.final_length = compute_expanded_length(token, env_list);
+    t_expand.result = ft_calloc(t_expand.final_length + 1, sizeof(char));
+    if (!t_expand.result)
         return NULL;
 
-    size_t i = 0, j = 0;
-    bool in_single_quotes = false;
-    bool in_double_quotes = false;
 
-    while (token[i])
+    while (token[t_expand.i])
     {
-        if (token[i] == '\'')
+        if (token[t_expand.i] == '\'')
         {
-            in_single_quotes = !in_single_quotes;
-            result[j++] = token[i++];
+            t_expand.in_single_quotes = !t_expand.in_single_quotes;
+            t_expand.result[t_expand.j++] = token[t_expand.i++];
             continue;
         }
-        if (token[i] == '\"')
+        if (token[t_expand.i] == '\"')
         {
-            in_double_quotes = !in_double_quotes;
-            result[j++] = token[i++];
+            t_expand.in_double_quotes = !t_expand.in_double_quotes;
+            t_expand.result[t_expand.j++] = token[t_expand.i++];
             continue;
         }
-        if (token[i] == '$' && !in_single_quotes)
+        if (token[t_expand.i] == '$' && !t_expand.in_single_quotes)
         {
-            i++;
-            if (token[i] == '\0' || ft_isspace(token[i]))
+            t_expand.i++;
+            if (token[t_expand.i] == '\0' || ft_isspace(token[t_expand.i]))
             {
-                result[j++] = '$';
+                t_expand.result[t_expand.j++] = '$';
                 continue;
             }
-            size_t start = i;
-            while (token[i] && (ft_isalnum(token[i]) || token[i] == '_'))
-                i++;
-            size_t var_len = i - start;
-            if (var_len == 0)
-                result[j++] = '$';
+            t_expand.start = t_expand.i;
+            while (token[t_expand.i] && (ft_isalnum(token[t_expand.i]) || token[t_expand.i] == '_'))
+            t_expand.i++;
+            t_expand.var_len = t_expand.i - t_expand.start;
+            if (t_expand.var_len == 0)
+            t_expand.result[t_expand.j++] = '$';
             else
             {
-                char var_name[var_len + 1];
-                ft_memcpy(var_name, token + start, var_len);
-                var_name[var_len] = '\0';
-                char *value = find_env_value(env_list, var_name);
-                if (value)
+                t_expand.var_name = malloc(t_expand.var_len + 1);
+                if (!t_expand.var_name)
                 {
-                    size_t value_len = ft_strlen(value);
-                    ft_memcpy(result + j, value, value_len);
-                    j += value_len;
+                    free(t_expand.result);
+                    return NULL;
+                }
+                ft_memcpy(t_expand.var_name, token + t_expand.start, t_expand.var_len);
+                t_expand.var_name[t_expand.var_len] = '\0';
+                t_expand.value = find_env_value(env_list, t_expand.var_name);
+                free(t_expand.var_name);
+                if (t_expand.value)
+                {
+                    t_expand.value_len = ft_strlen(t_expand.value);
+                    ft_memcpy(t_expand.result + t_expand.j, t_expand.value, t_expand.value_len);
+                    t_expand.j += t_expand.value_len;
                 }
             }
             continue;
         }
-        result[j++] = token[i++];
+        t_expand.result[t_expand.j++] = token[t_expand.i++];
     }
-    result[j] = '\0';
-    return result;
+    t_expand.result[t_expand.j] = '\0';
+    return t_expand.result;
 }

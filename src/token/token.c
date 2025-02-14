@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 19:30:43 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/14 22:19:47 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,15 @@ int	init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
 	free(parse_cmd->trimmed_input);
 	if (!parse_cmd->clean_input)
 		return (EXIT_FAILURE);
-	parse_cmd->buffer
-		= ft_calloc((ft_strlen(parse_cmd->clean_input) + 1), sizeof(char));
+	parse_cmd->buffer = ft_calloc((ft_strlen(parse_cmd->clean_input) + 1),sizeof(char));
 	if (!parse_cmd->buffer)
 	{
 		free(parse_cmd->clean_input);
 		return (EXIT_FAILURE);
 	}
 	parse_cmd->cmd.arg_count = count_args(parse_cmd->clean_input);
-	parse_cmd->cmd.args
-		= ft_calloc((parse_cmd->cmd.arg_count + 1), sizeof(char *));
+	parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 1),
+									sizeof(char *));
 	if (!parse_cmd->cmd.args)
 	{
 		free(parse_cmd->clean_input);
@@ -55,7 +54,8 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 		}
 		else
 			parse_cmd->cmd.args[parse_cmd->i++]
-				= expand_env_variables_in_token(parse_cmd->buffer, env_list);
+                        = expand_env_variables_in_token(parse_cmd->buffer,
+					env_list);
 		parse_cmd->j = 0;
 		parse_cmd->token_started = false;
 		parse_cmd->token_quote_type = '\0';
@@ -79,7 +79,8 @@ int	if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 		}
 		else
 			parse_cmd->cmd.args[parse_cmd->i++]
-				= expand_env_variables_in_token(parse_cmd->buffer, env_list);
+                        = expand_env_variables_in_token(parse_cmd->buffer,
+					env_list);
 	}
 	return (EXIT_SUCCESS);
 }
@@ -90,12 +91,12 @@ int	parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
 	{
 		parse_cmd->c = parse_cmd->clean_input[parse_cmd->k];
 		if (ft_is_operator(parse_cmd->clean_input + parse_cmd->k) == 2)
-			parse_cmd->operator = parse_cmd->clean_input[++parse_cmd->k];
+			parse_cmd->operator= parse_cmd->clean_input[++parse_cmd->k];
 		if (check_condition(parse_cmd) == EXIT_SUCCESS)
 			continue ;
 		if (check_condition_too(parse_cmd, env_list) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-		parse_cmd->operator = '\0';
+		parse_cmd->operator= '\0';
 	}
 	return (EXIT_SUCCESS);
 }

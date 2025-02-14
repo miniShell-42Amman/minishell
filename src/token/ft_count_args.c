@@ -25,7 +25,7 @@ int	ft_is_operator(const char *str)
 	return (0);
 }
 
-static void	skip_whitespace(const char *input, int *i, int len)
+void	skip_whitespace(const char *input, int *i, int len)
 {
 	while (*i < len && (input[*i] == ' ' || input[*i] == '\t'))
 		(*i)++;
@@ -48,7 +48,7 @@ static void	handle_quotes(char *input, t_counter *c)
 		(c->i)++;
 	}
 }
-
+// ls -la|ls
 int	count_args(char *input)
 {
 	t_counter	c;
@@ -72,4 +72,4 @@ int	count_args(char *input)
 		handle_quotes(input, &c);
 	}
 	return (c.count);
-}
+} 

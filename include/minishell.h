@@ -127,8 +127,9 @@ void free_command(t_cmd *cmd);
 t_token_type determine_token_type(char *token, int token_index, t_token *tokens_list, int *array);
 t_token *store_token(char **tokens_list, int token_count, int *array);
 void	free_tokens(t_token *tokens, int token_count);
-void ft_free_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result);
+// void ft_free_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result);
 int	ft_is_operator(const char *str);
+void	skip_whitespace(const char *input, int *i, int len);
 // /*
 //     ! Token functions
 // */

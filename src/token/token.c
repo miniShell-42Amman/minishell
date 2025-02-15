@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 22:19:47 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/15 00:44:29 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,19 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 				return (EXIT_FAILURE);
 		}
 		else
+		{
+		
+			ft_printf("parse_cmd->cmd.args %s\n", parse_cmd->cmd.args[parse_cmd->i]);
+			ft_printf("buffer %s\n ", parse_cmd->buffer);
 			parse_cmd->cmd.args[parse_cmd->i++]
                         = expand_env_variables_in_token(parse_cmd->buffer,
 					env_list);
+			ft_printf("parse_cmd->cmd.args->newValue %s\n", parse_cmd->cmd.args[parse_cmd->i - 1]);
+		}
+		// else
+		// 	parse_cmd->cmd.args[parse_cmd->i++]
+        //                 = expand_env_variables_in_token(parse_cmd->buffer,
+		// 			env_list);
 		parse_cmd->j = 0;
 		parse_cmd->token_started = false;
 		parse_cmd->token_quote_type = '\0';
@@ -64,7 +74,7 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 	}
 	return (EXIT_SUCCESS);
 }
-
+// مرفوضة 
 int	if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 {
 	if (parse_cmd->token_started)
@@ -78,9 +88,15 @@ int	if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 				return (EXIT_FAILURE);
 		}
 		else
+		{
+		
+			ft_printf(" parse_cmd->cmd.args 2 %s\n", parse_cmd->cmd.args[parse_cmd->i]);
+			ft_printf("buffer 2 %s\n ", parse_cmd->buffer);
 			parse_cmd->cmd.args[parse_cmd->i++]
                         = expand_env_variables_in_token(parse_cmd->buffer,
 					env_list);
+			ft_printf(" parse_cmd->cmd.args->newValue 2 %s\n", parse_cmd->cmd.args[parse_cmd->i - 1]);
+		}
 	}
 	return (EXIT_SUCCESS);
 }

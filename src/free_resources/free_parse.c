@@ -63,3 +63,30 @@ int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 		free(parse_cmd->buffer);
 	return (EXIT_SUCCESS);
 }
+
+void	free_command(t_cmd *cmd)
+{
+	int	i;
+
+	if (cmd->cmd)
+	{
+		free(cmd->cmd);
+		cmd->cmd = NULL;
+	}
+	if (cmd->args)
+	{
+		i = -1;
+		while (++i < cmd->arg_count)
+			if (cmd->args[i])
+			{
+				free(cmd->args[i]);
+				cmd->args[i] = NULL;
+			}
+		if (cmd->args)
+		{
+			free(cmd->args);
+			cmd->args = NULL;
+		}
+	}
+	free(cmd);
+}

@@ -5,25 +5,17 @@ NAME = minishell
 LIBFT_DIR = ./Libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-# SRC = src/main.c \
-# 	  src/token/token.c \
-# 	  src/token/store_token.c \
-# 	  src/utils/free.c \
-# 	  src/token/utils_token.c \
-# 	  src/env/get_env.c \
-# 	  src/env/expand_env_var_in_token.c \
-
-SRC = 	src/main.c \
-	   	src/env/get_env.c \
-	   	src/env/find_env_value.c \
-		src/free_resources/free_env.c \
-		src/token/ft_count_token.c \
-		src/token/ft_count_args.c \
-		src/token/token.c \
-		src/env/expand_env_var_in_token.c \
-		src/free_resources/free_command.c \
-		src/token/store_token.c \
-		src/token/token_utils.c \
+SRC = 	src/main.c 							\
+	   	src/env/get_env.c 					\
+	   	src/env/expand_env_var_utils.c 		\
+		src/free_resources/free_env.c 		\
+		src/token/ft_count_token.c 			\
+		src/token/ft_count_args.c			\
+		src/token/token.c 					\
+		src/env/expand_env_var_in_token.c 	\
+		src/free_resources/free_main.c		\
+		src/token/store_token.c 			\
+		src/token/token_utils.c			 	\
 		src/free_resources/free_parse.c
 
 OBJ_DIR = obj

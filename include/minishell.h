@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 21:55:56 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/16 00:47:46 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,6 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
-/*
-    ? env structures
-    *   linked list to store the environment variables
-*/
 typedef struct s_env
 {
 	char			*key;
@@ -50,13 +46,6 @@ typedef struct s_cmd
 
 }					t_cmd;
 
-/*
-    ? Token structures
-    *     "<"
-    *     ">"
-    *     ">>"
-    *     "<<"
-*/
 typedef enum e_token_type
 {
 	TOKEN_COMMAND,
@@ -82,7 +71,9 @@ typedef struct s_parse_cmd
 	int				i;
 	int				j;
 	int				k;
+	int				has_dollar;
 	bool			in_quotes;
+	bool			end_of_dollar;
 	bool			token_started;
 	bool			token_was_single_quoted;
 	bool			token_was_dollar_quote;
@@ -146,5 +137,12 @@ int					if_token_started_three(t_parse_cmd *parse_cmd,
 						t_env *env_list);
 int					if_token_started(t_parse_cmd *parse_cmd, t_env *env_list);
 int					init_parse_cmd(t_parse_cmd *parse_cmd, char *input);
+char				*get_var_value(t_env *env, const char *var, size_t len);
+size_t				calculate_length(const char *token, t_env *env);
+void	update_quote_state(char c, bool *squote, bool *dquote);
+size_t				handle_var_length(const char **token, t_env *env);
+void				process_variable(const char **t, t_env *e, char **res, size_t *j);
+void				free_resources(t_main *main, int flag);
+int					is_duplicate_operator_series(t_token *token, int token_count);
 
 #endif

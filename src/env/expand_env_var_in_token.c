@@ -20,7 +20,7 @@ void	update_quote_state(char c, bool *squote, bool *dquote)
 		*dquote = !*dquote;
 }
 
-size_t	handle_var_length(const char **token, t_env *env)
+size_t	handle_var_length(const char **token, t_env *env, size_t **len)
 {
 	const char	*start;
 	char		*value;
@@ -34,8 +34,16 @@ size_t	handle_var_length(const char **token, t_env *env)
 	}
 	else
 	{
-		while (**token && (ft_isalnum(**token) || **token == '_'))
+		if(**len)
+		{
+			var_len = **len;
+			*token+=**len;
+		}
+		else 
+		{
+			while (**token && (ft_isalnum(**token) || **token == '_') )
 			(*token)++;
+		}
 		var_len = *token - start;
 		value = get_var_value(env, start, var_len);
 	}
@@ -44,7 +52,7 @@ size_t	handle_var_length(const char **token, t_env *env)
 	return (0);
 }
 
-void	process_variable(const char **t, t_env *e, char **res, size_t *j)
+void	process_variable(const char **t, t_env *e, char **res, size_t *j, size_t **len)
 {
 	const char	*start;
 	char		*value;
@@ -59,9 +67,20 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j)
 	}
 	else
 	{
-		while (**t && (ft_isalnum(**t) || **t == '_'))
+		if(**len)
+		{
+			var_len = **len;
+			*t+=**len;
+		}
+		else 
+		{
+			while (**t && (ft_isalnum(**t) || **t == '_') )
 			(*t)++;
+		}
+		ft_printf("t: %s\n", *t);	
 		var_len = *t - start;
+		ft_printf("var_len: %d\n", var_len);
+		ft_printf("start: %s\n", start);
 		value = get_var_value(e, start, var_len);
 	}
 	if (value)
@@ -71,7 +90,7 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j)
 	}
 }
 
-char	*expand_env_variables_in_token(const char *token, t_env *env)
+char	*expand_env_variables_in_token(const char *token, t_env *env, size_t *len)
 {
 	char	*result;
 	size_t	j;
@@ -80,19 +99,18 @@ char	*expand_env_variables_in_token(const char *token, t_env *env)
 
 	if (!token || !env)
 		return (ft_strdup(""));
-	result = ft_calloc(calculate_length(token, env) + 1, sizeof(char));
+	result = ft_calloc(calculate_length(token, env,&len) + 1, sizeof(char));
 	if (!result)
 		return (NULL);
 	j = 0;
 	squote = false;
 	dquote = false;
-	ft_printf("TOKEN: Expand %s\n", token);
 	while (*token)
 	{
 		update_quote_state(*token, &squote, &dquote);
 		if (*token == '$' && !squote)
-		{
-			process_variable(&token, env, &result, &j);
+		{		
+			process_variable(&token, env, &result, &j, &len);
 			continue ;
 		}
 		result[j++] = *token++;

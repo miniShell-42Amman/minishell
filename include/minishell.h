@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 21:10:02 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/16 00:47:46 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/16 02:33:07 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ typedef struct s_parse_cmd
 	int				i;
 	int				j;
 	int				k;
-	int				has_dollar;
+	size_t				has_dollar;
 	bool			in_quotes;
 	bool			end_of_dollar;
 	bool			token_started;
@@ -115,7 +115,7 @@ int					count_args(char *input);
 t_cmd				*parse_cmd(char *input, t_env *env_list);
 char				*find_env_value(t_env *env_list, const char *var_name);
 char				*expand_env_variables_in_token(const char *token,
-						t_env *env_list);
+						t_env *env_list, size_t *len);
 void				free_command(t_cmd *cmd);
 t_token_type		determine_token_type(char *token, int token_index,
 						t_token *tokens_list, int *array);
@@ -138,10 +138,10 @@ int					if_token_started_three(t_parse_cmd *parse_cmd,
 int					if_token_started(t_parse_cmd *parse_cmd, t_env *env_list);
 int					init_parse_cmd(t_parse_cmd *parse_cmd, char *input);
 char				*get_var_value(t_env *env, const char *var, size_t len);
-size_t				calculate_length(const char *token, t_env *env);
+size_t				calculate_length(const char *token, t_env *env, size_t **len_var);
 void	update_quote_state(char c, bool *squote, bool *dquote);
-size_t				handle_var_length(const char **token, t_env *env);
-void				process_variable(const char **t, t_env *e, char **res, size_t *j);
+size_t	handle_var_length(const char **t, t_env *e, size_t **len);
+void				process_variable(const char **t, t_env *e, char **res, size_t *j, size_t **len);
 void				free_resources(t_main *main, int flag);
 int					is_duplicate_operator_series(t_token *token, int token_count);
 

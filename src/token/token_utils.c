@@ -73,7 +73,6 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	if ((parse_cmd->c == '\'' || parse_cmd->c == '"')
 		&& parse_cmd->token_quote_type == '\0')
 	{
-		ft_printf("current from if is : %c and index is %d\n", parse_cmd->c, parse_cmd->k);
 		
 		parse_cmd->token_quote_type = parse_cmd->c;
 		parse_cmd->in_quotes = true;
@@ -86,7 +85,6 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	else if (parse_cmd->c == parse_cmd->token_quote_type
 		&& parse_cmd->in_quotes)
 		{
-			ft_printf("current from else if is : %c and index is %d\n", parse_cmd->c, parse_cmd->k);
 		if(parse_cmd->clean_input[parse_cmd->k + 1] == '$')
 		{
 			int help = parse_cmd->k;
@@ -98,7 +96,6 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 				help++;
 			}
 		}
-		ft_printf("has dollar: %d\n", parse_cmd->has_dollar);
 		parse_cmd->in_quotes = false;
 		parse_cmd->token_quote_type = '\0';
 		parse_cmd->k++;	

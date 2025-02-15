@@ -54,7 +54,7 @@ char	*get_var_value(t_env *env, const char *var, size_t len)
 	return (NULL);
 }
 
-size_t	calculate_length(const char *token, t_env *env)
+size_t	calculate_length(const char *token, t_env *env, size_t **len_var)
 {
 	size_t	len;
 	bool	squote;
@@ -69,12 +69,11 @@ size_t	calculate_length(const char *token, t_env *env)
 		if (*token == '$' && !squote)
 		{
 			token++;
-			len += handle_var_length(&token, env);
+			len += handle_var_length(&token, env, len_var);
 			continue ;
 		}
 		len++;
 		token++;
 	}
-	ft_printf("len: %d\n", len);
 	return (len);
 }

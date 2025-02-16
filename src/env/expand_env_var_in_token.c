@@ -38,7 +38,6 @@ size_t	handle_var_length(const char **token, t_env *env, size_t **len)
 	{
 		if(**len)
 		{
-			ft_printf("Len is eqqual to LLLLLLLLL: %d\n",**len);
 			var_len = **len;
 			*token+=**len;
 			**len = 0;
@@ -58,7 +57,6 @@ size_t	handle_var_length(const char **token, t_env *env, size_t **len)
 
 void	process_variable(const char **t, t_env *e, char **res, size_t *j, size_t **len)
 {
-	ft_printf("*t is eqqual to start : %s\n",*t);
 	const char	*start;
 	char		*value;
 	size_t		var_len;
@@ -83,11 +81,6 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j, size_t **
 				(*t)++;
 		}
 		var_len = (size_t)(*t - start );
-		ft_printf("Start: %s\n", start);
-		ft_printf("Var_len: %d\n", var_len);
-		ft_printf("var_len is from %ld\n",(size_t)(*t - start ));
-		ft_printf("*t is eqqual to : %s\n",*t);
-		ft_printf("var_len is eqqual to : %d\n",var_len);
 		value = get_var_value(e, start, var_len);
 	}
 	if (value)
@@ -118,7 +111,6 @@ char	*expand_env_variables_in_token(const char *token, t_env *env, size_t *len, 
 	size_t	j;
 	bool	squote;
 	bool	dquote;
-	ft_printf("Token is eqqual to : %s\n",token);
 	if (!token || !env)
 		return (ft_strdup(""));
 	result = ft_calloc(calculate_length(token, env,&len, parse_cmd) + 1, sizeof(char));
@@ -128,14 +120,13 @@ char	*expand_env_variables_in_token(const char *token, t_env *env, size_t *len, 
 	squote = false;
 	dquote = false;
 	(void)parse_cmd;
+
 	if (token[0] == '\'' && token[ft_strlen(token) - 1] == '\'' && is_dolloar_quote(token) > 1 && token[1] != '"')
 	{
 		char *tmp = ft_substr(token, 1, ft_strlen(token) - 2);
-		// char *non_const_token = ft_strdup(token);
-		// free(non_const_token);
-		// token = ft_strdup(tmp);
-		// free(tmp);
-		token = tmp;
+		free((char *)token);
+		token = ft_strdup(tmp);
+		free(tmp);
 	}
 	while (*token)
 	{

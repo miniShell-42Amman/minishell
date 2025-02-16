@@ -54,15 +54,25 @@ char	*get_var_value(t_env *env, const char *var, size_t len)
 	return (NULL);
 }
 
-size_t	calculate_length(const char *token, t_env *env, size_t **len_var)
+size_t	calculate_length(const char *token, t_env *env, size_t **len_var, t_parse_cmd *parse_cmd)
 {
 	size_t	len;
 	bool	squote;
 	bool	dquote;
-
+	(void)parse_cmd;
 	len = 0;
 	squote = false;
 	dquote = false;
+	if (token[0] == '\'' && token[ft_strlen(token) - 1] == '\'' && is_dolloar_quote(token) > 1 && token[1] != '"')
+	{
+		char *tmp = ft_substr(token, 1, ft_strlen(token) - 2);
+		ft_printf("Token after removing quotes: %s\n", tmp);
+		// char *non_const_token = ft_strdup(token);
+		// free(non_const_token);
+		// token = ft_strdup(tmp);
+		// free(tmp);
+		token = tmp;
+	}
 	while (*token)
 	{
 		update_quote_state(*token, &squote, &dquote);

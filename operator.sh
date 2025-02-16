@@ -154,3 +154,10 @@ Three Operators:
 | | >
 | | >>
 | | |
+
+edge cases:
+bash->    echo "'$HOME$PWD'"  --->   '/root/root'
+mini->    echo "'$HOME$PWD'"  --->   signal SIGSEGV (Address boundary error)
+
+bash->    echo "'$HOME $PWD'"  --->   '/root /root'
+mini->    echo "'$HOME $PWD'"  --->   signal SIGSEGV (Address boundary error)

@@ -28,8 +28,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/loay1/Desktop/42Amman/miniShell/minishell",
-      "program": "c:/Users/loay1/Desktop/42Amman/miniShell/minishell/build/Debug/outDebug",
+      "cwd": "c:/Users/user/Desktop/Error404/src/env",
+      "program": "c:/Users/user/Desktop/Error404/src/env/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

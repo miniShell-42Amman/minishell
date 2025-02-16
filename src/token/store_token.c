@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 17:30:37 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 19:28:56 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/16 14:56:12 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 		{
 			new_token[i].value = NULL;
 			new_token[i].type = TOKEN_ARGUMENT;
-			i++;
+			// i++;
 			continue ;
 		}
 		if (store_token_value(new_token, tokens_list, i))

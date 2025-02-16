@@ -43,13 +43,19 @@ void	start_tokenization(t_main *main)
 		free(array);
 		return ;
 	}
-	for (int k = 0; k < (*main->cmd).arg_count; k++)
-	{
-		if (main->tokens_list[k].value)
-			ft_printf("Token[%d]: %s => %d\n", k, main->tokens_list[k].value,
-				main->tokens_list[k].type);
-	}
-	free(array);
+	// for (int k = 0; k < (*main->cmd).arg_count; k++)
+	// {
+	// 	if (main->tokens_list[k].value)
+	// 		ft_printf("Token[%d]: %s => %d\n", k, main->tokens_list[k].value,
+	// 			main->tokens_list[k].type);
+	// }
+	for (int k = 0; k < main->cmd->arg_count; k++)
+    {
+        if (main->tokens_list[k].value)
+            ft_printf("Token[%d]: %s => %d\n", k, main->tokens_list[k].value, main->tokens_list[k].type);
+    }
+	if (array)
+		free(array);
 }
 
 int	main(int ac, char **av, char **env)

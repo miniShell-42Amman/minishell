@@ -73,7 +73,6 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	if ((parse_cmd->c == '\'' || parse_cmd->c == '"')
 		&& parse_cmd->token_quote_type == '\0')
 	{
-		
 		parse_cmd->token_quote_type = parse_cmd->c;
 		parse_cmd->in_quotes = true;
 		parse_cmd->token_started = true;
@@ -87,14 +86,17 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 		{
 		if(parse_cmd->clean_input[parse_cmd->k + 1] == '$')
 		{
+			ft_printf("Im here\n"); 
+			ft_printf("%d\n", parse_cmd->k);
 			int help = parse_cmd->k;
 			while (parse_cmd->clean_input[help + 2] && 
 				(ft_isalnum(parse_cmd->clean_input[help + 2]) || 
 				parse_cmd->clean_input[help + 2] == '_'))			
-			{
-				parse_cmd->has_dollar++;
-				help++;
-			}
+				{
+					parse_cmd->has_dollar++;
+					help++;
+				}
+				ft_printf("%d\n", parse_cmd->has_dollar);
 		}
 		parse_cmd->in_quotes = false;
 		parse_cmd->token_quote_type = '\0';

@@ -1,39 +1,27 @@
 {
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "تجميع",
-            "type": "shell",
-            "command": "gcc",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "a.out"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+      {
+        "label": "تجميع",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-g",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "${workspaceFolder}/src/*.c",
+          "-o",
+          "${workspaceFolder}/minishell"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
         },
-        {
-            "label": "C/C++: gcc build active file",
-            "type": "shell",
-            "command": "/usr/bin/gcc",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
-                "-I", 
-                "${workspaceFolder}/include" // أضف هذا السطر
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always"
         }
-    ],
-    "version": "2.0.0"
-}
+      }
+    ]
+  }

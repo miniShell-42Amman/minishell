@@ -55,7 +55,7 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 	 	else
 			parse_cmd->cmd.args[parse_cmd->i++]
                         = expand_env_variables_in_token(parse_cmd->buffer,
-					env_list, &parse_cmd->has_dollar);
+					env_list, &parse_cmd->has_dollar, parse_cmd);
 		parse_cmd->j = 0;
 		parse_cmd->token_started = false;
 		parse_cmd->token_quote_type = '\0';
@@ -81,7 +81,7 @@ int	if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 		{
 				parse_cmd->cmd.args[parse_cmd->i++]
 						= expand_env_variables_in_token(parse_cmd->buffer,
-			env_list, &parse_cmd->has_dollar);
+			env_list, &parse_cmd->has_dollar, parse_cmd);
 		}
 	}
 	return (EXIT_SUCCESS);

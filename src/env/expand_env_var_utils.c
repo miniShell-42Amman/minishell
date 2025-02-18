@@ -54,23 +54,23 @@ char	*get_var_value(t_env *env, const char *var, size_t len)
 	return (NULL);
 }
 
-size_t	calculate_length(const char *token, t_env *env, size_t **len_var, t_parse_cmd *parse_cmd)
+size_t	calculate_length(const char *token, t_env *env, t_parse_cmd *p)
 {
 	size_t	len;
 	bool	squote;
 	bool	dquote;
-	(void)parse_cmd;
 	len = 0;
 	squote = false;
 	dquote = false;
 	if (token[0] == '\'' && token[ft_strlen(token) - 1] == '\'' && is_dolloar_quote(token) > 1 && token[1] != '"')
 	{
 		char *tmp = ft_substr(token, 1, ft_strlen(token) - 2);
-		// char *non_const_token = ft_strdup(token);
-		// free(non_const_token);
-		// token = ft_strdup(tmp);
-		// free(tmp);
 		token = tmp;
+	}
+	if(p->splitter_clean_input[p->index_splitter] &&  is_dolloar_quote(token) == is_dolloar_quote(p->splitter_clean_input[p->index_splitter]) &&  is_dolloar_quote(token) > 0 )
+	{
+		calculate_dollar_array(p);
+
 	}
 	while (*token)
 	{
@@ -78,7 +78,7 @@ size_t	calculate_length(const char *token, t_env *env, size_t **len_var, t_parse
 		if (*token == '$' && !squote)
 		{
 			token++;
-			len += handle_var_length(&token, env, len_var);
+			len += handle_var_length(&token, env, p);
 			continue ;
 		}
 		len++;

@@ -84,20 +84,6 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	else if (parse_cmd->c == parse_cmd->token_quote_type
 		&& parse_cmd->in_quotes)
 		{
-		if(parse_cmd->clean_input[parse_cmd->k + 1] == '$')
-		{
-			ft_printf("Im here\n"); 
-			ft_printf("%d\n", parse_cmd->k);
-			int help = parse_cmd->k;
-			while (parse_cmd->clean_input[help + 2] && 
-				(ft_isalnum(parse_cmd->clean_input[help + 2]) || 
-				parse_cmd->clean_input[help + 2] == '_'))			
-				{
-					parse_cmd->has_dollar++;
-					help++;
-				}
-				ft_printf("%d\n", parse_cmd->has_dollar);
-		}
 		parse_cmd->in_quotes = false;
 		parse_cmd->token_quote_type = '\0';
 		parse_cmd->k++;	
@@ -106,30 +92,28 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	return (EXIT_FAILURE);
 }
 
-int	is_duplicate_operator_series(t_token *token, int token_count)
+int	is_duplicate_operator_series(t_token *t, int count)
 {
 	int	i;
 
-	i = 0;
-	while (i < token_count - 1)
+	i = -1;
+	while (++i < count - 1)
 	{
-		if ((token[i].type >= 2 && token[i + 1].type >= 2) && token[i].type != 6)
+		if (t[i].type >= 2 && t[i + 1].type >= 2)
 		{
-			ft_printf("Error404: syntax error near unexpected token \'%s\'\n",
-				token[i + 1].value);
-			return (EXIT_FAILURE);
+			if (t[i].type == 6 && t[i + 1].type == 6)
+				return (ft_printf("syntax error near unexpected token `|'\n"));
+			else if (t[i].type != 6)
+			{
+				ft_printf("syntax error near unexpected token `%s'\n",
+					t[i + 1].value);
+				return (EXIT_FAILURE);
+			}
 		}
-		else if(token[i].type == 6 && (token[i + 1].type == 6 || (i + 2 < token_count && token[i + 2].type >= 2)))
-		{
-			if(i + 2 < token_count && token[i+2].type)
-				ft_printf("Error404: syntax error near unexpected token \'%s\'\n",
-					token[i + 2].value);
-			else
-				ft_printf("Error404: syntax error near unexpected token \'%s\'\n",
-					token[i + 1].value);
-			return (EXIT_FAILURE);
-		}
-		i++;
+		if (t[i].type == 6 && (i == 0 || i == count - 1))
+			return (ft_printf("syntax error near unexpected token `|'\n"));
+		if (t[i].type == 6 && t[i + 1].type == 6)
+			return (ft_printf("syntax error near unexpected token `|'\n"));
 	}
 	return (EXIT_SUCCESS);
 }

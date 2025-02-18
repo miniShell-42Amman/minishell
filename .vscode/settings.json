@@ -72,7 +72,10 @@
     "bitset": "c",
     "format": "c",
     "unordered_map": "c",
-    "cstdlib": "c"
+    "cstdlib": "c",
+    "types.h": "c",
+    "functional": "c",
+    "__locale": "c"
   },
   "cSpell.words": [
     "MINISHELL"

@@ -33,8 +33,8 @@ size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
 	start = *token;
 	if (**token == '?')
 	{
-		(*token)++;
 		value = get_var_value(env, "?", 1);
+		(*token)++;
 	}
 	else
 	{
@@ -143,43 +143,9 @@ void calculate_dollar_array(t_parse_cmd *p)
 			i++;
 		}
 	}
-	printf("array has dollar %ld\n", p->arr_has_dollar[0]);
 	p->arr_has_dollar[j] = (size_t)-1;
 }
-void merge_sdquote(char **splitter_arr) 
-{
-	int i = 0;
-	int j = 0;
-	bool squote = false;
-	bool dquote = false;
-	char *merged_str;
-	
-	while (splitter_arr[i])
-	{
-		j = 0;
-		while (splitter_arr[i][j])
-		{
-			if (splitter_arr[i][j] == '\'')
-				squote = !squote;
-			else if (splitter_arr[i][j] == '"')
-				dquote = !dquote;
-			j++;
-		}
-		if ((squote || dquote) && splitter_arr[i + 1])
-		{
-			merged_str = ft_strjoin(splitter_arr[i], splitter_arr[i + 1]);
-			free(splitter_arr[i]);
-			free(splitter_arr[i + 1]);
-			splitter_arr[i] = merged_str;
-			for (int k = i + 1; splitter_arr[k]; k++)
-				splitter_arr[k] = splitter_arr[k + 1];
-		}
-		else
-		{
-			i++;
-		}
-	}
-}
+
 char	*expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *parse_cmd)
 {
 	char	*result;
@@ -188,56 +154,53 @@ char	*expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *
 	bool	dquote;
 
 	j= 0;
+	if (!token || !env)
+		return (ft_strdup(""));
 	// ft_printf("how are you\n");
 	if (token[0] == '\'' && token[ft_strlen(token) - 1] == '\'' && token[1] != '"')
 	{
-		result = ft_calloc(calculate_length(token, env, parse_cmd) + 3, sizeof(char));
+		result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
+		ft_printf("result = %s\n", token);
 		result[0] = '\'';
-		ft_printf("i live you\n");
 		char *tmp = ft_substr(token, 1, ft_strlen(token) - 2);
 		free((char *)token);
 		token = ft_strdup(tmp);
 		free(tmp);
-	} else
-
-	parse_cmd->arr_has_dollar_count = 0;
-	if (!token || !env)
-	return (ft_strdup(""));
-	if(parse_cmd->splitter_clean_input[parse_cmd->index_splitter] &&  is_dolloar_quote(token) == is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]) &&  is_dolloar_quote(token) > 0 )
-	{
-		printf("LOVE YOU TOO\n");
-		ft_printf("is_dolloar_quote(token) %d == is_dolloar_quote(parse_cmd->clean_input) %d\n", is_dolloar_quote(token), is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]));
-		calculate_dollar_array(parse_cmd);
-
+		result[ft_strlen(token) + 1] = '\'';
+		return (result);
 	}
+	parse_cmd->arr_has_dollar_count = 0;
+	result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
+	parse_cmd->arr_has_dollar_count = 0;
+	
+	if(parse_cmd->splitter_clean_input[parse_cmd->index_splitter] &&  is_dolloar_quote(token) == is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]) &&  is_dolloar_quote(token) > 0 )
+		calculate_dollar_array(parse_cmd);
 	while(parse_cmd->arr_has_dollar && parse_cmd->arr_has_dollar[parse_cmd->arr_has_dollar_count] != (size_t)-1)
 	{
-		ft_printf("FUCK\n");
-		printf("p arr has dollar[%ld] = %ld\n", parse_cmd->arr_has_dollar_count, parse_cmd->arr_has_dollar[parse_cmd->arr_has_dollar_count]);
 		parse_cmd->arr_has_dollar_count++;
 	}
-	result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
 	if (!result)
 		return (NULL);
 	j = 0;
-	parse_cmd->arr_has_dollar_count = 0;
 	squote = false;
 	dquote = false;
 	while (*token)
 	{
-		ft_printf("current character is %c\n",*token);
 		update_quote_state(*token, &squote, &dquote);
 		if (*token == '$')
 		{	
-			ft_printf("processsss\n");
 			process_variable(&token, env, &result, &j, parse_cmd);
 			continue ;
 		}
 		result[j++] = *token++;
 	}
 	parse_cmd->arr_has_dollar_count = 0;
-	free(parse_cmd->arr_has_dollar);
-	parse_cmd->arr_has_dollar = NULL;
+	// free(parse_cmd->arr_has_dollar);
+	// parse_cmd->arr_has_dollar = NULL;
+	if (parse_cmd->arr_has_dollar) {
+        free(parse_cmd->arr_has_dollar);
+        parse_cmd->arr_has_dollar = NULL;
+    }
     result[j] = '\0';
 	return (result);
 }

@@ -18,6 +18,9 @@ int	free_cmd_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
 		ft_free_parse_cmd(parse_cmd);
 	if (cmd_result)
 		free_command(cmd_result);
+	if (parse_cmd->splitter_clean_input)
+		ft_free_split(parse_cmd->splitter_clean_input);
+
 	return (EXIT_SUCCESS);
 }
 
@@ -34,20 +37,33 @@ t_cmd	ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 		free(parse_cmd->cmd.args[i]);
 		i++;
 	}
+	i = 0;
+	while(parse_cmd->splitter_clean_input[i])
+	{
+		free(parse_cmd->splitter_clean_input[i]);
+		i++;
+	}
 	if (parse_cmd->cmd.args)
 		free(parse_cmd->cmd.args);
 	if (parse_cmd->cmd.cmd)
 		free(parse_cmd->cmd.cmd);
 	if (parse_cmd->buffer)
 		free(parse_cmd->buffer);
+	if(parse_cmd->arr_has_dollar)
+		free(parse_cmd->arr_has_dollar);
+	if (parse_cmd->splitter_clean_input)
+		ft_free_split(parse_cmd->splitter_clean_input);
 	parse_cmd->cmd.args = NULL;
 	parse_cmd->cmd.cmd = NULL;
+	parse_cmd->arr_has_dollar = NULL;
+	parse_cmd->splitter_clean_input = NULL;
 	parse_cmd->cmd.arg_count = 0;
 	return (parse_cmd->cmd);
 }
 
 int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 {
+	int i;
 	parse_cmd->cmd.args[parse_cmd->i] = NULL;
 	if (parse_cmd->cmd.args[0])
 	{
@@ -59,6 +75,20 @@ int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 		parse_cmd->cmd.cmd = NULL;
 	if (parse_cmd->clean_input)
 		free(parse_cmd->clean_input);
+	if(parse_cmd->splitter_clean_input)
+	{
+		i = 0;
+		while(parse_cmd->splitter_clean_input[i])
+		{
+			free(parse_cmd->splitter_clean_input[i]);
+			i++;
+		}
+		free(parse_cmd->splitter_clean_input);
+	}
+	if(parse_cmd->arr_has_dollar)
+	{
+		free(parse_cmd->arr_has_dollar);
+	}
 	if (parse_cmd->buffer)
 		free(parse_cmd->buffer);
 	return (EXIT_SUCCESS);

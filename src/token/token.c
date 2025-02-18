@@ -17,7 +17,8 @@ int	smart_count_words(const char *str)
 	int		wc;
 	t_split	s;
 
-	ft_bzero(&s, sizeof(s));
+	wc = 0;
+	ft_bzero(&s, sizeof(t_split));
 	while (str[s.i])
 	{
 		update_quote_state(str[s.i], &s.sq, &s.dq);
@@ -42,9 +43,9 @@ char	**smart_split(const char *str)
 	int			word_count;
 
 	original = str;
-	ft_bzero(&s, sizeof(s));
+	ft_bzero(&s, sizeof(t_split));
 	word_count = smart_count_words(str);
-	res = ft_calloc(word_count + 1, sizeof(char *));
+	res = (char **)ft_calloc(word_count + 1, sizeof(char *));
 	if (!res)
 		return (NULL);
 	while (str[s.i])
@@ -71,6 +72,8 @@ int	init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
 	parse_cmd->trimmed_input = ft_strtrim(input, " \t\n");
 	parse_cmd->clean_input = ft_strdup(parse_cmd->trimmed_input);
 	parse_cmd->splitter_clean_input = smart_split(parse_cmd->clean_input);
+	for (int i = 0; parse_cmd->splitter_clean_input[i]; i++)
+		ft_printf("%s splitter_clean_input\n", parse_cmd->splitter_clean_input[i]);
 	free(parse_cmd->trimmed_input);
 	if (!parse_cmd->clean_input)
 		return (EXIT_FAILURE);
@@ -97,13 +100,10 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 {
 	if (parse_cmd->token_started)
 	{
-		ft_printf("1\n");
 		parse_cmd->buffer[parse_cmd->j] = '\0';
 		if ((parse_cmd->token_was_single_quoted
 			|| parse_cmd->token_was_dollar_quote) || !ft_strchr(parse_cmd->buffer, '$'))
 			{
-
-				ft_printf("2\n");
 				parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup(parse_cmd->buffer);
 				if (parse_cmd->cmd.args[parse_cmd->i - 1] == NULL)
 				return (EXIT_FAILURE);
@@ -113,7 +113,6 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 				= expand_env_variables_in_token(parse_cmd->buffer,
 					env_list, parse_cmd);
 					
-					ft_printf("3\n");
 				}
 				parse_cmd->j = 0;
 				parse_cmd->token_started = false;
@@ -122,7 +121,6 @@ int	if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 				parse_cmd->token_was_dollar_quote = false;
 			}
 			parse_cmd->index_splitter++;
-			ft_printf("4\n");
 			return (EXIT_SUCCESS);
 }
 int is_dollar_inside_quote(const char *str)
@@ -137,20 +135,11 @@ int is_dollar_inside_quote(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '\'' && !dquote)
-		{
 			squote = !squote;
-			ft_printf("if   single is %d double is %d\n", squote, dquote);
-		}
 		else if (str[i] == '\"' && !squote)
-		{
-			ft_printf("else if   single is %d double is %d\n", squote, dquote);
 			dquote = !dquote;
-		}
 		else if (str[i] == '$' && !squote)
-		{
-			ft_printf("single is %d double is %d\n", squote, dquote);
 			return 1;
-		}
 		i++;
 	}
 	return 0;
@@ -160,27 +149,22 @@ int	if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 		{
 			if (parse_cmd->token_started)
 			{
-		ft_printf("5\n");
 		parse_cmd->buffer[parse_cmd->j] = '\0';
-		// ft_printf("parse_cmd->token_was_single_quoted %d parse_cmd->token_was_dollar_quote %d parse_cmd->has_dollar %d\n", parse_cmd->token_was_single_quoted, parse_cmd->token_was_dollar_quote, parse_cmd->has_dollar);
 		if ((parse_cmd->token_was_single_quoted
 			|| parse_cmd->token_was_dollar_quote) && !is_dollar_inside_quote(parse_cmd->clean_input))
 			{
-				ft_printf("6\n");
 				parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup(parse_cmd->buffer);
 				if (parse_cmd->cmd.args[parse_cmd->i - 1] == NULL)
 				return (EXIT_FAILURE);
 			}
 			else
 			{
-				ft_printf("7\n");
 				parse_cmd->cmd.args[parse_cmd->i++]
 				= expand_env_variables_in_token(parse_cmd->buffer,
 					env_list, parse_cmd);
 					
 				}
 			}
-			ft_printf("8\n");
 	parse_cmd->index_splitter++;
 	return (EXIT_SUCCESS);
 }
@@ -218,6 +202,7 @@ t_cmd	*parse_cmd(char *input, t_env *env_list)
 		return (NULL);
 	if (clean_parse_cmd(&parse_cmd) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
+	
 	*cmd_result = parse_cmd.cmd;
 	return (cmd_result);
 }

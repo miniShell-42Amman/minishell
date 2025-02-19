@@ -161,5 +161,5 @@ int					is_duplicate_operator_series(t_token *token, int token_count);
 int is_dolloar_quote(const char *token);
 void calculate_dollar_array(t_parse_cmd *p);
 int is_string_inside_single(const char *token);
-
+char **convert_env_to_list(t_env *env_list);
 #endif

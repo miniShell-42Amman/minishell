@@ -116,8 +116,10 @@ t_cmd parse_cmd(char *input, t_env *env_list)
             free(parse_cmd.cmd.args);
         if (parse_cmd.buffer)
             free(parse_cmd.buffer);
+        parse_cmd.clean_input = NULL;
         parse_cmd.cmd.args = NULL;
         parse_cmd.cmd.cmd = NULL;
+        parse_cmd.args = NULL;
         parse_cmd.cmd.arg_count = 0;
         return parse_cmd.cmd;
     }

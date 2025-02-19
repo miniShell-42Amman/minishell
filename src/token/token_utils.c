@@ -12,13 +12,14 @@
 
 #include "minishell.h"
 
-int	ft_have_operator(t_parse_cmd *parse_cmd)
+int ft_have_operator(t_parse_cmd *parse_cmd)
 {
+
 	if (parse_cmd->c == '|')
 		parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup("|");
-	else if (parse_cmd->operator == '>')
+	else if (parse_cmd->operator== '>')
 		parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup(">>");
-	else if (parse_cmd->operator == '<')
+	else if (parse_cmd->operator== '<')
 		parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup("<<");
 	else if (parse_cmd->c == '<')
 		parse_cmd->cmd.args[parse_cmd->i++] = ft_strdup("<");
@@ -30,10 +31,9 @@ int	ft_have_operator(t_parse_cmd *parse_cmd)
 	return (EXIT_SUCCESS);
 }
 
-int	check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
+int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
 {
-	if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|'
-			|| parse_cmd->c == '<' || parse_cmd->c == '>'))
+	if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|' || parse_cmd->c == '<' || parse_cmd->c == '>'))
 	{
 		if (if_token_started(parse_cmd, env_list) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
@@ -45,19 +45,19 @@ int	check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
 	{
 		if (parse_cmd->j >= (int)(ft_strlen(parse_cmd->clean_input) + 1))
 			return (EXIT_FAILURE);
+
 		parse_cmd->buffer[parse_cmd->j++] = parse_cmd->c;
 		if (parse_cmd->operator)
-			parse_cmd->buffer[parse_cmd->j++] = parse_cmd->operator;		
+			parse_cmd->buffer[parse_cmd->j++] = parse_cmd->operator;
 		parse_cmd->token_started = true;
 		parse_cmd->k++;
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	check_condition(t_parse_cmd *parse_cmd)
+int check_condition(t_parse_cmd *parse_cmd)
 {
-	if (!parse_cmd->token_started && parse_cmd->c == '$'
-		&& parse_cmd->clean_input[parse_cmd->k + 1] == '"')
+	if (!parse_cmd->token_started && parse_cmd->c == '$' && parse_cmd->clean_input[parse_cmd->k + 1] == '"')
 	{
 		parse_cmd->token_was_dollar_quote = true;
 		parse_cmd->k++;
@@ -68,10 +68,9 @@ int	check_condition(t_parse_cmd *parse_cmd)
 	return (EXIT_FAILURE);
 }
 
-int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
+int ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 {
-	if ((parse_cmd->c == '\'' || parse_cmd->c == '"')
-		&& parse_cmd->token_quote_type == '\0')
+	if ((parse_cmd->c == '\'' || parse_cmd->c == '"') && parse_cmd->token_quote_type == '\0')
 	{
 		parse_cmd->token_quote_type = parse_cmd->c;
 		parse_cmd->in_quotes = true;
@@ -81,20 +80,19 @@ int	ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 		parse_cmd->k++;
 		return (EXIT_SUCCESS);
 	}
-	else if (parse_cmd->c == parse_cmd->token_quote_type
-		&& parse_cmd->in_quotes)
-		{
+	else if (parse_cmd->c == parse_cmd->token_quote_type && parse_cmd->in_quotes)
+	{
 		parse_cmd->in_quotes = false;
 		parse_cmd->token_quote_type = '\0';
-		parse_cmd->k++;	
+		parse_cmd->k++;
 		return (EXIT_SUCCESS);
 	}
 	return (EXIT_FAILURE);
 }
 
-int	is_duplicate_operator_series(t_token *t, int count)
+int is_duplicate_operator_series(t_token *t, int count)
 {
-	int	i;
+	int i;
 
 	i = -1;
 	while (++i < count - 1)
@@ -106,7 +104,7 @@ int	is_duplicate_operator_series(t_token *t, int count)
 			else if (t[i].type != 6)
 			{
 				ft_printf("syntax error near unexpected token `%s'\n",
-					t[i + 1].value);
+						  t[i + 1].value);
 				return (EXIT_FAILURE);
 			}
 		}

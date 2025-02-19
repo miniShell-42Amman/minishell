@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+int g_exit_status = 0;
 void	start_tokenization(t_main *main)
 {
 	int	*array;
@@ -79,6 +79,8 @@ int	main(int ac, char **av, char **env)
 			break ;
 		add_history(main.input);
 		start_tokenization(&main);
+		// redirections(&main);
+		// execute_cmd(&main);
 		free(main.input);
 		main.input = NULL;
 	}

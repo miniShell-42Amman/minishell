@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   build_env.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/20 21:49:48 by oissa             #+#    #+#             */
+/*   Updated: 2025/02/20 21:49:48 by oissa            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 size_t calculate_number_operations(t_token *tokens, size_t token_count)
@@ -129,6 +141,40 @@ char *resolve_command_path(char *command, t_env *env_list)
     return (NULL);
 }
 
+void check_builtins(t_execute *execute)
+{
+    if (ft_strcmp(execute->commands[execute->i][0], "echo") == 0)
+    {
+        echo(execute->commands[execute->i], execute->cmd_args[execute->i]);
+        exit(EXIT_SUCCESS);
+    }
+    else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
+    {
+        free_execute(execute);
+        exit(EXIT_SUCCESS);
+    }
+    else if (ft_strcmp(execute->commands[execute->i][0], "env") == 0)
+    {
+        env(execute->envp);
+        exit(EXIT_SUCCESS);
+    }
+    // else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
+    // {
+    //     export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
+    //     exit(EXIT_SUCCESS);
+    // }
+    // else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
+    // {
+    //     unset(execute->commands[execute->i], execute->env_list);
+    //     exit(EXIT_SUCCESS);
+    // }
+    else if (ft_strcmp(execute->commands[execute->i][0], "pwd") == 0)
+    {
+        pwd();
+        exit(EXIT_SUCCESS);
+    }
+}
+
 void execute_command(t_execute *execute)
 {
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
@@ -144,27 +190,54 @@ void execute_command(t_execute *execute)
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
+    check_builtins(execute);
     execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list);
     if (!execute->cmd_path)
     {
+        ft_dprintf(STDERR_FILENO, "Error404: %s: command not found\n", execute->commands[execute->i][0]);
         free_execute(execute);
         exit(EXIT_FAILURE);
     }
     if (execve(execute->cmd_path, execute->commands[execute->i], execute->envp) < 0)
     {
-        perror("execve");
+        perror("Error404");
         exit(EXIT_FAILURE);
     }
 }
 
+int check_builtins_too(t_execute *execute)
+{
+    if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
+        {
+            cd(execute->commands[execute->i], execute->cmd_args[execute->i], execute->env_list);
+            execute->i++;
+            return (EXIT_SUCCESS);
+        }
+        else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
+        {
+            export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
+            execute->i++;
+            return (EXIT_SUCCESS);
+        }
+        else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
+        {
+            unset(execute->commands[execute->i], execute->env_list);
+            execute->i++;
+            return (EXIT_SUCCESS);
+        }
+    return (EXIT_FAILURE);
+}
+
 int fork_and_execute(t_execute *execute, int *check)
 {
-    execute->pids = malloc(execute->num_cmds * sizeof(pid_t));
+    execute->pids = ft_calloc(execute->num_cmds, sizeof(pid_t));
     if (!execute->pids)
         return (EXIT_FAILURE);
     execute->i = 0;
     while (execute->i < execute->num_cmds)
     {
+        if (check_builtins_too(execute) == EXIT_SUCCESS)
+            continue ;
         execute->pid = fork();
         if (execute->pid < 0)
         {
@@ -182,6 +255,8 @@ int fork_and_execute(t_execute *execute, int *check)
 
 void close_pipes_and_wait(t_execute *execute)
 {
+    if (!execute->pids)
+        return ;
     execute->i = 0;
     while ((int)execute->i < 2 * execute->num_pipes)
     {
@@ -191,7 +266,8 @@ void close_pipes_and_wait(t_execute *execute)
     execute->i = 0;
     while (execute->i < execute->num_cmds)
     {
-        waitpid(execute->pids[execute->i], NULL, 0);
+        if (execute->pids[execute->i] > 0)
+            waitpid(execute->pids[execute->i], NULL, 0);
         execute->i++;
     }
 }

@@ -21,6 +21,13 @@ SRC = 	src/main.c 							\
 		src/execute/utils/ft_strtok.c		\
 		src/execute/utils/list_utils.c		\
 		src/execute/utils/free_execute.c	\
+		src/builtins/echo.c					\
+		src/builtins/cd.c					\
+		src/builtins/pwd.c					\
+		src/builtins/env.c					\
+		src/builtins/export.c				\
+		src/builtins/unset.c				\
+
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

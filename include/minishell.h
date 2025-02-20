@@ -86,7 +86,6 @@ typedef struct s_parse_cmd
 	char			c;
 	char			token_quote_type;
 	int				operator;
-	char* loay;
 }					t_parse_cmd;
 
 typedef struct s_main
@@ -116,6 +115,22 @@ typedef struct s_counter
 	int				*array;
 	int				count;
 }					t_counter;
+
+typedef	struct s_execute
+{
+	char **envp;
+	size_t num_cmds;
+	char ***commands;
+	size_t *cmd_args;
+	int *pipe_fds;
+	pid_t *pids;
+	int num_pipes;
+	size_t cmd_index;
+    size_t i;
+	size_t arg_index;
+	char *cmd_path;
+}			t_execute;
+
 
 int					create_node(t_env **node);
 int					init_values(t_env *new_node, char **object);

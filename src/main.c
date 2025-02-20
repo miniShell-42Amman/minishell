@@ -79,7 +79,7 @@ int	main(int ac, char **av, char **env)
 			break ;
 		add_history(main.input);
 		start_tokenization(&main);
-		convert_env_to_list(main.env_list);
+		start_execution(main.tokens_list, main.cmd->arg_count, main.env_list);
 		// redirections(&main);
 		// execute_cmd(&main);
 		free(main.input);

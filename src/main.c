@@ -17,14 +17,6 @@ void	start_tokenization(t_main *main)
 	int	*array;
 
 	array = ft_count_token(main->input);
-	if (array)
-	{
-		for (int i = 0; i < array[0]; i++)
-		{
-			if (array[i])
-				ft_printf("array[%d]: %d\n", i, array[i]);
-		}	
-	}
 	main->cmd = parse_cmd(main->input, main->env_list);
 	if (!main->cmd)
 	{

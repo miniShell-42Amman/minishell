@@ -124,11 +124,13 @@ typedef	struct s_execute
 	size_t *cmd_args;
 	int *pipe_fds;
 	pid_t *pids;
+	pid_t pid;
 	int num_pipes;
 	size_t cmd_index;
     size_t i;
 	size_t arg_index;
 	char *cmd_path;
+	t_env *env_list;
 }			t_execute;
 
 
@@ -177,4 +179,5 @@ int is_dolloar_quote(const char *token);
 void calculate_dollar_array(t_parse_cmd *p);
 int is_string_inside_single(const char *token);
 char **convert_env_to_list(t_env *env_list);
+void start_execution(t_token *tokens, size_t token_count, t_env *env_list);
 #endif

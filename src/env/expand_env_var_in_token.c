@@ -181,8 +181,6 @@ char	*expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *
     j = 0;
     if (!token || !env)
         return (ft_strdup("")); 
-    ft_printf("token received: %s\n", token); 
-    ft_printf("index splitter: %d\n", parse_cmd->index_splitter);
     parse_cmd->arr_has_dollar_count = 0;
     result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
     parse_cmd->arr_has_dollar_count = 0;

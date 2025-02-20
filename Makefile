@@ -17,7 +17,10 @@ SRC = 	src/main.c 							\
 		src/token/store_token.c 			\
 		src/token/token_utils.c			 	\
 		src/free_resources/free_parse.c		\
-		src/execute/build_env.c				
+		src/execute/build_env.c				\
+		src/execute/utils/ft_strtok.c		\
+		src/execute/utils/list_utils.c		\
+		src/execute/utils/free_execute.c	\
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

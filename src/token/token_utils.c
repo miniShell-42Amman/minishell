@@ -113,5 +113,7 @@ int is_duplicate_operator_series(t_token *t, int count)
 		if (t[i].type == 6 && t[i + 1].type == 6)
 			return (ft_printf("syntax error near unexpected token `|'\n"));
 	}
+	if(t[i].type == 6)
+		return (ft_printf("syntax error near unexpected token `|'\n"));
 	return (EXIT_SUCCESS);
 }

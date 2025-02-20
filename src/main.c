@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	start_tokenization(t_main *main)
+int	start_tokenization(t_main *main)
 {
 	int	*array;
 
@@ -24,7 +24,7 @@ void	start_tokenization(t_main *main)
 		free_resources(main, 0);
 		if (array)
 			free(array);
-		return ;
+		return (EXIT_FAILURE);
 	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 			array);
@@ -33,10 +33,11 @@ void	start_tokenization(t_main *main)
 	{
 		free_resources(main, 0);
 		free(array);
-		return ;
+		return (EXIT_FAILURE);
 	}
 	if (array)
 		free(array);
+	return (EXIT_SUCCESS);
 }
 
 int	main(int ac, char **av, char **env)
@@ -59,8 +60,8 @@ int	main(int ac, char **av, char **env)
 		if (ft_strcmp(main.input, "exit") == 0)
 			break ;
 		add_history(main.input);
-		start_tokenization(&main);
-		start_execution(main.tokens_list, main.cmd->arg_count, main.env_list);
+		if(!start_tokenization(&main))
+			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list);
 		free(main.input);
 		main.input = NULL;
 	}

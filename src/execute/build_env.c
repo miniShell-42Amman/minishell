@@ -269,12 +269,15 @@ void close_pipes_and_wait(t_execute *execute)
         execute->i++;
     }
     execute->i = 0;
-    while (execute->i < execute->num_cmds)
-    {
-        if (execute->pids[execute->i] > 0)
-            waitpid(execute->pids[execute->i], NULL, 0);
-        execute->i++;
-    }
+    // while (execute->i < execute->num_cmds)
+    // {
+    //     if (execute->pids[execute->i] > 0)
+    //         waitpid(execute->pids[execute->i], NULL, 0);
+    //     execute->i++;
+    // }
+    while (wait(NULL) != -1)
+        ;
+
 }
 
 void start_execution(t_token *tokens, size_t token_count, t_env *env_list)

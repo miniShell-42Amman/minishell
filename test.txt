@@ -7,3 +7,6 @@ Check -> pwd,export,unset,env handle cases
 Exit_status 
 $?
 Shortcut ctrl+c , ctrl + d , ctrl + \
+
+
+1 << 2 << 3 

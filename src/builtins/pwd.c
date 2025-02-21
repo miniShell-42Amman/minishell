@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 21:57:26 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/20 22:43:28 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/21 16:34:36 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,8 @@
 
 void    pwd(void)
 {
-    char    *path;
-
-    path = getcwd(NULL, 0);
-    if (!path)
+    char    path[PATH_MAX];
+    if (!getcwd(path, PATH_MAX))
         return ;
     ft_printf("%s\n", path);
-    free(path);
 }

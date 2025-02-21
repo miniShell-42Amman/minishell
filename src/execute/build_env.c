@@ -12,6 +12,13 @@
 
 #include "minishell.h"
 
+void exit_error(char *message, t_execute *execute)
+{
+    ft_dprintf(STDERR_FILENO, "%s\n", message);
+    free_execute(execute);
+    exit(EXIT_FAILURE);
+}
+
 size_t calculate_number_operations(t_token *tokens, size_t token_count)
 {
     size_t i;
@@ -77,6 +84,7 @@ int fill_commands(t_token *token, size_t token_count, t_execute *execute)
         }
     return (EXIT_SUCCESS);
 }
+
 int create_pipes(t_execute *execute, int *check)
 {
     execute->pipe_fds = malloc(2 * execute->num_pipes * sizeof(int));
@@ -141,38 +149,39 @@ char *resolve_command_path(char *command, t_env *env_list)
     return (NULL);
 }
 
-void check_builtins(t_execute *execute)
+int is_commands(t_execute *execute,int flag)
 {
+    char *customs[] = {"echo", "exit", "env", "pwd", "export", "unset", "cd"};
+    int i;
+    int max;
+
+    i = 0;
+    max = 4;
+    if (flag)
+    {
+        i = 4;
+        max = 7;
+    }
+    while (i < max)
+    {
+        if (ft_strcmp(execute->commands[execute->i][0], customs[i]) == 0)
+            return (EXIT_SUCCESS);
+        i++;
+    }
+    return (EXIT_FAILURE); 
+}
+
+void check_cutstom(t_execute *execute)
+{
+
     if (ft_strcmp(execute->commands[execute->i][0], "echo") == 0)
-    {
-        echo(execute->commands[execute->i], execute->cmd_args[execute->i]);
-        exit(EXIT_SUCCESS);
-    }
+        echo(execute->commands[execute->i]);
     else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
-    {
         free_execute(execute);
-        exit(EXIT_SUCCESS);
-    }
     else if (ft_strcmp(execute->commands[execute->i][0], "env") == 0)
-    {
         env(execute->envp);
-        exit(EXIT_SUCCESS);
-    }
-    // else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
-    // {
-    //     export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
-    //     exit(EXIT_SUCCESS);
-    // }
-    // else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-    // {
-    //     unset(execute->commands[execute->i], execute->env_list);
-    //     exit(EXIT_SUCCESS);
-    // }
     else if (ft_strcmp(execute->commands[execute->i][0], "pwd") == 0)
-    {
         pwd();
-        exit(EXIT_SUCCESS);
-    }
 }
 
 void execute_command(t_execute *execute)
@@ -190,7 +199,12 @@ void execute_command(t_execute *execute)
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
-    check_builtins(execute);
+    handle_redirections(execute);
+    if(!is_commands(execute,0))
+    {
+        check_cutstom(execute);
+        exit(EXIT_SUCCESS);
+    }
     execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list);
     if (!execute->cmd_path)
     {
@@ -205,27 +219,14 @@ void execute_command(t_execute *execute)
     }
 }
 
-int check_builtins_too(t_execute *execute)
+void check_builtins_too(t_execute *execute)
 {
     if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
-        {
-            cd(execute->commands[execute->i], execute->cmd_args[execute->i], execute->env_list);
-            execute->i++;
-            return (EXIT_SUCCESS);
-        }
-        else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
-        {
+            cd(execute->commands[execute->i], execute->cmd_args[execute->i], &execute->env_list);
+    else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
             export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
-            execute->i++;
-            return (EXIT_SUCCESS);
-        }
-        else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-        {
+    else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
             unset(execute->commands[execute->i], execute->env_list);
-            execute->i++;
-            return (EXIT_SUCCESS);
-        }
-    return (EXIT_FAILURE);
 }
 
 int fork_and_execute(t_execute *execute, int *check)
@@ -236,8 +237,12 @@ int fork_and_execute(t_execute *execute, int *check)
     execute->i = 0;
     while (execute->i < execute->num_cmds)
     {
-        if (check_builtins_too(execute) == EXIT_SUCCESS)
+        if (is_commands(execute,1) == EXIT_SUCCESS)
+        {
+            check_builtins_too(execute);
+            execute->i++;
             continue ;
+        }
         execute->pid = fork();
         if (execute->pid < 0)
         {

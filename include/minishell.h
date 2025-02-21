@@ -177,7 +177,7 @@ void free_resources(t_main *main, int flag);
 int is_duplicate_operator_series(t_token *token, int token_count);
 int is_dolloar_quote(const char *token);
 void calculate_dollar_array(t_parse_cmd *p);
-int 	is_string_inside_single(const char *token);
+int is_string_inside_single(const char *token);
 char **convert_env_to_list(t_env *env_list);
 void start_execution(t_token *tokens, size_t token_count, t_env *env_list);
 char *ft_strtok(char *str, const char *delim);
@@ -188,11 +188,15 @@ char **convert_env_to_list(t_env *env_list);
 void free_execute(t_execute *execute);
 void free_execute_too(t_execute *execute);
 int fill_env_list(char ***envp, t_env *env_list, int envp_count);
-void	echo(char **args, int arg_count);
-void    cd(char **args, int arg_count, t_env *env_list);
-void    pwd(void);
-void    env(char **env);
-int	 export(char **args, int arg_count, t_env **env);
-void    unset(char **args, t_env *env_list);
+void echo(char **args);
+void cd(char **args, int arg_count, t_env **env);
+void pwd(void);
+void env(char **env);
+int export(char **args, int arg_count, t_env **env);
+void unset(char **args, t_env *env_list);
+t_env *new_node_env(char *key, char *value);
+void add_new_node(t_env **head, t_env *new_node);
+void handle_redirections(t_execute *execute);
+
 
 #endif

@@ -27,6 +27,7 @@ SRC = 	src/main.c 							\
 		src/builtins/env.c					\
 		src/builtins/export.c				\
 		src/builtins/unset.c				\
+		src/execute/redirections.c			\
 
 
 OBJ_DIR = obj

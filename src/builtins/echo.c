@@ -3,34 +3,57 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/20 21:15:23 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/20 22:43:14 by oissa            ###   ########.fr       */
+/*   Created: 2025/02/21 01:22:35 by lalhindi          #+#    #+#             */
+/*   Updated: 2025/02/21 01:26:56 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	echo(char **args, int arg_count)
+static int	check_n_flag(char *arg)
 {
-    bool new_line;
-    int i;
+	int	j;
 
-    i = 1;
-    new_line = true;
-    if (arg_count > 1 && ft_strncmp(args[i], "-n", 2) == 0)
-    {
-        new_line = false;
-        i++;
-    }
-    while (args[i])
-    {
-        ft_printf("%s", args[i]);
-        if (args[i + 1])
-            ft_printf(" ");
-        i++;
-    }
-    if (new_line)
-        ft_printf("\n");
+	if (ft_strncmp(arg, "-n", 2) != 0)
+		return (0);
+	j = 1;
+	while (arg[++j])
+		if (arg[j] != 'n')
+			return (0);
+	return (1);
+}
+
+static void	print_args(char **args, int i)
+{
+	while (args[i])
+	{
+		ft_printf(args[i]);
+		if (args[i + 1])
+			ft_printf(" ");
+		i++;
+	}
+}
+
+void	echo(char **args)
+{
+	int	i;
+	int	new_line;
+
+	i = 1;
+	new_line = 1;
+	if (!args[1])
+	{
+		ft_printf("\n");
+		return ;
+	}
+	while (args[i] && check_n_flag(args[i]))
+	{
+		new_line = 0;
+		i++;
+	}
+	print_args(args, i);
+	if (new_line)
+		ft_printf("\n");
 }

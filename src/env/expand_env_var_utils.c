@@ -11,6 +11,31 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+t_env *new_node_env(char *key, char *value)
+{
+    t_env *new_node = malloc(sizeof(t_env));
+    if (!new_node)
+        return (NULL);
+    new_node->key = key;
+    new_node->value = value;
+    new_node->next = NULL;
+    return (new_node);
+}
+
+void add_new_node(t_env **head, t_env *new_node)
+{
+    t_env *tmp;
+
+    if (!*head)
+    {
+        *head = new_node;
+        return;
+    }
+    tmp = *head;
+    while (tmp->next)
+        tmp = tmp->next;
+    tmp->next = new_node;
+}
 
 char	*find_env_value(t_env *env_list, const char *var_name)
 {

@@ -1,0 +1,9 @@
+Cd -> handle functions with norminette and valgrind
+Redirections -> handle functions with valgrind with and use other getline
+Check -> pwd,export,unset,env handle cases 
+
+
+
+Exit_status 
+$?
+Shortcut ctrl+c , ctrl + d , ctrl + \

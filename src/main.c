@@ -60,12 +60,15 @@ int	main(int ac, char **av, char **env)
 		if (ft_strcmp(main.input, "exit") == 0)
 			break ;
 		add_history(main.input);
-		if(!start_tokenization(&main))
+		char *str = ft_strtrim(main.input," ");
+		if(*str && *main.input && !start_tokenization(&main))
 			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list);
 		free(main.input);
+		free(str);
 		main.input = NULL;
 	}
 	free_resources(&main, 1);
 	rl_clear_history();
 	return (0);
 }
+			 

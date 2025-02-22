@@ -13,6 +13,7 @@ SRC = 	src/main.c 							\
 		src/token/ft_count_args.c			\
 		src/token/token.c 					\
 		src/env/expand_env_var_in_token.c 	\
+		src/env/expand_env_utils_second.c 	\
 		src/free_resources/free_main.c		\
 		src/token/store_token.c 			\
 		src/token/token_utils.c			 	\
@@ -28,6 +29,7 @@ SRC = 	src/main.c 							\
 		src/builtins/export.c				\
 		src/builtins/unset.c				\
 		src/execute/redirections.c			\
+		src/builtins/export_utils.c			\
 
 
 OBJ_DIR = obj

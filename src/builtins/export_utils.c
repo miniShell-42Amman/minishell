@@ -1,22 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   export_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/20 21:57:26 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/21 16:34:36 by lalhindi         ###   ########.fr       */
+/*   Created: 2025/02/22 03:04:40 by lalhindi          #+#    #+#             */
+/*   Updated: 2025/02/22 15:54:11 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	pwd(void)
+char	*remove_quotes(char *str)
 {
-	char	path[PATH_MAX];
+	char	*clean;
+	int		len;
 
-	if (!getcwd(path, PATH_MAX))
-		return ;
-	ft_printf("%s\n", path);
+	clean = NULL;
+	len = ft_strlen(str);
+	if (len < 2)
+		return (ft_strdup(str));
+	if ((str[0] == '"' && str[len - 1] == '"') || (str[0] == '\''
+			&& str[len - 1] == '\''))
+		clean = ft_substr(str, 1, len - 2);
+	if (clean)
+		return (clean);
+	return (ft_strdup(str));
 }

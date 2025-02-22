@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 19:50:24 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/21 20:19:08 by oissa            ###   ########.fr       */
+/*   Updated: 2025/02/22 02:52:30 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
     while (i < envp_count)
     {
         size_t envp_len;
-
-        envp_len = ft_strlen(env_list->key) + ft_strlen(env_list->value) + 2;
+        if(env_list->has_value == 0)
+            envp_len = ft_strlen(env_list->key) + 1;
+        else
+            envp_len = ft_strlen(env_list->key) + ft_strlen(env_list->value) + 2;
         (*envp)[i] = malloc(envp_len);
         if (!(*envp)[i]) 
         {

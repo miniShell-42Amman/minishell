@@ -186,6 +186,8 @@ void check_cutstom(t_execute *execute)
 
 void execute_command(t_execute *execute)
 {
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
     {
         perror("dup2");
@@ -198,8 +200,8 @@ void execute_command(t_execute *execute)
     }
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
-        close(execute->pipe_fds[execute->j]);
-    handle_redirections(execute);
+        close(execute->pipe_fds[execute->j]);   
+    handle_redirections(execute);    
     if(!is_commands(execute,0))
     {
         check_cutstom(execute);
@@ -219,14 +221,15 @@ void execute_command(t_execute *execute)
     }
 }
 
-void check_builtins_too(t_execute *execute)
+int check_builtins_too(t_execute *execute)
 {
-    if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
-            cd(execute->commands[execute->i], execute->cmd_args[execute->i], &execute->env_list);
+    if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0 && cd(execute->commands[execute->i], execute->cmd_args[execute->i], &execute->env_list))
+            return 1;
     else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
             export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
             unset(execute->commands[execute->i], execute->env_list);
+    return 0;        
 }
 
 int fork_and_execute(t_execute *execute, int *check)
@@ -239,7 +242,8 @@ int fork_and_execute(t_execute *execute, int *check)
     {
         if (is_commands(execute,1) == EXIT_SUCCESS)
         {
-            check_builtins_too(execute);
+            if(check_builtins_too(execute))
+                return(EXIT_FAILURE);
             execute->i++;
             continue ;
         }
@@ -269,12 +273,12 @@ void close_pipes_and_wait(t_execute *execute)
         execute->i++;
     }
     execute->i = 0;
-    // while (execute->i < execute->num_cmds)
-    // {
-    //     if (execute->pids[execute->i] > 0)
-    //         waitpid(execute->pids[execute->i], NULL, 0);
-    //     execute->i++;
-    // }
+            // while (execute->i < execute->num_cmds)
+            // {
+            //     if (execute->pids[execute->i] > 0)
+            //         waitpid(execute->pids[execute->i], NULL, 0);
+            //     execute->i++;
+            // }
     while (wait(NULL) != -1)
         ;
 

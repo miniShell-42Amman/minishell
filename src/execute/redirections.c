@@ -1,15 +1,11 @@
 #include "minishell.h"
 
-/*
-  دالة append_str:
-  تُضيف السلسلة src إلى نهاية dest وتُحدث حجم dest.
-  (يمكن استخدام دالة مكتبية أو إعادة كتابتها كما هو موضح)
-*/
 char *append_str(char *dest, size_t *dest_size, const char *src)
 {
     size_t src_len = ft_strlen(src);
     char *new_ptr = realloc(dest, *dest_size + src_len + 1);
-    if (!new_ptr) {
+    if (!new_ptr)
+    {
         free(dest);
         perror("realloc");
         exit(EXIT_FAILURE);
@@ -19,125 +15,118 @@ char *append_str(char *dest, size_t *dest_size, const char *src)
     return new_ptr;
 }
 
-/*
-  الدالة المعدلة:
-  - تقوم بمعالجة رموز ">", ">>" و "<" كما في السابق.
-  - عند العثور على here-document (<<) لا تقرأها على الفور وترسل مدخلها عبر dup2،
-    بل تجمع محتويات جميع here-docs في متغير مؤقت (heredoc_all).
-  - بعد الانتهاء من المرور على مصفوفة argv، يتم إنشاء أنبوب (pipe)
-    وكتابة المحتوى المجمّع إليه، ثم إعادة توجيه STDIN إليه.
-  - كما يتم إزالة رموز إعادة التوجيه ووسائطها من argv.
-*/
-void handle_redirections(t_execute *execute)
+void choose_flags_fd(t_redirections *redirections, int *flags, int *fd, int *std_fd)
 {
-    char **argv = execute->commands[execute->i];
-    int j = 0, k;
-    char *heredoc_all = NULL;
-    size_t heredoc_total_size = 0;
-
-    while (argv[j])
+    *std_fd = 0;
+    *flags = 0;
+    if (ft_strcmp(redirections->op, ">") == 0)
+        *flags = O_WRONLY | O_CREAT | O_TRUNC;
+    else if (ft_strcmp(redirections->op, ">>") == 0)
+        *flags = O_WRONLY | O_CREAT | O_APPEND;
+    else if (ft_strcmp(redirections->op, "<") == 0)
+        *flags = O_RDONLY;
+    *fd = open(redirections->target, *flags, 0644);
+    if (*fd < 0)
     {
-        if (ft_strcmp(argv[j], ">") == 0 ||
-            ft_strcmp(argv[j], ">>") == 0 ||
-            ft_strcmp(argv[j], "<") == 0)
-        {
-            char *op = argv[j];
-            char *target = argv[j+1];
-            if (!target)
-            {
-                ft_dprintf(STDERR_FILENO, "syntax error near unexpected token `%s'\n", op);
-                exit(EXIT_FAILURE);
-            }
-            if (ft_strcmp(op, ">") == 0)
-            {
-                int fd = open(target, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (fd < 0) { perror("open"); exit(EXIT_FAILURE); }
-                if (dup2(fd, STDOUT_FILENO) < 0) { perror("dup2"); exit(EXIT_FAILURE); }
-                close(fd);
-            }
-            else if (ft_strcmp(op, ">>") == 0)
-            {
-                int fd = open(target, O_WRONLY | O_CREAT | O_APPEND, 0644);
-                if (fd < 0) { perror("open"); exit(EXIT_FAILURE); }
-                if (dup2(fd, STDOUT_FILENO) < 0) { perror("dup2"); exit(EXIT_FAILURE); }
-                close(fd);
-            }
-            else if (ft_strcmp(op, "<") == 0)
-            {
-                int fd = open(target, O_RDONLY);
-                if (fd < 0) { perror("open"); exit(EXIT_FAILURE); }
-                if (dup2(fd, STDIN_FILENO) < 0) { perror("dup2"); exit(EXIT_FAILURE); }
-                close(fd);
-            }
-            /* إزالة عامل إعادة التوجيه والوسيط من argv */
-            k = j;
-            while (argv[k+2])
-            {
-                argv[k] = argv[k+2];
-                k++;
-            }
-            argv[k] = NULL;
-            argv[k+1] = NULL;
-            /* لا نقوم بزيادة j هنا لأن العنصر الجديد في الموضع j يجب فحصه */
-        }
-        else if (ft_strcmp(argv[j], "<<") == 0)
-        {
-            char *target = argv[j+1];
-            if (!target)
-            {
-                ft_dprintf(STDERR_FILENO, "syntax error near unexpected token `%s'\n", argv[j]);
-                exit(EXIT_FAILURE);
-            }
-            /* استخدام readline بدل getline */
-            char *line;
-            char *current_doc = NULL;
-            size_t current_size = 0;
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    if (*flags == O_RDONLY)
+        *std_fd = STDIN_FILENO;
+    else
+        *std_fd = STDOUT_FILENO;
+}
 
-            while (1)
-            {
-                line = readline("> ");
-                rl_on_new_line();  // تأكيد الانتقال لسطر جديد
-                
-                if (!line)
-                {
-                    ft_dprintf(STDERR_FILENO, "warning: here-document delimited by EOF (wanted `%s')\n", target);
-                    break;
-                }
-                if (ft_strcmp(line, target) == 0)
-                {
-                    free(line);
-                    break;
-                }
-                current_doc = append_str(current_doc, &current_size, line);
-                current_doc = append_str(current_doc, &current_size, "\n");
-                free(line);
-            }
-       
-            /* دمج current_doc في المحتوى الكلي heredoc_all */
-            if (current_doc)
-            {
-                heredoc_all = append_str(heredoc_all, &heredoc_total_size, current_doc);
-                free(current_doc);
-            }
-            /* إزالة رمز here-document والمحدد من argv */
-            k = j;
-            while (argv[k+2])
-            {
-                argv[k] = argv[k+2];
-                k++;
-            }
-            argv[k] = NULL;
-            argv[k+1] = NULL;
-            /* لا نقوم بزيادة j لأن قد يكون هناك المزيد */
-        }
-        else
-        {
-            j++;
-        }
+int redirection_check(t_redirections *redirections)
+{
+    int fd;
+    int flags;
+    int std_fd;
+
+    redirections->op = redirections->argv[redirections->j];
+    redirections->target = redirections->argv[redirections->j + 1];
+    if (!redirections->target && ft_dprintf(STDERR_FILENO, "syntax error near token `%s'\n", redirections->op))
+        exit(EXIT_FAILURE);
+    choose_flags_fd(redirections, &flags, &fd, &std_fd);
+    if (dup2(fd, std_fd) < 0)
+        exit(EXIT_FAILURE);
+    close(fd);
+    redirections->k = redirections->j;
+    while (redirections->argv[redirections->k + 2])
+    {
+        redirections->argv[redirections->k] = redirections->argv[redirections->k + 2];
+        redirections->k++;
+    }
+    redirections->argv[redirections->k] = NULL;
+    return (EXIT_SUCCESS);
+}
+void handle_heredoc_sigint(int signum)
+{
+	(void)signum;
+	g_signal = 130;
+	write(STDOUT_FILENO, "\n", 1);
+	// rl_replace_line("", 0);
+	// rl_on_new_line();
+	// rl_redisplay();
+}
+int redirection_check_else_if(t_redirections *redirections)
+{
+    char *target = redirections->argv[redirections->j + 1];
+    if (!target)
+    {
+        ft_dprintf(STDERR_FILENO, "syntax error near token `<<'\n");
+        exit(EXIT_FAILURE);
     }
 
-    /* إذا تم جمع محتوى here-document واحد أو أكثر، نقوم بإعادة توجيه STDIN إلى أنبوب يحتوي على المحتوى المدمج */
-    if (heredoc_all)
+    char *current_doc = NULL;
+    size_t current_size = 0;
+    char *line;
+
+    signal(SIGINT, handle_heredoc_sigint);
+    while (1)
+    {
+        line = readline("> ");
+        if (g_signal || !line)
+        {
+            free(line);
+            free(current_doc);
+            // *exit_status = 130;
+            signal(SIGINT, handle_sigint);
+            close(STDIN_FILENO);
+            exit(130);
+        }
+        if (ft_strcmp(line, target) == 0)
+        {
+            free(line);
+            break;
+        }
+
+        current_doc = append_str(current_doc, &current_size, line);
+        current_doc = append_str(current_doc, &current_size, "\n");
+        free(line);
+    }
+    signal(SIGINT, SIG_DFL);
+    if (current_doc)
+    {
+        redirections->heredoc_all = append_str(redirections->heredoc_all,
+                                               &redirections->heredoc_total_size,
+                                               current_doc);
+        free(current_doc);
+    }
+
+    redirections->k = redirections->j;
+    while (redirections->argv[redirections->k + 2])
+    {
+        redirections->argv[redirections->k] = redirections->argv[redirections->k + 2];
+        redirections->k++;
+    }
+    redirections->argv[redirections->k] = NULL;
+    return (EXIT_SUCCESS);
+}
+
+void if_redirections_heredoc_all(t_redirections *redirections)
+{
+    if (redirections->heredoc_all)
     {
         int pipefd[2];
         if (pipe(pipefd) < 0)
@@ -145,12 +134,12 @@ void handle_redirections(t_execute *execute)
             perror("pipe");
             exit(EXIT_FAILURE);
         }
-        if (write(pipefd[1], heredoc_all, strlen(heredoc_all)) < 0)
+        if (write(pipefd[1], redirections->heredoc_all, redirections->heredoc_total_size) < 0)
         {
             perror("write");
             exit(EXIT_FAILURE);
         }
-        free(heredoc_all);
+        free(redirections->heredoc_all);
         close(pipefd[1]);
         if (dup2(pipefd[0], STDIN_FILENO) < 0)
         {
@@ -159,4 +148,25 @@ void handle_redirections(t_execute *execute)
         }
         close(pipefd[0]);
     }
+}
+void handle_redirections(t_execute *execute)
+{
+    t_redirections redirections;
+
+    ft_bzero(&redirections, sizeof(t_redirections));
+    redirections.argv = execute->commands[execute->i];
+
+    while (redirections.argv[redirections.j])
+    {
+        if ((!ft_strcmp(redirections.argv[redirections.j], ">") ||
+             !ft_strcmp(redirections.argv[redirections.j], ">>") ||
+             !ft_strcmp(redirections.argv[redirections.j], "<")) &&
+            !redirection_check(&redirections))
+            continue;
+        else if (!ft_strcmp(redirections.argv[redirections.j], "<<") &&
+                 !redirection_check_else_if(&redirections))
+            continue;
+        redirections.j++;
+    }
+    if_redirections_heredoc_all(&redirections);
 }

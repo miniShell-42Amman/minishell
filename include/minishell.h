@@ -20,6 +20,7 @@
 #define WHITE "\033[0;37m"
 #define BLUE "\033[0;34m"
 #define YELLOW "\033[0;33m"
+#define PROMPT "\001\033[35m\002⚠️  Error404 ⚠️  >\001\033[0;32m\002 "
 
 #include "libft.h"
 #include <readline/history.h>
@@ -29,6 +30,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
+
+extern volatile sig_atomic_t g_signal;
 
 typedef struct s_env
 {
@@ -86,14 +90,17 @@ typedef struct s_parse_cmd
 	char c;
 	char token_quote_type;
 	int operator;
+	int  exit_status;
 } t_parse_cmd;
 
 typedef struct s_main
 {
-	char *input;
 	t_cmd *cmd;
 	t_token *tokens_list;
 	t_env *env_list;
+	int exit_status;
+	char *input;
+	char *str;
 } t_main;
 
 typedef struct s_split
@@ -134,6 +141,21 @@ typedef struct s_execute
 	t_env *env_list;
 } t_execute;
 
+typedef struct s_redirections
+{
+	char **argv;
+	int j;
+	int k;
+	char *heredoc_all;
+	size_t heredoc_total_size;
+	char *op;
+	char *target;
+	char *current_doc;
+	size_t current_size;
+	char *line;
+}			t_redirections;
+
+
 int create_node(t_env **node);
 int init_values(t_env *new_node, char **object);
 t_env *clone_env(char **env);
@@ -143,7 +165,7 @@ int add_node_to_env(t_env **head, t_env *new_node);
 void free_object(char **object, t_env *head);
 int *ft_count_token(char *input);
 int count_args(char *input);
-t_cmd *parse_cmd(char *input, t_env *env_list);
+t_cmd *parse_cmd(char *input, t_env *env_list, int *status);
 char *find_env_value(t_env *env_list, const char *var_name);
 char *expand_env_variables_in_token(const char *token,
 									t_env *env_list, t_parse_cmd *parse_cmd);
@@ -189,7 +211,7 @@ void free_execute(t_execute *execute);
 void free_execute_too(t_execute *execute);
 int fill_env_list(char ***envp, t_env *env_list, int envp_count);
 void echo(char **args);
-void cd(char **args, int arg_count, t_env **env);
+int cd(char **args, int arg_count, t_env **env);
 void pwd(void);
 void env(char **env);
 int export(char **args, int arg_count, t_env **env);
@@ -197,6 +219,12 @@ void unset(char **args, t_env *env_list);
 t_env *new_node_env(char *key, char *value);
 void add_new_node(t_env **head, t_env *new_node);
 void handle_redirections(t_execute *execute);
-
-
+char *get_env_var(t_env *env, const char *key);
+void	ft_sort_arr(char **arr, int size);
+void update_existing_env(t_env *tmp, char *v);
+void update_env(t_env **env, char *k, char *v);
+void add_new_env(t_env **env, char *k, char *v);
+char *remove_quotes(char *str);
+void setup_signals(void);
+void handle_sigint(int signum);
 #endif

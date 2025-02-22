@@ -283,11 +283,12 @@ int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
 	return (EXIT_SUCCESS);
 }
 
-t_cmd *parse_cmd(char *input, t_env *env_list)
+t_cmd *parse_cmd(char *input, t_env *env_list, int *status)
 {
 	t_parse_cmd parse_cmd;
 	t_cmd *cmd_result;
-
+	if (*status != 0)
+		*status = parse_cmd.exit_status; 
 	cmd_result = ft_calloc(1, sizeof(t_cmd));
 	if ((!cmd_result || init_parse_cmd(&parse_cmd, input)) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
@@ -297,7 +298,8 @@ t_cmd *parse_cmd(char *input, t_env *env_list)
 		return (NULL);
 	if (clean_parse_cmd(&parse_cmd) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
-
 	*cmd_result = parse_cmd.cmd;
+	*status = parse_cmd.exit_status; 
+	ft_printf("status for parse %d\n", *status);
 	return (cmd_result);
 }

@@ -113,7 +113,9 @@
     "stdexcept": "c",
     "streambuf": "c",
     "cstdbool": "c",
-    "typeinfo": "c"
+    "typeinfo": "c",
+    "sstream": "c",
+    "history.h": "c"
   },
   "cSpell.words": [
     "MINISHELL"

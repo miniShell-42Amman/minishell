@@ -19,7 +19,8 @@ size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
     start = *token;
     if (**token == '?')
     {
-        value = get_var_value(env, "?", 1);
+        value = ft_itoa(p->exit_status);
+        // value = get_var_value(env, "?", 1);
         (*token)++;
     }
     else
@@ -58,7 +59,13 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
     start = *t;
     if (**t == '?')
     {
-        value = get_var_value(e, "?", 1);
+        // value = get_var_value(e, "?", 1);
+        value = ft_itoa(p->exit_status);
+        // if (value)
+        // {
+        //     ft_strlcpy(*res + *j, value, ft_strlen(value) + 1);
+        //     *j += ft_strlen(value);
+        // }
         (*t)++;
     }
 
@@ -191,13 +198,11 @@ char	*expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *
     j = 0;
     squote = false;
     dquote = false;
-    // ft_printf()
     while (*token)
     {
         update_quote_state(*token, &squote, &dquote);
         if (*token == '$' && !is_string_inside_single(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]) && (*(token + 1) != ' ' && *(token + 1) != '\0'))
         {
-            // ft_printf("is_string_inside_single: %d\n", is_string_inside_single(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]));
             process_variable(&token, env, &result, &j, parse_cmd);
             continue;
         }

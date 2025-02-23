@@ -90,7 +90,14 @@ int ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	return (EXIT_FAILURE);
 }
 
-int is_duplicate_operator_series(t_token *t, int count)
+static int print_syntax_error(char *token, int *status)
+{
+    ft_printf("syntax error near unexpected token `%s'\n", token);
+    *status = 2;
+    return (EXIT_FAILURE);
+}
+
+int is_duplicate_operator_series(t_token *t, int count, int *status)
 {
 	int i;
 
@@ -99,21 +106,18 @@ int is_duplicate_operator_series(t_token *t, int count)
 	{
 		if (t[i].type >= 2 && t[i + 1].type >= 2)
 		{
-			if (t[i].type == 6 && t[i + 1].type == 6)
-				return (ft_printf("syntax error near unexpected token `|'\n"));
+			if (t[i].type == 6 && t[i + 1].type == 6 )
+
+				return (print_syntax_error("|", status));
 			else if (t[i].type != 6)
-			{
-				ft_printf("syntax error near unexpected token `%s'\n",
-						  t[i + 1].value);
-				return (EXIT_FAILURE);
-			}
+				return (print_syntax_error(t[i + 1].value, status));
 		}
 		if (t[i].type == 6 && (i == 0 || i == count - 1))
-			return (ft_printf("syntax error near unexpected token `|'\n"));
+			return (print_syntax_error("|", status));
 		if (t[i].type == 6 && t[i + 1].type == 6)
-			return (ft_printf("syntax error near unexpected token `|'\n"));
+			return (print_syntax_error("|", status));
 	}
 	if(t[i].type == 6)
-		return (ft_printf("syntax error near unexpected token `|'\n"));
+		return (print_syntax_error("|", status));
 	return (EXIT_SUCCESS);
 }

@@ -1,7 +1,7 @@
 #include "minishell.h"
 #include <stdbool.h>
 
-void	update_quote_state(char c, bool *squote, bool *dquote)
+void update_quote_state(char c, bool *squote, bool *dquote)
 {
     if (c == '\'' && !*dquote)
         *squote = !*squote;
@@ -9,18 +9,17 @@ void	update_quote_state(char c, bool *squote, bool *dquote)
         *dquote = !*dquote;
 }
 
-size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
+size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
 {
-    const char	*start;
-    char		*value;
-    size_t		var_len;
+    const char *start;
+    char *value;
+    size_t var_len;
 
     var_len = 0;
     start = *token;
     if (**token == '?')
     {
-        value = ft_itoa(p->exit_status);
-        // value = get_var_value(env, "?", 1);
+        value = ft_itoa(*p->exit_status);
         (*token)++;
     }
     else
@@ -37,9 +36,8 @@ size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
 
             while (**token && (ft_isalnum(**token) || **token == '_') && **token != '\'')
                 (*token)++;
-                
-            }
-        
+        }
+
         var_len = *token - start;
         value = get_var_value(env, start, var_len);
     }
@@ -48,24 +46,18 @@ size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
     return (0);
 }
 
-void	process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_cmd *p)
+void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_cmd *p)
 {
-    const char	*start;
-    char		*value;
-    size_t		var_len;
+    const char *start;
+    char *value;
+    size_t var_len;
 
     var_len = 0;
     (*t)++;
     start = *t;
     if (**t == '?')
     {
-        // value = get_var_value(e, "?", 1);
-        value = ft_itoa(p->exit_status);
-        // if (value)
-        // {
-        //     ft_strlcpy(*res + *j, value, ft_strlen(value) + 1);
-        //     *j += ft_strlen(value);
-        // }
+        value = ft_itoa(*p->exit_status);
         (*t)++;
     }
 
@@ -76,12 +68,11 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
             var_len = p->arr_has_dollar[p->arr_has_dollar_count];
             *t += var_len;
             p->arr_has_dollar_count++;
-
         }
         else
         {
             while (**t && (ft_isalnum(**t) || **t == '_') && **t != '\'')
-                (*t)++;   
+                (*t)++;
         }
         var_len = (size_t)(*t - start);
         value = get_var_value(e, start, var_len);
@@ -93,7 +84,7 @@ void	process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
     }
 }
 
-int	is_dolloar_quote(const char *token)
+int is_dolloar_quote(const char *token)
 {
     int i = 0;
     int count = 0;
@@ -108,7 +99,7 @@ int	is_dolloar_quote(const char *token)
     return (count);
 }
 
-void	calculate_dollar_array(t_parse_cmd *p)
+void calculate_dollar_array(t_parse_cmd *p)
 {
     int i = 0;
     int j = 0;
@@ -130,7 +121,7 @@ void	calculate_dollar_array(t_parse_cmd *p)
     {
         if (p->splitter_clean_input[p->index_splitter][i] == '$')
         {
-            if(p->splitter_clean_input[p->index_splitter][i + 1] == '?')
+            if (p->splitter_clean_input[p->index_splitter][i + 1] == '?')
             {
                 p->arr_has_dollar[j++] = 1;
                 i += 2;
@@ -176,18 +167,16 @@ int is_string_inside_single(const char *token)
         return 0;
     return (parent == '\'') ? 1 : 0;
 }
- 
 
-char	*expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *parse_cmd)
+char *expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *parse_cmd)
 {
-    char	*result;
-    size_t	j;
-    bool	squote;
-    bool	dquote;
-
+    char *result;
+    size_t j;
+    bool squote;
+    bool dquote;
     j = 0;
     if (!token || !env)
-        return (ft_strdup("")); 
+        return (ft_strdup(""));
     parse_cmd->arr_has_dollar_count = 0;
     result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
     parse_cmd->arr_has_dollar_count = 0;

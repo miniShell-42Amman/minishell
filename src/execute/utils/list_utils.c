@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 19:50:24 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/22 02:52:30 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/23 21:03:52 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
         (*envp)[i] = malloc(envp_len);
         if (!(*envp)[i]) 
         {
-            perror("malloc");
+            perror("Erorr404: malloc");
             ft_free_split(*envp);
             return (EXIT_FAILURE);
         }

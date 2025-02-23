@@ -40,7 +40,8 @@ int	free_cmd_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
 
 t_cmd	ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 {
-	ft_dprintf(2, RED "Error: " RESET "Unclosed quotes\n");
+	ft_dprintf(2, RED "Error404: " RESET "Unclosed quotes\n");
+	*parse_cmd->exit_status = 2;
 	if (parse_cmd->clean_input)
 		free(parse_cmd->clean_input);
 	if(parse_cmd->cmd.args)

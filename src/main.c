@@ -22,8 +22,6 @@ int start_tokenization(t_main *main)
 	main->cmd = parse_cmd(main->input, main->env_list, &main->exit_status);
 	if (!main->cmd)
 	{
-		main->exit_status = 1;
-		ft_printf("main->exit_status = %d\n", main->exit_status);
 		free_resources(main, 0);
 		if (array)
 			free(array);
@@ -32,7 +30,7 @@ int start_tokenization(t_main *main)
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 									array);
 	if (!main->tokens_list || is_duplicate_operator_series(main->tokens_list,
-														   main->cmd->arg_count))
+														   main->cmd->arg_count, &main->exit_status))
 	{
 		free_resources(main, 0);
 		free(array);
@@ -40,53 +38,44 @@ int start_tokenization(t_main *main)
 	}
 	if (array)
 		free(array);
+	main->exit_status = 0;	
 	return (EXIT_SUCCESS);
 }
+
 void handle_sigint(int signum)
 {
-	(void)signum;
-	// if (g_signal == 0)
-	// {
-		write(STDOUT_FILENO, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-	// }
-	g_signal = 130;
+    (void)signum;
+	if(!g_signal || g_signal == 130)
+	{
+		write(1, "\n", 1);
+		rl_replace_line("", 0);    
+		rl_on_new_line();  
+		// rl_redisplay();
+	}
+    g_signal = 130;         
 }
-void handle_sigterm(int signum)
+void handle_sigquit(int signum)
 {
 	(void)signum;
-	if (g_signal == 0)
+	if(!g_signal || g_signal == 131)
 	{
-		write(STDOUT_FILENO, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
+		write(1, "Quit: 3\n", 8);
 	}
-	g_signal = 143;
+	g_signal = 131;
 }
-// void handle_sigint(int signum)
-// {
-//     (void)signum;
-//     write(1, "\n", 1);
-//     rl_replace_line("", 0);
-//     rl_on_new_line();
-//     rl_redisplay();
-//     g_signal = 1;
-// }
-
 void setup_signals(void)
 {
-	struct sigaction sa;
+    struct sigaction sa_int, sa_quit;
 
-	sa.sa_handler = handle_sigint;
-	sa.sa_flags = 0;
-	sigemptyset(&sa.sa_mask);
-	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = handle_sigterm;
-	sigaction(SIGTERM, &sa, NULL);
+    sa_int.sa_handler = handle_sigint;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sa_int, NULL);
 
+    sa_quit.sa_handler = handle_sigquit;
+    sigemptyset(&sa_quit.sa_mask);
+    sa_quit.sa_flags = 0;
+    sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 int main(int ac, char **av, char **env)
@@ -96,6 +85,7 @@ int main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 	ft_bzero(&main, sizeof(t_main));
+	main.exit_status = 0;
 	main.env_list = clone_env(env);
 	if (!main.env_list)
 	{
@@ -105,26 +95,24 @@ int main(int ac, char **av, char **env)
 	setup_signals();
 	while (1)
 	{
-
-		g_signal = 0;
 		free_resources(&main, 0);
 		main.input = readline(PROMPT);
+		if (g_signal)
+		{ 
+			main.exit_status = g_signal;
+			g_signal = 0;
+		}
 		if (!main.input)
 		{
 			ft_printf("exit\n");
 			break;
-		}
-		if (g_signal)
-		{
-			main.exit_status = g_signal;
-			g_signal = 0;
 		}
 		if (ft_strcmp(main.input, "exit") == 0)
 			break;
 		add_history(main.input);
 		main.str = ft_strtrim(main.input, " ");
 		if (*main.str && *main.input && !start_tokenization(&main))
-			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list);
+			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
 		free(main.input);
 		free(main.str);
 		main.str = NULL;

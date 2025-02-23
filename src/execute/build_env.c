@@ -106,7 +106,7 @@ int create_pipes(t_execute *execute, int *check)
     return (EXIT_SUCCESS);
 }
 
-char *resolve_command_path(char *command, t_env *env_list)
+char *resolve_command_path(char *command, t_env *env_list, t_execute *execute)
 {
     char *path_copy;
     char *path_token;
@@ -146,7 +146,7 @@ char *resolve_command_path(char *command, t_env *env_list)
         path_token = ft_strtok(NULL, ":");
     }
     free(path_copy);
-    return (NULL);
+    return (*execute->exit_status = 127,NULL);
 }
 
 int is_commands(t_execute *execute,int flag)
@@ -171,13 +171,13 @@ int is_commands(t_execute *execute,int flag)
     return (EXIT_FAILURE); 
 }
 
-void check_cutstom(t_execute *execute)
+void execute_builtin(t_execute *execute)
 {
 
     if (ft_strcmp(execute->commands[execute->i][0], "echo") == 0)
         echo(execute->commands[execute->i]);
     else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
-        free_execute(execute);
+        *execute->exit_status = ft_exit(execute->commands[execute->i]);
     else if (ft_strcmp(execute->commands[execute->i][0], "env") == 0)
         env(execute->envp);
     else if (ft_strcmp(execute->commands[execute->i][0], "pwd") == 0)
@@ -189,47 +189,41 @@ void execute_command(t_execute *execute)
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
-    {
-        perror("dup2");
         exit(EXIT_FAILURE);
-    }
     if (execute->i != execute->num_cmds - 1 && dup2(execute->pipe_fds[execute->i * 2 + 1], STDOUT_FILENO) < 0)
-    {
-        perror("dup2");
         exit(EXIT_FAILURE);
-    }
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
-        close(execute->pipe_fds[execute->j]);   
+        close(execute->pipe_fds[execute->j]);  
     handle_redirections(execute);    
     if(!is_commands(execute,0))
     {
-        check_cutstom(execute);
-        exit(EXIT_SUCCESS);
+        execute_builtin(execute);
+        exit(*execute->exit_status);
     }
-    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list);
+    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute);
     if (!execute->cmd_path)
     {
-        ft_dprintf(STDERR_FILENO, "Error404: %s: command not found\n", execute->commands[execute->i][0]);
-        free_execute(execute);
-        exit(EXIT_FAILURE);
+        ft_dprintf(STDERR_FILENO, "Error404: %s: command not found\n", 
+            execute->commands[execute->i][0]);
+        exit(*execute->exit_status);
     }
-    if (execve(execute->cmd_path, execute->commands[execute->i], execute->envp) < 0)
-    {
-        perror("Error404");
-        exit(EXIT_FAILURE);
-    }
+    execve(execute->cmd_path, execute->commands[execute->i], execute->envp);
+    exit(*execute->exit_status = 127);
 }
 
-int check_builtins_too(t_execute *execute)
+int handle_builtins(t_execute *execute)
 {
-    if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0 && cd(execute->commands[execute->i], execute->cmd_args[execute->i], &execute->env_list))
-            return 1;
+    if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
+        *execute->exit_status = cd(execute->commands[execute->i], 
+            execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
-            export(execute->commands[execute->i],  execute->cmd_args[execute->i] ,&execute->env_list);
+        *execute->exit_status = export(execute->commands[execute->i], 
+            execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-            unset(execute->commands[execute->i], execute->env_list);
-    return 0;        
+        unset(execute->commands[execute->i], 
+            execute->env_list);
+    return (EXIT_SUCCESS);
 }
 
 int fork_and_execute(t_execute *execute, int *check)
@@ -242,8 +236,7 @@ int fork_and_execute(t_execute *execute, int *check)
     {
         if (is_commands(execute,1) == EXIT_SUCCESS)
         {
-            if(check_builtins_too(execute))
-                return(EXIT_FAILURE);
+            handle_builtins(execute);
             execute->i++;
             continue ;
         }
@@ -264,33 +257,41 @@ int fork_and_execute(t_execute *execute, int *check)
 
 void close_pipes_and_wait(t_execute *execute)
 {
+    int status;
+    pid_t pid;
+    pid_t last_pid;
+
     if (!execute->pids)
-        return ;
+        return;
+    
+    last_pid = execute->pids[execute->num_cmds - 1];
     execute->i = 0;
-    while ((int)execute->i < 2 * execute->num_pipes)
+    while (execute->i < (size_t)(2 * execute->num_pipes))
+        close(execute->pipe_fds[execute->i++]);
+    while ((pid = wait(&status)) != -1)
     {
-        close(execute->pipe_fds[execute->i]);
-        execute->i++;
+        if (pid == last_pid)
+        {
+            if ((status & 0xFF) == 0)
+                *execute->exit_status = (status >> 8) & 0xFF;
+            else
+                *execute->exit_status = 128 + (status & 0x7F);
+        }
     }
-    execute->i = 0;
-            // while (execute->i < execute->num_cmds)
-            // {
-            //     if (execute->pids[execute->i] > 0)
-            //         waitpid(execute->pids[execute->i], NULL, 0);
-            //     execute->i++;
-            // }
-    while (wait(NULL) != -1)
-        ;
 
 }
 
-void start_execution(t_token *tokens, size_t token_count, t_env *env_list)
+void start_execution(t_token *tokens, size_t token_count, t_env *env_list,int *status)
 {
     t_execute execute;
-    int check_pipes = 0;
+    int check_pipes;
+
+    check_pipes = 0;
     ft_bzero(&execute, sizeof(t_execute));
     execute.env_list = env_list;
     execute.envp = convert_env_to_list(env_list);
+    execute.exit_status = status;
+    *execute.exit_status = 0;
     execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
     execute.num_pipes = execute.num_cmds - 1;
     if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args
@@ -299,6 +300,7 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list)
         free_execute(&execute);
         if(check_pipes)
             close_pipes_and_wait(&execute);
+        *status = 1;   
         return;
     }
     close_pipes_and_wait(&execute);

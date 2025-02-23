@@ -7,7 +7,7 @@ char *append_str(char *dest, size_t *dest_size, const char *src)
     if (!new_ptr)
     {
         free(dest);
-        perror("realloc");
+        perror("Erorr404: realloc");
         exit(EXIT_FAILURE);
     }
     ft_memcpy(new_ptr + *dest_size, src, src_len + 1);
@@ -28,7 +28,7 @@ void choose_flags_fd(t_redirections *redirections, int *flags, int *fd, int *std
     *fd = open(redirections->target, *flags, 0644);
     if (*fd < 0)
     {
-        perror("open");
+        perror("Erorr404: open");
         exit(EXIT_FAILURE);
     }
     if (*flags == O_RDONLY)
@@ -45,7 +45,7 @@ int redirection_check(t_redirections *redirections)
 
     redirections->op = redirections->argv[redirections->j];
     redirections->target = redirections->argv[redirections->j + 1];
-    if (!redirections->target && ft_dprintf(STDERR_FILENO, "syntax error near token `%s'\n", redirections->op))
+    if (!redirections->target && ft_dprintf(STDERR_FILENO, "Erorr404: syntax error near token `%s'\n", redirections->op))
         exit(EXIT_FAILURE);
     choose_flags_fd(redirections, &flags, &fd, &std_fd);
     if (dup2(fd, std_fd) < 0)
@@ -60,40 +60,51 @@ int redirection_check(t_redirections *redirections)
     redirections->argv[redirections->k] = NULL;
     return (EXIT_SUCCESS);
 }
-void handle_heredoc_sigint(int signum)
+void handle_heredoc_sigint(int signum) 
 {
-	(void)signum;
-	g_signal = 130;
-	write(STDOUT_FILENO, "\n", 1);
-	// rl_replace_line("", 0);
-	// rl_on_new_line();
-	// rl_redisplay();
+    (void)signum;
+
+    g_signal = 130;
+    exit(STDIN_FILENO);
 }
+
 int redirection_check_else_if(t_redirections *redirections)
 {
+    struct sigaction sa_orig, sa_new;
+
     char *target = redirections->argv[redirections->j + 1];
     if (!target)
     {
-        ft_dprintf(STDERR_FILENO, "syntax error near token `<<'\n");
-        exit(EXIT_FAILURE);
+        ft_dprintf(STDERR_FILENO, "Erorr404: syntax error near token `<<'\n");
+        // exit(EXIT_FAILURE);
+        return (EXIT_FAILURE);
     }
 
     char *current_doc = NULL;
     size_t current_size = 0;
     char *line;
-
-    signal(SIGINT, handle_heredoc_sigint);
+    sigemptyset(&sa_new.sa_mask);
+    sa_new.sa_handler = handle_heredoc_sigint;
+    // sa_new.sa_flags = 0;
+    sigaction(SIGINT, &sa_new, &sa_orig);
     while (1)
     {
-        line = readline("> ");
-        if (g_signal || !line)
+        // line = readline("> ");
+        if (g_signal == 130)
         {
+            ft_dprintf(STDERR_FILENO, "\n");
             free(line);
             free(current_doc);
-            // *exit_status = 130;
-            signal(SIGINT, handle_sigint);
-            close(STDIN_FILENO);
-            exit(130);
+            redirections->argv[redirections->j] = NULL;
+            sigaction(SIGINT, &sa_orig, NULL);
+            g_signal = 0;
+            return (EXIT_FAILURE);
+        }
+        line = readline("> ");
+        if (!line)
+        {
+            ft_dprintf(STDERR_FILENO, "Erorr404: warning: here-document delimited by EOF\n");
+            break;
         }
         if (ft_strcmp(line, target) == 0)
         {
@@ -105,7 +116,7 @@ int redirection_check_else_if(t_redirections *redirections)
         current_doc = append_str(current_doc, &current_size, "\n");
         free(line);
     }
-    signal(SIGINT, SIG_DFL);
+    sigaction(SIGINT, &sa_orig, NULL);
     if (current_doc)
     {
         redirections->heredoc_all = append_str(redirections->heredoc_all,
@@ -124,6 +135,7 @@ int redirection_check_else_if(t_redirections *redirections)
     return (EXIT_SUCCESS);
 }
 
+
 void if_redirections_heredoc_all(t_redirections *redirections)
 {
     if (redirections->heredoc_all)
@@ -131,19 +143,19 @@ void if_redirections_heredoc_all(t_redirections *redirections)
         int pipefd[2];
         if (pipe(pipefd) < 0)
         {
-            perror("pipe");
+            perror("Erorr404: pipe");
             exit(EXIT_FAILURE);
         }
         if (write(pipefd[1], redirections->heredoc_all, redirections->heredoc_total_size) < 0)
         {
-            perror("write");
+            perror("Erorr404: write");
             exit(EXIT_FAILURE);
         }
         free(redirections->heredoc_all);
         close(pipefd[1]);
         if (dup2(pipefd[0], STDIN_FILENO) < 0)
         {
-            perror("dup2");
+            perror("Erorr404: dup2");
             exit(EXIT_FAILURE);
         }
         close(pipefd[0]);

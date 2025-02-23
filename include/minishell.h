@@ -90,7 +90,7 @@ typedef struct s_parse_cmd
 	char c;
 	char token_quote_type;
 	int operator;
-	int  exit_status;
+	int  *exit_status;
 } t_parse_cmd;
 
 typedef struct s_main
@@ -139,6 +139,7 @@ typedef struct s_execute
 	size_t arg_index;
 	char *cmd_path;
 	t_env *env_list;
+	int *exit_status;
 } t_execute;
 
 typedef struct s_redirections
@@ -189,19 +190,19 @@ int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list);
 int if_token_started_three(t_parse_cmd *parse_cmd,
 						   t_env *env_list);
 int if_token_started(t_parse_cmd *parse_cmd, t_env *env_list);
-int init_parse_cmd(t_parse_cmd *parse_cmd, char *input);
+int init_parse_cmd(t_parse_cmd *parse_cmd, char *input, int *status);
 char *get_var_value(t_env *env, const char *var, size_t len);
 size_t calculate_length(const char *token, t_env *env, t_parse_cmd *p);
 void update_quote_state(char c, bool *squote, bool *dquote);
 size_t handle_var_length(const char **t, t_env *e, t_parse_cmd *p);
 void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_cmd *p);
 void free_resources(t_main *main, int flag);
-int is_duplicate_operator_series(t_token *token, int token_count);
+int is_duplicate_operator_series(t_token *token, int token_count, int *status);
 int is_dolloar_quote(const char *token);
 void calculate_dollar_array(t_parse_cmd *p);
 int is_string_inside_single(const char *token);
 char **convert_env_to_list(t_env *env_list);
-void start_execution(t_token *tokens, size_t token_count, t_env *env_list);
+void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *status);
 char *ft_strtok(char *str, const char *delim);
 int ft_strtok_utils(const char *delim, char **start, char **last);
 int is_delim(char c, const char *delim);
@@ -227,4 +228,5 @@ void add_new_env(t_env **env, char *k, char *v);
 char *remove_quotes(char *str);
 void setup_signals(void);
 void handle_sigint(int signum);
+int ft_exit(char **args);
 #endif

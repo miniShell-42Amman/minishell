@@ -176,13 +176,14 @@ char **smart_split(const char *str)
 	return (res);
 }
 
-int init_parse_cmd(t_parse_cmd *parse_cmd, char *input)
+int init_parse_cmd(t_parse_cmd *parse_cmd, char *input, int *status)
 {
 	ft_bzero(parse_cmd, sizeof(t_parse_cmd));
 	ft_bzero(&parse_cmd->cmd, sizeof(t_cmd));
 	parse_cmd->trimmed_input = ft_strtrim(input, " \t\n");
 	parse_cmd->clean_input = ft_strdup(parse_cmd->trimmed_input);
 	parse_cmd->splitter_clean_input = smart_split(parse_cmd->clean_input);
+	parse_cmd->exit_status = status;
 	free(parse_cmd->trimmed_input);
 	if (!parse_cmd->clean_input)
 		return (EXIT_FAILURE);
@@ -287,11 +288,10 @@ t_cmd *parse_cmd(char *input, t_env *env_list, int *status)
 {
 	t_parse_cmd parse_cmd;
 	t_cmd *cmd_result;
-	if (*status != 0)
-		*status = parse_cmd.exit_status; 
+
 	cmd_result = ft_calloc(1, sizeof(t_cmd));
-	if ((!cmd_result || init_parse_cmd(&parse_cmd, input)) && !free_cmd_parse(&parse_cmd, cmd_result))
-		return (NULL);
+	if ((!cmd_result || init_parse_cmd(&parse_cmd, input,status)) && !free_cmd_parse(&parse_cmd, cmd_result))
+		return (NULL);	
 	if ((parse_cmd_loop(&parse_cmd, env_list) || if_token_started_three(&parse_cmd, env_list)) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
 	if (parse_cmd.in_quotes && !free_cmd_parse(&parse_cmd, cmd_result))
@@ -299,7 +299,5 @@ t_cmd *parse_cmd(char *input, t_env *env_list, int *status)
 	if (clean_parse_cmd(&parse_cmd) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
 	*cmd_result = parse_cmd.cmd;
-	*status = parse_cmd.exit_status; 
-	ft_printf("status for parse %d\n", *status);
 	return (cmd_result);
 }

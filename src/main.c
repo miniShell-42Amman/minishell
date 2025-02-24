@@ -36,46 +36,42 @@ int start_tokenization(t_main *main)
 		free(array);
 		return (EXIT_FAILURE);
 	}
+	for (int i = 0; i < main->cmd->arg_count; i++)
+	{
+		printf("token: %s type %d\n", main->tokens_list[i].value, main->tokens_list[i].type);
+	}
 	if (array)
 		free(array);
-	main->exit_status = 0;	
+	main->exit_status = 0;
 	return (EXIT_SUCCESS);
 }
 
 void handle_sigint(int signum)
 {
-    (void)signum;
-	if(!g_signal || g_signal == 130)
-	{
-		write(1, "\n", 1);
-		rl_replace_line("", 0);    
-		rl_on_new_line();  
-		// rl_redisplay();
-	}
-    g_signal = 130;         
-}
-void handle_sigquit(int signum)
-{
 	(void)signum;
-	if(!g_signal || g_signal == 131)
+	if (!g_signal || g_signal == 130)
 	{
-		write(1, "Quit: 3\n", 8);
+		ft_printf("\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
 	}
-	g_signal = 131;
+	g_signal = 130;
 }
+
 void setup_signals(void)
 {
-    struct sigaction sa_int, sa_quit;
+	struct sigaction sa_int, sa_quit;
 
-    sa_int.sa_handler = handle_sigint;
-    sigemptyset(&sa_int.sa_mask);
-    sa_int.sa_flags = SA_RESTART;
-    sigaction(SIGINT, &sa_int, NULL);
+	sa_int.sa_handler = handle_sigint;
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sa_int, NULL);
 
-    sa_quit.sa_handler = handle_sigquit;
-    sigemptyset(&sa_quit.sa_mask);
-    sa_quit.sa_flags = 0;
-    sigaction(SIGQUIT, &sa_quit, NULL);
+	sa_quit.sa_handler = SIG_IGN;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 int main(int ac, char **av, char **env)
@@ -95,13 +91,14 @@ int main(int ac, char **av, char **env)
 	setup_signals();
 	while (1)
 	{
+		g_signal = 0;
 		free_resources(&main, 0);
-		main.input = readline(PROMPT);
 		if (g_signal)
-		{ 
+		{
 			main.exit_status = g_signal;
 			g_signal = 0;
 		}
+		main.input = readline(PROMPT);
 		if (!main.input)
 		{
 			ft_printf("exit\n");
@@ -109,7 +106,8 @@ int main(int ac, char **av, char **env)
 		}
 		if (ft_strcmp(main.input, "exit") == 0)
 			break;
-		add_history(main.input);
+		if(ft_strlen(main.input) > 0)
+			add_history(main.input);
 		main.str = ft_strtrim(main.input, " ");
 		if (*main.str && *main.input && !start_tokenization(&main))
 			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);

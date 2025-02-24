@@ -115,7 +115,8 @@
     "cstdbool": "c",
     "typeinfo": "c",
     "sstream": "c",
-    "history.h": "c"
+    "history.h": "c",
+    "tttttttttttttttttttttttttttt": "cpp"
   },
   "cSpell.words": [
     "MINISHELL"

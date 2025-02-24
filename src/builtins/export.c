@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 01:24:11 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/02/23 01:34:22 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/24 08:09:54 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static int	print_export(t_env *env)
 
 static int	handle_invalid_key(char *arg)
 {
-	ft_printf("export: `%s': not a valid identifier\n", arg);
+	ft_dprintf(2,"export: `%s': not a valid identifier\n", arg);
 	return (1);
 }
 

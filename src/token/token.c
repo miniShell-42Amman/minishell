@@ -290,8 +290,13 @@ t_cmd *parse_cmd(char *input, t_env *env_list, int *status)
 	t_cmd *cmd_result;
 
 	cmd_result = ft_calloc(1, sizeof(t_cmd));
-	if ((!cmd_result || init_parse_cmd(&parse_cmd, input,status)) && !free_cmd_parse(&parse_cmd, cmd_result))
-		return (NULL);	
+	if (!cmd_result)
+		return (NULL);
+	if (init_parse_cmd(&parse_cmd, input, status) != EXIT_SUCCESS)
+	{
+		free(cmd_result);
+		return (NULL);
+	}
 	if ((parse_cmd_loop(&parse_cmd, env_list) || if_token_started_three(&parse_cmd, env_list)) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
 	if (parse_cmd.in_quotes && !free_cmd_parse(&parse_cmd, cmd_result))

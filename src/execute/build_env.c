@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <sys/stat.h>
 
 void exit_error(char *message, t_execute *execute)
 {
@@ -35,7 +36,6 @@ size_t calculate_number_operations(t_token *tokens, size_t token_count)
     return (count);
 }
 
-
 int init_command(t_token *token, size_t token_count, t_execute *execute)
 {
     execute->commands = ft_calloc(execute->num_cmds, sizeof(char **));
@@ -43,12 +43,12 @@ int init_command(t_token *token, size_t token_count, t_execute *execute)
     if (!execute->commands || !execute->cmd_args)
         return (EXIT_FAILURE);
     execute->i = -1;
-    while(++execute->i < token_count)
+    while (++execute->i < token_count)
     {
-        if(token[execute->i].type == TOKEN_PIPE)
+        if (token[execute->i].type == TOKEN_PIPE)
             execute->cmd_index++;
         else
-            execute->cmd_args[execute->cmd_index]++;        
+            execute->cmd_args[execute->cmd_index]++;
     }
     execute->i = -1;
     while (++execute->i < execute->num_cmds)
@@ -62,26 +62,26 @@ int init_command(t_token *token, size_t token_count, t_execute *execute)
 
 int fill_commands(t_token *token, size_t token_count, t_execute *execute)
 {
-    if(init_command(token, token_count, execute))
+    if (init_command(token, token_count, execute))
         return (EXIT_FAILURE);
     execute->i = -1;
     execute->cmd_index = 0;
     execute->arg_index = 0;
-    while(++execute->i < token_count)
+    while (++execute->i < token_count)
+    {
+        if (token[execute->i].type == TOKEN_PIPE)
         {
-            if(token[execute->i].type == TOKEN_PIPE)
-            {
-                execute->cmd_index++;
-                execute->arg_index = 0;
-            }
-            else
-            {
-                execute->commands[execute->cmd_index][execute->arg_index] = ft_strdup(token[execute->i].value);
-                if (!execute->commands[execute->cmd_index][execute->arg_index])
-                    return (EXIT_FAILURE);
-                execute->arg_index++;
-            }
+            execute->cmd_index++;
+            execute->arg_index = 0;
         }
+        else
+        {
+            execute->commands[execute->cmd_index][execute->arg_index] = ft_strdup(token[execute->i].value);
+            if (!execute->commands[execute->cmd_index][execute->arg_index])
+                return (EXIT_FAILURE);
+            execute->arg_index++;
+        }
+    }
     return (EXIT_SUCCESS);
 }
 
@@ -99,13 +99,19 @@ int create_pipes(t_execute *execute, int *check)
         if (pipe(execute->pipe_fds + execute->i * 2) < 0)
         {
             *check = 1;
-            return (EXIT_FAILURE);   
+            return (EXIT_FAILURE);
         }
         execute->i++;
     }
     return (EXIT_SUCCESS);
 }
-
+int is_directory(const char *path)
+{
+    struct stat statbuf;
+    if (stat(path, &statbuf) != 0)
+        return 0;
+    return S_ISDIR(statbuf.st_mode);
+}
 char *resolve_command_path(char *command, t_env *env_list, t_execute *execute)
 {
     char *path_copy;
@@ -113,8 +119,21 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute)
     char *full_path;
     char *path;
 
-    if(command[0] == '/' || command[0] == '.')
-        return (ft_strdup(command));
+    if (command[0] == '/' || command[0] == '.')
+    {
+        if (access(command, F_OK) == 0)
+        {
+            if (access(command, X_OK) == 0)
+            {
+                if (is_directory(command))
+                    return (*execute->exit_status = 126, ft_strdup(command));
+                return (ft_strdup(command));
+            }
+            else
+                return (*execute->exit_status = 126, NULL);
+        }
+        return (*execute->exit_status = 127, NULL);
+    }
     path = find_env_value(env_list, "PATH");
     if (!path)
         return (NULL);
@@ -137,19 +156,31 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute)
         ft_strlcpy(full_path, path_token, ft_strlen(path_token) + 1);
         ft_strlcat(full_path, "/", ft_strlen(path_token) + 2);
         ft_strlcat(full_path, command, ft_strlen(path_token) + ft_strlen(command) + 2);
-        if (access(full_path, X_OK) == 0)
+        if (access(full_path, F_OK) == 0)
         {
-            free(path_copy);
-            return (full_path);
+            if (access(full_path, X_OK) == 0)
+            {
+                if (is_directory(full_path))
+                {
+                    free(path_copy);
+                    return (*execute->exit_status = 126, full_path);
+                }
+                free(path_copy);
+                return (full_path);
+            }
+            else
+            {
+                free(path_copy);
+                return (*execute->exit_status = 126, NULL);
+            }
         }
         free(full_path);
         path_token = ft_strtok(NULL, ":");
     }
     free(path_copy);
-    return (*execute->exit_status = 127,NULL);
+    return (*execute->exit_status = 127, NULL);
 }
-
-int is_commands(t_execute *execute,int flag)
+int is_commands(t_execute *execute, int flag)
 {
     char *customs[] = {"echo", "exit", "env", "pwd", "export", "unset", "cd"};
     int i;
@@ -157,18 +188,23 @@ int is_commands(t_execute *execute,int flag)
 
     i = 0;
     max = 4;
-    if (flag)
+    if (flag == 1)
     {
         i = 4;
         max = 7;
     }
+    else if (flag == 2)
+    {
+        i = 0;
+        max = 7;
+    }
     while (i < max)
     {
-        if (ft_strcmp(execute->commands[execute->i][0], customs[i]) == 0)
+        if (execute->commands[execute->i][0] && ft_strcmp(execute->commands[execute->i][0], customs[i]) == 0)
             return (EXIT_SUCCESS);
         i++;
     }
-    return (EXIT_FAILURE); 
+    return (EXIT_FAILURE);
 }
 
 void execute_builtin(t_execute *execute)
@@ -182,6 +218,15 @@ void execute_builtin(t_execute *execute)
         env(execute->envp);
     else if (ft_strcmp(execute->commands[execute->i][0], "pwd") == 0)
         pwd();
+    else if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
+        *execute->exit_status = cd(execute->commands[execute->i],
+                                   execute->cmd_args[execute->i], &execute->env_list);
+    else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
+        *execute->exit_status = export(execute->commands[execute->i],
+                                       execute->cmd_args[execute->i], &execute->env_list);
+    else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
+        unset(execute->commands[execute->i],
+              execute->env_list);
 }
 
 void execute_command(t_execute *execute)
@@ -194,9 +239,9 @@ void execute_command(t_execute *execute)
         exit(EXIT_FAILURE);
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
-        close(execute->pipe_fds[execute->j]);  
-    handle_redirections(execute);    
-    if(!is_commands(execute,0))
+        close(execute->pipe_fds[execute->j]);
+    handle_redirections(execute);
+    if (!is_commands(execute, 2))
     {
         execute_builtin(execute);
         exit(*execute->exit_status);
@@ -204,25 +249,30 @@ void execute_command(t_execute *execute)
     execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute);
     if (!execute->cmd_path)
     {
-        ft_dprintf(STDERR_FILENO, "Error404: %s: command not found\n", 
-            execute->commands[execute->i][0]);
+        if (*execute->exit_status == 126)
+            ft_dprintf(2, "Error404: %s: Is a directory\n", execute->commands[execute->i][0]);
+        else
+            ft_dprintf(2, "Error404: %s: command not found\n", execute->commands[execute->i][0]);
         exit(*execute->exit_status);
     }
-    execve(execute->cmd_path, execute->commands[execute->i], execute->envp);
-    exit(*execute->exit_status = 127);
+    if (execve(execute->cmd_path, execute->commands[execute->i], execute->envp))
+    {
+        perror("execve");
+        exit(*execute->exit_status);
+    }
 }
 
 int handle_builtins(t_execute *execute)
 {
     if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
-        *execute->exit_status = cd(execute->commands[execute->i], 
-            execute->cmd_args[execute->i], &execute->env_list);
+        *execute->exit_status = cd(execute->commands[execute->i],
+                                   execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
-        *execute->exit_status = export(execute->commands[execute->i], 
-            execute->cmd_args[execute->i], &execute->env_list);
+        *execute->exit_status = export(execute->commands[execute->i],
+                                       execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-        unset(execute->commands[execute->i], 
-            execute->env_list);
+        unset(execute->commands[execute->i],
+              execute->env_list);
     return (EXIT_SUCCESS);
 }
 
@@ -234,17 +284,17 @@ int fork_and_execute(t_execute *execute, int *check)
     execute->i = 0;
     while (execute->i < execute->num_cmds)
     {
-        if (is_commands(execute,1) == EXIT_SUCCESS)
+        if (execute->num_cmds == 1 && is_commands(execute, 1) == EXIT_SUCCESS)
         {
             handle_builtins(execute);
             execute->i++;
-            continue ;
+            continue;
         }
         execute->pid = fork();
         if (execute->pid < 0)
         {
             *check = 1;
-            return(EXIT_FAILURE);
+            return (EXIT_FAILURE);
         }
         if (execute->pid == 0)
             execute_command(execute);
@@ -263,7 +313,7 @@ void close_pipes_and_wait(t_execute *execute)
 
     if (!execute->pids)
         return;
-    
+
     last_pid = execute->pids[execute->num_cmds - 1];
     execute->i = 0;
     while (execute->i < (size_t)(2 * execute->num_pipes))
@@ -278,15 +328,38 @@ void close_pipes_and_wait(t_execute *execute)
                 *execute->exit_status = 128 + (status & 0x7F);
         }
     }
-
 }
 
-void start_execution(t_token *tokens, size_t token_count, t_env *env_list,int *status)
+int preprocess_heredocs(t_execute *execute)
+{
+    t_redirections redirections;
+    size_t i;
+
+    i = -1;
+    while (++i < execute->num_cmds)
+    {
+        ft_bzero(&redirections, sizeof(t_redirections));
+        redirections.argv = execute->commands[i];
+        redirections.j = 0;
+        while (redirections.argv[redirections.j])
+        {
+            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0)
+            {
+                if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
+                    return (EXIT_FAILURE);
+            }
+            else
+                redirections.j++;
+        }
+    }
+    return (EXIT_SUCCESS);
+}
+
+void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *status)
 {
     t_execute execute;
-    int check_pipes;
+    int check_pipes = 0;
 
-    check_pipes = 0;
     ft_bzero(&execute, sizeof(t_execute));
     execute.env_list = env_list;
     execute.envp = convert_env_to_list(env_list);
@@ -294,15 +367,62 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list,int *s
     *execute.exit_status = 0;
     execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
     execute.num_pipes = execute.num_cmds - 1;
-    if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args
-        || create_pipes(&execute,&check_pipes) || fork_and_execute(&execute,&check_pipes))
+
+    if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args)
     {
         free_execute(&execute);
-        if(check_pipes)
-            close_pipes_and_wait(&execute);
-        *status = 1;   
+        *status = 1;
         return;
     }
+
+    if (preprocess_heredocs(&execute) != EXIT_SUCCESS)
+    {
+        free_execute(&execute);
+        *status = 130;
+        return;
+    }
+
+    if (create_pipes(&execute, &check_pipes))
+    {
+        free_execute(&execute);
+        *status = 1;
+        return;
+    }
+
+    if (fork_and_execute(&execute, &check_pipes))
+    {
+        free_execute(&execute);
+        *status = 1;
+        return;
+    }
+
     close_pipes_and_wait(&execute);
     free_execute(&execute);
+    return;
 }
+
+// void start_execution(t_token *tokens, size_t token_count, t_env *env_list,int *status)
+// {
+//     t_execute execute;
+//     int check_pipes;
+
+//     check_pipes = 0;
+//     ft_bzero(&execute, sizeof(t_execute));
+//     execute.env_list = env_list;
+//     execute.envp = convert_env_to_list(env_list);
+//     execute.exit_status = status;
+//     *execute.exit_status = 0;
+//     execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
+//     execute.num_pipes = execute.num_cmds - 1;
+//     if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args
+//         || create_pipes(&execute,&check_pipes) || fork_and_execute(&execute,&check_pipes))
+//     {
+//         free_execute(&execute);
+//         if(check_pipes)
+//             close_pipes_and_wait(&execute);
+//         *status = 1;
+//         return;
+//     }
+//     close_pipes_and_wait(&execute);
+//     free_execute(&execute);
+// }

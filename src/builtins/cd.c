@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 21:45:29 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/21 22:40:21 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/24 08:12:14 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,16 @@ int	cd(char **args, int arg_count, t_env **env)
 			print_cd_error("cd", "HOME not set");
 		return (1);
 	}
+	if (ft_strcmp(oldpwd, target) == 0)
+		return (0);
 	if (chdir(target) != 0 && print_cd_error("cd",
 			"failed to change directory"))
 		return (1);
-	if (update_pwd(env, oldpwd) == 0 && args[1] && ft_strcmp(args[1], "-") == 0
-		&& ft_dprintf(2, "%s\n", get_env_var(*env, "PWD")))
+	if (update_pwd(env, oldpwd) == 0)
+	{
+		if (args[1] && ft_strcmp(args[1], "-") == 0)
+			ft_dprintf(2, "%s\n", get_env_var(*env, "PWD"));
 		return (0);
+	}
 	return (1);
 }

@@ -33,7 +33,7 @@ int ft_exit(char **args)
 		if (!is_numeric(args[1]))
 		{
 			ft_dprintf(STDERR_FILENO, "Error404: exit: %s: numeric argument required\n", args[1]);
-			return(255);
+			return(2);
 		}
 		else
 			return(ft_atoi(args[1]));

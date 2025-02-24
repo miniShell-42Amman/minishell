@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:22:35 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/02/21 01:26:56 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/24 07:58:11 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void	echo(char **args)
 {
 	int	i;
 	int	new_line;
-
 	i = 1;
 	new_line = 1;
 	if (!args[1])
@@ -48,6 +47,7 @@ void	echo(char **args)
 		ft_printf("\n");
 		return ;
 	}
+	
 	while (args[i] && check_n_flag(args[i]))
 	{
 		new_line = 0;

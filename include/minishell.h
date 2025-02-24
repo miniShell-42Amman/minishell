@@ -229,4 +229,7 @@ char *remove_quotes(char *str);
 void setup_signals(void);
 void handle_sigint(int signum);
 int ft_exit(char **args);
+int redirection_check_else_if(t_redirections *redirections);
+
+
 #endif

@@ -334,6 +334,7 @@ int preprocess_heredocs(t_execute *execute)
 {
     t_redirections redirections;
     size_t i;
+    int tmp = dup(STDIN_FILENO);
 
     i = -1;
     while (++i < execute->num_cmds)
@@ -345,13 +346,28 @@ int preprocess_heredocs(t_execute *execute)
         {
             if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0)
             {
+                signal(SIGINT, handle_heredoc_sigint);
+                if (g_signal == 130)
+                {
+                    break;
+                }
                 if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
                     return (EXIT_FAILURE);
             }
             else
                 redirections.j++;
         }
+        if (g_signal == 130)
+        {
+            dup2(tmp, STDIN_FILENO);
+            close(tmp);
+            signal(SIGINT, handle_sigint);
+
+            return (EXIT_FAILURE);
+        }
     }
+    close(tmp);
+    signal(SIGINT, handle_sigint);
     return (EXIT_SUCCESS);
 }
 

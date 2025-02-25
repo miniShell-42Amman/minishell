@@ -156,7 +156,7 @@ typedef struct s_redirections
 	char *line;
 }			t_redirections;
 
-
+void handle_heredoc_sigint(int signum);
 int create_node(t_env **node);
 int init_values(t_env *new_node, char **object);
 t_env *clone_env(char **env);
@@ -231,5 +231,6 @@ void handle_sigint(int signum);
 int ft_exit(char **args);
 int redirection_check_else_if(t_redirections *redirections);
 char **smart_split(const char *str);
+void handle_sigint(int signum);
 
 #endif

@@ -45,14 +45,12 @@ int start_tokenization(t_main *main)
 void handle_sigint(int signum)
 {
 	(void)signum;
-	if (!g_signal || g_signal == 130)
-	{
-		ft_printf("\n");
+	// if (!g_signal || g_signal == 130)
+	// {
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
-	}
-	g_signal = 130;
+	// }
+	// g_signal = 130;
 }
 
 void setup_signals(void)
@@ -116,3 +114,5 @@ int main(int ac, char **av, char **env)
 	rl_clear_history();
 	return (0);
 }
+
+// valgrind --leak-check=full --trace-children=yes --show-leak-kinds=all --suppressions=readline_curses.supp ./minishell

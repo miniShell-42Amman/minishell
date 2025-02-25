@@ -138,10 +138,10 @@ int redirection_check(t_redirections *redirections)
 void handle_heredoc_sigint(int signum)
 {
     (void)signum;
-    write(1, "\n", 1);
+    close(STDIN_FILENO);     
+    ft_printf("\n");       
     rl_replace_line("", 0);
-    rl_on_new_line();
-    // rl_redisplay();
+    // rl_on_new_line();
     g_signal = 130;
 }
 
@@ -160,10 +160,15 @@ int redirection_check_else_if(t_redirections *redirections)
     char *current_doc = NULL;
     size_t current_size = 0;
     char *line;
-    signal(SIGINT, handle_heredoc_sigint);
+   
     while (1)
     {
+     
         line = readline("> ");
+        if(g_signal == 130)
+        {
+            break;
+        }
         if (!line)
         {
             ft_dprintf(STDERR_FILENO, "Erorr404: warning: here-document delimited by EOF\n");

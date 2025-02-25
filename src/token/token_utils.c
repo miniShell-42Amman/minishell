@@ -100,7 +100,7 @@ static int print_syntax_error(char *token, int *status)
 int is_duplicate_operator_series(t_token *t, int count, int *status)
 {
 	int i;
-
+	
 	i = -1;
 	while (++i < count - 1)
 	{

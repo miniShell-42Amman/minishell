@@ -330,11 +330,35 @@ void close_pipes_and_wait(t_execute *execute)
     }
 }
 
-int preprocess_heredocs(t_execute *execute)
+// int preprocess_heredocs(t_execute *execute)
+// {
+//     t_redirections redirections;
+//     size_t i;
+
+//     i = -1;
+//     while (++i < execute->num_cmds)
+//     {
+//         ft_bzero(&redirections, sizeof(t_redirections));
+//         redirections.argv = execute->commands[i];
+//         redirections.j = 0;
+//         while (redirections.argv[redirections.j])
+//         {
+//             if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0)
+//             {
+//                 if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
+//                     return (EXIT_FAILURE);
+//             }
+//             else
+//                 redirections.j++;
+//         }
+//     }
+//     return (EXIT_SUCCESS);
+// }
+int preprocess_heredocs(t_execute *execute, t_token *token)
 {
     t_redirections redirections;
     size_t i;
-
+    int tmp = dup(STDIN_FILENO);
     i = -1;
     while (++i < execute->num_cmds)
     {
@@ -343,15 +367,28 @@ int preprocess_heredocs(t_execute *execute)
         redirections.j = 0;
         while (redirections.argv[redirections.j])
         {
-            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0)
+            ft_printf("token type %d\n", token[redirections.j].type);
+            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && token[redirections.j].type == TOKEN_REDIRECTION_HEREDOC)
             {
+                signal(SIGINT, handle_heredoc_sigint);
+                if (g_signal == 130)
+                    break;
                 if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
                     return (EXIT_FAILURE);
             }
             else
                 redirections.j++;
         }
+        if (g_signal == 130)
+        {
+            dup2(tmp, STDIN_FILENO);
+            close(tmp);
+            signal(SIGINT, handle_sigint);
+            return (EXIT_FAILURE);
+        }
     }
+    close(tmp);
+    signal(SIGINT, handle_sigint);
     return (EXIT_SUCCESS);
 }
 
@@ -375,7 +412,7 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *
         return;
     }
 
-    if (preprocess_heredocs(&execute) != EXIT_SUCCESS)
+    if (preprocess_heredocs(&execute, tokens) != EXIT_SUCCESS)
     {
         free_execute(&execute);
         *status = 130;

@@ -135,16 +135,23 @@ int redirection_check(t_redirections *redirections)
 //     return (EXIT_SUCCESS);
 // }
 
+// void handle_heredoc_sigint(int signum)
+// {
+//     (void)signum;
+//     write(1, "\n", 1);
+//     rl_replace_line("", 0);
+//     rl_on_new_line();
+//     // rl_redisplay();
+//     g_signal = 130;
+// }
+
 void handle_heredoc_sigint(int signum)
 {
     (void)signum;
-    write(1, "\n", 1);
-    rl_replace_line("", 0);
-    rl_on_new_line();
-    // rl_redisplay();
+    close(STDIN_FILENO);     
+    ft_printf("\n");
     g_signal = 130;
 }
-
 int redirection_check_else_if(t_redirections *redirections)
 {
     // (void)flage;
@@ -164,6 +171,10 @@ int redirection_check_else_if(t_redirections *redirections)
     while (1)
     {
         line = readline("> ");
+        if(g_signal == 130)
+        {
+            break;
+        }
         if (!line)
         {
             ft_dprintf(STDERR_FILENO, "Erorr404: warning: here-document delimited by EOF\n");
@@ -174,13 +185,10 @@ int redirection_check_else_if(t_redirections *redirections)
             free(line);
             break;
         }
-
         current_doc = append_str(current_doc, &current_size, line);
         current_doc = append_str(current_doc, &current_size, "\n");
         free(line);
     }
-    // if (flage ==1 )
-    //     sigaction(SIGINT, &sa_orig, NULL);
     if (current_doc)
     {
         redirections->heredoc_all = append_str(redirections->heredoc_all,

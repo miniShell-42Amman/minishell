@@ -42,19 +42,30 @@ int start_tokenization(t_main *main)
 	return (EXIT_SUCCESS);
 }
 
+// void handle_sigint(int signum)
+// {
+// 	(void)signum;
+// 	if (!g_signal || g_signal == 130)
+// 	{
+// 		ft_printf("\n");
+// 		rl_replace_line("", 0);
+// 		rl_on_new_line();
+// 		rl_redisplay();
+// 	}
+// 	g_signal = 130;
+// }
+
 void handle_sigint(int signum)
 {
 	(void)signum;
-	if (!g_signal || g_signal == 130)
-	{
+	// if (!g_signal || g_signal == 130)
+	// {
 		ft_printf("\n");
 		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
-	}
-	g_signal = 130;
+	// }
+	// g_signal = 130;
 }
-
 void setup_signals(void)
 {
 	struct sigaction sa_int, sa_quit;

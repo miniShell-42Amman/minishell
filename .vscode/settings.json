@@ -116,7 +116,8 @@
     "typeinfo": "c",
     "sstream": "c",
     "history.h": "c",
-    "tttttttttttttttttttttttttttt": "cpp"
+    "tttttttttttttttttttttttttttt": "cpp",
+    "locale": "c"
   },
   "cSpell.words": [
     "MINISHELL"

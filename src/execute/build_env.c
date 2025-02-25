@@ -400,29 +400,3 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *
     free_execute(&execute);
     return;
 }
-
-// void start_execution(t_token *tokens, size_t token_count, t_env *env_list,int *status)
-// {
-//     t_execute execute;
-//     int check_pipes;
-
-//     check_pipes = 0;
-//     ft_bzero(&execute, sizeof(t_execute));
-//     execute.env_list = env_list;
-//     execute.envp = convert_env_to_list(env_list);
-//     execute.exit_status = status;
-//     *execute.exit_status = 0;
-//     execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
-//     execute.num_pipes = execute.num_cmds - 1;
-//     if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args
-//         || create_pipes(&execute,&check_pipes) || fork_and_execute(&execute,&check_pipes))
-//     {
-//         free_execute(&execute);
-//         if(check_pipes)
-//             close_pipes_and_wait(&execute);
-//         *status = 1;
-//         return;
-//     }
-//     close_pipes_and_wait(&execute);
-//     free_execute(&execute);
-// }

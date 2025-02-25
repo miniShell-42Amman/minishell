@@ -1,98 +1,51 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_count_token.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/10 23:31:52 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/02/11 21:09:48 by oissa            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-static int	get_operator_length(char *input, int i)
+static int is_valid_operator(char *token, int pos, char **tokens)
 {
-	if (input[i] == '|')
-		return (1);
-	if (input[i] == '<' || input[i] == '>')
-	{
-		if (input[i + 1] == input[i])
-			return (2);
-		return (1);
-	}
-	return (0);
+    if (ft_strchr(token, '\'') || ft_strchr(token, '"'))
+        return (1); 
+    if (ft_strcmp(token, "|") == 0) {
+        if (pos == 0 || !tokens[pos+1] || ft_strcmp(tokens[pos-1], "|") == 0)
+            return (0);
+        return (1);
+    }
+    if (ft_strcmp(token, ">") == 0 || ft_strcmp(token, "<") == 0 ||
+        ft_strcmp(token, ">>") == 0 || ft_strcmp(token, "<<") == 0) {
+        if (!tokens[pos+1] || ft_strchr("><|", tokens[pos+1][0]))
+            return (0);
+        return (1);
+    }
+    return (1);
 }
 
-static int	is_inside_quotes(int in_single, int in_double)
+static void validate_tokens(char **tokens, t_counter *ct)
 {
-	return (in_single || in_double);
+	int i;
+
+    i = -1;
+    while (tokens[++i]) {
+        if (ft_strchr("|<>", tokens[i][0]) && !is_valid_operator(tokens[i], i, tokens)) {
+            if (!ct->array)
+                ct->array = ft_calloc(ct->count_word + 1, sizeof(int));
+            ct->array[ct->count++] = i;
+        }
+    }
+    if (ct->array)
+        ct->array[ct->count] = -1;
 }
 
-static int	is_adjacent_to_quotes(char *input, int i, int op_len)
+int *ft_count_token(char *input)
 {
-	if (i > 0 && (input[i - 1] == '\'' || input[i - 1] == '"'))
-		return (1);
-	if (input[i + op_len] == '\'' || input[i + op_len] == '"')
-		return (1);
-	return (0);
-}
+    t_counter ct;
+    char **tokens;
 
-static void	process_token(char *input, t_counter *ct)
-{
-	int	op_len;
-
-	while (input[ct->i] && (input[ct->i] != ' ' && input[ct->i] != '\t'))
-	{
-		if (input[ct->i] == '\'' && !ct->in_double)
-			ct->in_single = !ct->in_single;
-		else if (input[ct->i] == '"' && !ct->in_single)
-			ct->in_double = !ct->in_double;
-		op_len = get_operator_length(input, ct->i);
-		if (op_len > 0)
-		{
-			if (is_inside_quotes(ct->in_single, ct->in_double)
-				|| is_adjacent_to_quotes(input, ct->i, op_len))
-			{
-				if (!ct->array)
-					ct->array = ft_calloc(sizeof(int), (count_args(input) + 1));
-				ct->array[ct->count++] = ct->count_word - 1;
-				ct->i += op_len;
-				continue ;
-			}
-			else
-				break ;
-		}
-		ct->i++;
-	}
-}
-
-int	*ft_count_token(char *input)
-{
-	t_counter	ct;
-	int			op_len;
-
-	if (!input || !*input || input[0] == '|')
-		return (NULL);
-	ft_bzero(&ct, sizeof(t_counter));
-	while (input[ct.i])
-	{
-		skip_whitespace(input, &ct.i, ft_strlen(input));
-		if (!input[ct.i])
-			break ;
-		op_len = get_operator_length(input, ct.i);
-		if (op_len > 0 && !is_inside_quotes(ct.in_single, ct.in_double)
-			&& !is_adjacent_to_quotes(input, ct.i, op_len))
-		{
-			ct.count_word++;
-			ct.i += op_len;
-			continue ;
-		}
-		ct.count_word++;
-		process_token(input, &ct);
-	}
-	if (ct.array)
-		ct.array[ct.count] = -1;
-	return (ct.array);
+    ft_bzero(&ct, sizeof(t_counter));
+    tokens = smart_split(input);
+    if (!tokens)
+        return (NULL);
+    while (tokens[ct.count_word])
+        ct.count_word++;
+    validate_tokens(tokens, &ct);
+    ft_free_split(tokens);
+    return ct.array;
 }

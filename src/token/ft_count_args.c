@@ -41,7 +41,7 @@ static void	handle_quotes(char *input, t_counter *c)
 			c->in_double = !(c->in_double);
 		if (!(c->in_single) && !(c->in_double))
 		{
-			if (input[c->i] == ' ' || input[c->i] == '\t' || input[c->i] == '|'
+			if (input[c->i] == ' ' || input[c->i] == '\t'
 				|| ft_is_operator(&input[c->i]))
 				break ;
 		}

@@ -36,10 +36,6 @@ int start_tokenization(t_main *main)
 		free(array);
 		return (EXIT_FAILURE);
 	}
-	for (int i = 0; i < main->cmd->arg_count; i++)
-	{
-		printf("token: %s type %d\n", main->tokens_list[i].value, main->tokens_list[i].type);
-	}
 	if (array)
 		free(array);
 	main->exit_status = 0;

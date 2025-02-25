@@ -33,7 +33,7 @@ int ft_have_operator(t_parse_cmd *parse_cmd)
 
 int check_condition_too(t_parse_cmd *parse_cmd, t_env *env_list)
 {
-	if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|' || parse_cmd->c == '<' || parse_cmd->c == '>'))
+	if (!parse_cmd->in_quotes && (parse_cmd->c == ' ' || parse_cmd->c == '|' || parse_cmd->c == '<' || parse_cmd->c == '>' || parse_cmd->operator == '<' || parse_cmd->operator == '>'))
 	{
 		if (if_token_started(parse_cmd, env_list) == EXIT_FAILURE)
 			return (EXIT_FAILURE);

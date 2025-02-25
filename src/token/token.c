@@ -183,6 +183,12 @@ int init_parse_cmd(t_parse_cmd *parse_cmd, char *input, int *status)
 	parse_cmd->trimmed_input = ft_strtrim(input, " \t\n");
 	parse_cmd->clean_input = ft_strdup(parse_cmd->trimmed_input);
 	parse_cmd->splitter_clean_input = smart_split(parse_cmd->clean_input);
+	if(!parse_cmd->splitter_clean_input)
+	{
+		free(parse_cmd->clean_input);
+		free(parse_cmd->trimmed_input);
+		return (EXIT_FAILURE);
+	}
 	parse_cmd->exit_status = status;
 	free(parse_cmd->trimmed_input);
 	if (!parse_cmd->clean_input)
@@ -193,7 +199,12 @@ int init_parse_cmd(t_parse_cmd *parse_cmd, char *input, int *status)
 		free(parse_cmd->clean_input);
 		return (EXIT_FAILURE);
 	}
-	parse_cmd->cmd.arg_count = count_args(parse_cmd->clean_input);
+    parse_cmd->cmd.arg_count = 0;
+    if (parse_cmd->splitter_clean_input)
+    {
+        while (parse_cmd->splitter_clean_input[parse_cmd->cmd.arg_count])
+            parse_cmd->cmd.arg_count++;
+    }
 	parse_cmd->cmd.args = ft_calloc((parse_cmd->cmd.arg_count + 1), sizeof(char *));
 	if (!parse_cmd->cmd.args)
 	{

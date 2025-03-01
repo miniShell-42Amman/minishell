@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 22:02:51 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/02/22 17:02:23 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/01 02:20:23 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void	update_existing_env(t_env *tmp, char *v)
 	if (tmp && v)
 	{
 		free(tmp->value);
+		tmp->value = NULL;
 		tmp->value = ft_strdup(v);
 		tmp->has_value = 1;
 	}
@@ -62,7 +63,9 @@ void	update_env(t_env **env, char *k, char *v)
 	else
 		add_new_env(env, k, v);
 	free(k);
+	k = NULL;
 	free(v);
+	v = NULL;
 }
 
 void	ft_sort_arr(char **arr, int size)

@@ -5,7 +5,7 @@ static int is_valid_operator(char *token, int pos, char **tokens)
     if (ft_strchr(token, '\'') || ft_strchr(token, '"'))
         return (0); 
     if (ft_strcmp(token, "|") == 0) {
-        if (pos == 0 || !token[pos + 1])
+        if (pos == 0 || !tokens[pos + 1])
             return (0);
         return (1);
     }
@@ -38,8 +38,7 @@ static void validate_tokens(char **tokens, t_counter *ct)
         {
             if (!ct->array)
                 ct->array = ft_calloc(ct->count_word + 1, sizeof(int));   
-            ct->array[ct->count++] = i;
-            
+            ct->array[ct->count++] = i;   
         }
     }
     if (ct->array)

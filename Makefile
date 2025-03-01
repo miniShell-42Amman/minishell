@@ -31,6 +31,7 @@ SRC = 	src/main.c 							\
 		src/execute/redirections.c			\
 		src/builtins/export_utils.c			\
 		src/builtins/exit.c					\
+		src/signal/handle_signal.c			\
 
 
 OBJ_DIR = obj

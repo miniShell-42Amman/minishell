@@ -12,11 +12,12 @@
 
 #include "minishell.h"
 #include <sys/stat.h>
+#include <errno.h>
 
 void exit_error(char *message, t_execute *execute)
 {
     ft_dprintf(STDERR_FILENO, "%s\n", message);
-    free_execute(execute);
+    free_execute(execute, 0);
     exit(EXIT_FAILURE);
 }
 
@@ -119,6 +120,11 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute)
     char *full_path;
     char *path;
 
+    if (command[0] == '\0')
+    {
+        *execute->exit_status = 127;
+        return NULL;
+    }
     if (command[0] == '/' || command[0] == '.')
     {
         if (access(command, F_OK) == 0)
@@ -209,7 +215,7 @@ int is_commands(t_execute *execute, int flag)
 
 void execute_builtin(t_execute *execute)
 {
-
+    *execute->exit_status = 0;
     if (ft_strcmp(execute->commands[execute->i][0], "echo") == 0)
         echo(execute->commands[execute->i]);
     else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
@@ -225,25 +231,49 @@ void execute_builtin(t_execute *execute)
         *execute->exit_status = export(execute->commands[execute->i],
                                        execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-        unset(execute->commands[execute->i],
-              execute->env_list);
+        *execute->exit_status = unset(execute->commands[execute->i],
+                                      &execute->env_list);
 }
 
-void execute_command(t_execute *execute)
+
+void execute_command(t_execute *execute, t_token *tokens)
 {
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
+    {
+        free_execute(execute, 1);
+        if (tokens)
+        {
+            free_tokens(tokens, execute->token_count);
+            tokens = NULL;
+        }
         exit(EXIT_FAILURE);
+
+    }
     if (execute->i != execute->num_cmds - 1 && dup2(execute->pipe_fds[execute->i * 2 + 1], STDOUT_FILENO) < 0)
+    {
+        free_execute(execute, 1);
+        if (tokens)
+        {
+            free_tokens(tokens, execute->token_count);
+            tokens = NULL;
+        }
         exit(EXIT_FAILURE);
+    }
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
-    handle_redirections(execute);
+    handle_redirections(execute, tokens);
     if (!is_commands(execute, 2))
     {
         execute_builtin(execute);
+        free_execute(execute, 1);
+        if (tokens)
+        {
+            free_tokens(tokens, execute->token_count);
+            tokens = NULL;
+        }
         exit(*execute->exit_status);
     }
     execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute);
@@ -253,11 +283,31 @@ void execute_command(t_execute *execute)
             ft_dprintf(2, "Error404: %s: Is a directory\n", execute->commands[execute->i][0]);
         else
             ft_dprintf(2, "Error404: %s: command not found\n", execute->commands[execute->i][0]);
+        free_execute(execute, 1);  
+        if (tokens)
+        {
+            free_tokens(tokens, execute->token_count);
+            tokens = NULL;
+        }         
         exit(*execute->exit_status);
     }
     if (execve(execute->cmd_path, execute->commands[execute->i], execute->envp))
     {
-        perror("execve");
+        if(errno == ENOENT)
+        {    ft_dprintf(2, "Error404: command not found");
+            *execute->exit_status = 127;
+        }
+        else
+        {
+            ft_dprintf(2, "Error404: %s: %s\n", execute->commands[execute->i][0], strerror(errno));
+            *execute->exit_status = 126;
+        }
+        free_execute(execute, 1);
+        if (tokens)
+        {
+            free_tokens(tokens, execute->token_count);
+            tokens = NULL;
+        }
         exit(*execute->exit_status);
     }
 }
@@ -271,12 +321,12 @@ int handle_builtins(t_execute *execute)
         *execute->exit_status = export(execute->commands[execute->i],
                                        execute->cmd_args[execute->i], &execute->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
-        unset(execute->commands[execute->i],
-              execute->env_list);
+        *execute->exit_status = unset(execute->commands[execute->i],
+                                      &execute->env_list);
     return (EXIT_SUCCESS);
 }
 
-int fork_and_execute(t_execute *execute, int *check)
+int fork_and_execute(t_execute *execute, int *check, t_token *tokens)
 {
     execute->pids = ft_calloc(execute->num_cmds, sizeof(pid_t));
     if (!execute->pids)
@@ -297,7 +347,7 @@ int fork_and_execute(t_execute *execute, int *check)
             return (EXIT_FAILURE);
         }
         if (execute->pid == 0)
-            execute_command(execute);
+            execute_command(execute, tokens);
         else
             execute->pids[execute->i] = execute->pid;
         execute->i++;
@@ -329,46 +379,72 @@ void close_pipes_and_wait(t_execute *execute)
         }
     }
 }
+// int loop_check_heredoc(t_redirections *redirections, t_token *token)
+// {
+//     while (redirections->argv[redirections->j])
+//     {
+//         if (ft_strcmp(redirections->argv[redirections->j], "<<") == 0 
+//         && token[redirections->j].type == TOKEN_REDIRECTION_HEREDOC)
+//         {
+//             signal(SIGINT, handle_heredoc_sigint);
+//             if (g_signal == 130)
+//                 break;
+//             if (redirection_check_else_if(redirections) != EXIT_SUCCESS)
+//                 return (EXIT_FAILURE);
+//         }
+//         else
+//             redirections->j++;
+//     }
+//     return (EXIT_SUCCESS);
+// }
 
-// int preprocess_heredocs(t_execute *execute)
+// int preprocess_heredocs(t_execute *execute, t_token *token)
 // {
 //     t_redirections redirections;
 //     size_t i;
+//     int tmp;
 
+//     tmp = dup(STDIN_FILENO);
 //     i = -1;
 //     while (++i < execute->num_cmds)
 //     {
 //         ft_bzero(&redirections, sizeof(t_redirections));
 //         redirections.argv = execute->commands[i];
 //         redirections.j = 0;
-//         while (redirections.argv[redirections.j])
+//         if (loop_check_heredoc(&redirections, token) == EXIT_FAILURE)
+//             return (EXIT_FAILURE);
+//         if (g_signal == 130)
 //         {
-//             if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0)
-//             {
-//                 if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
-//                     return (EXIT_FAILURE);
-//             }
-//             else
-//                 redirections.j++;
+//             dup2(tmp, STDIN_FILENO);
+//             close(tmp);
+//             signal(SIGINT, handle_sigint);
+//             return (EXIT_FAILURE);
 //         }
 //     }
+//     close(tmp);
+//     signal(SIGINT, handle_sigint);
+//     redirections.argv = NULL;
 //     return (EXIT_SUCCESS);
 // }
 int preprocess_heredocs(t_execute *execute, t_token *token)
 {
     t_redirections redirections;
     size_t i;
+    int num_command;
     int tmp = dup(STDIN_FILENO);
     i = -1;
+
     while (++i < execute->num_cmds)
     {
         ft_bzero(&redirections, sizeof(t_redirections));
         redirections.argv = execute->commands[i];
+        num_command = 0;
+        while (redirections.argv[num_command++])
+            ;
         redirections.j = 0;
         while (redirections.argv[redirections.j])
         {
-            ft_printf("token type %d\n", token[redirections.j].type);
-            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && token[redirections.j].type == TOKEN_REDIRECTION_HEREDOC)
+            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && token[execute->i * num_command + redirections.j].type != TOKEN_ARGUMENT)
             {
                 signal(SIGINT, handle_heredoc_sigint);
                 if (g_signal == 130)
@@ -404,36 +480,35 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *
     *execute.exit_status = 0;
     execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
     execute.num_pipes = execute.num_cmds - 1;
-
     if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args)
     {
-        free_execute(&execute);
+        free_execute(&execute, 0);
         *status = 1;
         return;
     }
 
     if (preprocess_heredocs(&execute, tokens) != EXIT_SUCCESS)
     {
-        free_execute(&execute);
+        free_execute(&execute, 0);
         *status = 130;
         return;
     }
 
     if (create_pipes(&execute, &check_pipes))
     {
-        free_execute(&execute);
+        free_execute(&execute, 0);
         *status = 1;
         return;
     }
 
-    if (fork_and_execute(&execute, &check_pipes))
+    if (fork_and_execute(&execute, &check_pipes, tokens))
     {
-        free_execute(&execute);
+        free_execute(&execute, 0);
         *status = 1;
         return;
     }
 
     close_pipes_and_wait(&execute);
-    free_execute(&execute);
+    free_execute(&execute, 0);
     return;
 }

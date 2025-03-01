@@ -6,52 +6,36 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 22:49:19 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/23 01:46:43 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/02/27 06:28:17 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void    delete_env_var(char *var, t_env *list_env)
+int unset(char **args, t_env **env_list)
 {
-    t_env *tmp;
+    t_env *current;
     t_env *prev;
 
-    tmp = list_env;
+    if (!args[1])
+        return 0;
+    current = *env_list;
     prev = NULL;
-    while (tmp)
+    while (current)
     {
-        if (!ft_strcmp(tmp->key, var))
+        if (ft_strcmp(current->key, args[1]) == 0)
         {
             if (prev)
-                prev->next = tmp->next;
+                prev->next = current->next;
             else
-                list_env = tmp->next;
-            free(tmp->key);
-            free(tmp->value);
-            free(tmp);
-            return ;
+                *env_list = current->next;
+            free(current->key);
+            free(current->value);
+            free(current);
+            return 0;
         }
-        prev = tmp;
-        tmp = tmp->next;
+        prev = current;
+        current = current->next;
     }
-}
-
-void    unset(char **args, t_env *env_list)
-{
-    int i;
-
-    i = 1;
-    while (args[i])
-    {
-        if (ft_strchr(args[i], '='))
-        {
-            ft_putstr_fd("⚠️  Error404 ⚠️ : unset: `", 2);
-            ft_putstr_fd(args[i], 2);
-            ft_putstr_fd("': not a valid identifier\n", 2);
-        }
-        else
-            delete_env_var(args[i], env_list);
-        i++;
-    }
+    return 0;
 }

@@ -63,7 +63,17 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
 
     else
     {
-        if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
+        if(ft_isdigit(**t))
+        {
+            value = ft_itoa(**t - '0');
+            (*t)++;
+        }
+        else if(**t == '_')
+        {
+            value = get_var_value(e, "_", 1);
+            (*t)++;
+        }
+        else if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
         {
             var_len = p->arr_has_dollar[p->arr_has_dollar_count];
             *t += var_len;

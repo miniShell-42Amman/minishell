@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 19:53:58 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/24 22:30:52 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/01 01:56:20 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void    free_execute_too(t_execute *execute)
     }
 }
 
-void free_execute(t_execute *execute)
+void free_execute(t_execute *execute, int flage)
 {
     execute->i = 0;
     if (execute->envp)
@@ -52,4 +52,9 @@ void free_execute(t_execute *execute)
         free(execute->commands);
     }
     free_execute_too(execute);
+    if (flage == 1 && execute->env_list != NULL)
+    {
+        free_env_list(execute->env_list);
+        execute->env_list = NULL;
+    }
 }

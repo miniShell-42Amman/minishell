@@ -57,7 +57,7 @@ int init_command(t_token *token, size_t token_count, t_execute *execute)
         execute->commands[execute->i] = ft_calloc(execute->cmd_args[execute->i] + 1, sizeof(char *));
         if (!execute->commands[execute->i])
             return (EXIT_FAILURE);
-    }
+        }
     return (EXIT_SUCCESS);
 }
 
@@ -252,34 +252,20 @@ void execute_command(t_execute *execute, t_token *tokens)
     signal(SIGQUIT, SIG_DFL);
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
     {
-        free_execute(execute, 1);
-        // if (tokens)
-        // {
-        //     free_tokens(tokens, execute->token_count);
-        //     tokens = NULL;
-        // }
+        free_execute(execute,1);
         free(tokens->value);
         exit(EXIT_FAILURE);
     }
     if (execute->i != execute->num_cmds - 1 && dup2(execute->pipe_fds[execute->i * 2 + 1], STDOUT_FILENO) < 0)
     {
         free_execute(execute, 1);
-        // if (tokens)
-        // {
-        //     free_tokens(tokens, execute->token_count);
-        //     tokens = NULL;
-        // }
         free(tokens->value);
         exit(EXIT_FAILURE);
     }
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
-    ft_printf("before\n");
     handle_redirections(execute, tokens);
-    ft_printf("after\n");
-    // ft_printf("execute_command\n");
-    // ft_printf("execute_command\n");
     if (!is_commands(execute, 2))
     {
         execute_builtin(execute);
@@ -287,10 +273,7 @@ void execute_command(t_execute *execute, t_token *tokens)
         free(tokens->value);
         exit(*execute->exit_status);
     }
-    ft_printf("before2\n");
     execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute, tokens);
-    ft_printf("after2\n");
-
     if (!execute->cmd_path)
     {
         if (*execute->exit_status == 126)
@@ -351,6 +334,7 @@ int fork_and_execute(t_execute *execute, int *check, t_token *tokens)
         execute->pid = fork();
         if (execute->pid < 0)
         {
+            // free_execute(execute, 1);
             *check = 1;
             return (EXIT_FAILURE);
         }
@@ -384,6 +368,7 @@ void close_pipes_and_wait(t_execute *execute)
                 *execute->exit_status = (status >> 8) & 0xFF;
             else
                 *execute->exit_status = 128 + (status & 0x7F);
+            // free_execute(execute, 1);    
         }
     }
 }
@@ -460,13 +445,14 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
                 && token[num_command].type != TOKEN_ARGUMENT)
             {
                 signal(SIGINT, handle_heredoc_sigint);
+                if (redirection_check_else_if(&redirections,execute) != EXIT_SUCCESS)
+                    return (EXIT_FAILURE);
                 if (g_signal == 130)
                 {
                     free_redirections(&redirections);
+                    free_execute(execute, 0);
                     break;
                 }
-                if (redirection_check_else_if(&redirections) != EXIT_SUCCESS)
-                    return (EXIT_FAILURE);
             }
             else 
             {
@@ -522,6 +508,5 @@ void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *
     }
     close_pipes_and_wait(&execute);
     free_execute(&execute, 0);
-    execute.exit_status = NULL;
     return;
 }

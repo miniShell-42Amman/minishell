@@ -258,10 +258,11 @@ void update_env(t_env **env, char *k, char *v);
 void add_new_env(t_env **env, char *k, char *v);
 char *remove_quotes(char *str);
 int ft_exit(char **args);
-int redirection_check_else_if(t_redirections *redirections);
+int redirection_check_else_if(t_redirections *redirections,
+							  t_execute *execute);
 void if_redirections_heredoc_all(t_redirections *redirections);
 void redirection_check_else_if_loop(t_redirections *redirections,
-									t_here_document *here_doc);
+									t_here_document *here_doc, t_execute *execute);
 int redirection_check(t_redirections *redirections);
 void choose_flags_fd(t_redirections *redirections,
 					 int *flags, int *fd, int *std_fd);

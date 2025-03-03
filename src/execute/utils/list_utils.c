@@ -58,13 +58,14 @@ char **convert_env_to_list(t_env *env_list)
     
     if (!envp)
     {
+        ft_free_split(envp);
         perror("minishell: malloc error");
         return (NULL);
     }
     
     if (fill_env_list(&envp, env_list, env_count))
     {
-        free(envp);
+        ft_free_split(envp);
         return (NULL);
     }
     return (envp);

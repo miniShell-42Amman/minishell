@@ -2,7 +2,7 @@
 void free_redirections(t_redirections *redirections)
 {
     // if (*redirections->argv)
-    //     ft_free_split(redirections->argv);
+        // ft_free_split(redirections->argv);
     if (redirections->heredoc_all)
     {
         free(redirections->heredoc_all);

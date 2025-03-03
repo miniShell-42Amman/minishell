@@ -55,7 +55,7 @@ int	redirection_check(t_redirections *redirections)
 	redirections->target = redirections->argv[redirections->j + 1];
 	if (!redirections->target && ft_dprintf(STDERR_FILENO,
 			"Erorr404: syntax error near token `%s'\n", redirections->op))
-		exit(EXIT_FAILURE);
+				exit(EXIT_FAILURE);
 	choose_flags_fd(redirections, &flags, &fd, &std_fd);
 	if (dup2(fd, std_fd) < 0)
 		exit(EXIT_FAILURE);

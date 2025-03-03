@@ -9,8 +9,9 @@ char *append_str(char *dest, size_t *dest_size, const char *src)
 
 	src_len = ft_strlen(src);
 	new_ptr = ft_realloc(dest, *dest_size, *dest_size + src_len + 1);
-	if (!new_ptr) {
-        free(dest);
+	if (!new_ptr)
+	{
+		free(dest);
 	}
 	if (!new_ptr)
 	{
@@ -80,21 +81,24 @@ int redirection_check(t_redirections *redirections)
 }
 
 void redirection_check_else_if_loop(t_redirections *redirections,
-									t_here_document *here_doc)
+									t_here_document *here_doc, t_execute *execute)
 {
+	(void)execute;
 	while (1)
 	{
 		here_doc->line = readline("> ");
 		if (g_signal == 130)
 		{
 			free_here_doc(here_doc);
+			free_redirections(redirections);
+			// free_execute(execute, 0);
 			break;
 		}
 		if (!here_doc->line)
 		{
 			ft_dprintf(STDERR_FILENO,
 					   "Erorr404: warning: here-document delimited by EOF\n");
-			free_here_doc(here_doc);		   
+			free_here_doc(here_doc);
 			break;
 		}
 		if (ft_strcmp(here_doc->line, here_doc->target) == 0)
@@ -116,7 +120,7 @@ void redirection_check_else_if_loop(t_redirections *redirections,
 	}
 }
 
-int redirection_check_else_if(t_redirections *redirections)
+int redirection_check_else_if(t_redirections *redirections, t_execute *execute)
 {
 	t_here_document here_doc;
 
@@ -132,7 +136,12 @@ int redirection_check_else_if(t_redirections *redirections)
 		return (EXIT_FAILURE);
 	}
 	signal(SIGINT, handle_heredoc_sigint);
-	redirection_check_else_if_loop(redirections, &here_doc);
+	redirection_check_else_if_loop(redirections, &here_doc, execute);
+	if (redirections->argv && redirections->argv[redirections->j])
+	{
+			free(redirections->argv[redirections->j]);
+			redirections->argv[redirections->j] = NULL;
+	}
 	redirections->k = redirections->j;
 	while (redirections->argv[redirections->k + 2])
 	{
@@ -141,7 +150,6 @@ int redirection_check_else_if(t_redirections *redirections)
 	}
 	redirections->argv[redirections->k] = NULL;
 	free_here_doc(&here_doc);
-	// redirections->argv = ft_free_split(redirections->argv);
 	return (EXIT_SUCCESS);
 }
 void if_redirections_heredoc_all(t_redirections *redirections)
@@ -206,15 +214,9 @@ void handle_redirections(t_execute *execute, t_token *tokens)
 	num_command = ft_determine_number_of_commands(execute);
 	while (redirections.argv[redirections.j])
 	{
-		if (((!ft_strcmp(redirections.argv[redirections.j], ">")) 
-		|| (!ft_strcmp(redirections.argv[redirections.j], ">>")) 
-		|| (!ft_strcmp(redirections.argv[redirections.j], "<"))) 
-		&& tokens[num_command + redirections.j].type != TOKEN_ARGUMENT 
-		&& !redirection_check(&redirections))
+		if (((!ft_strcmp(redirections.argv[redirections.j], ">")) || (!ft_strcmp(redirections.argv[redirections.j], ">>")) || (!ft_strcmp(redirections.argv[redirections.j], "<"))) && tokens[num_command + redirections.j].type != TOKEN_ARGUMENT && !redirection_check(&redirections))
 			continue;
-		else if ((!ft_strcmp(redirections.argv[redirections.j], "<<")) 
-		&& tokens[num_command + redirections.j].type != TOKEN_ARGUMENT 
-		&& !redirection_check_else_if(&redirections))
+		else if ((!ft_strcmp(redirections.argv[redirections.j], "<<")) && tokens[num_command + redirections.j].type != TOKEN_ARGUMENT && !redirection_check_else_if(&redirections, execute))
 			continue;
 		redirections.j++;
 	}

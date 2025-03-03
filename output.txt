@@ -1,0 +1,13 @@
+6
+Libft
+Makefile
+include
+ls
+minishell
+minishell_tester
+obj
+omar
+operator.sh
+output.txt
+src
+testing

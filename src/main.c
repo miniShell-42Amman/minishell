@@ -37,11 +37,11 @@ int start_tokenization(t_main *main)
 	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 									array);
-	for(int i = 0; i < main->cmd->arg_count; i++)
-	{
-		if (main->tokens_list[i].value)
-			ft_printf("token[%d]: %s type %d\n", i, main->tokens_list[i].value, main->tokens_list[i].type);
-	}
+	// for(int i = 0; i < main->cmd->arg_count; i++)
+	// {
+	// 	if (main->tokens_list[i].value)
+	// 		ft_printf("token[%d]: %s type %d\n", i, main->tokens_list[i].value, main->tokens_list[i].type);
+	// }
 	int i = skip_space(main->input);
 	if (main->tokens_list[0].value && !*main->tokens_list[0].value && !ft_strchr("\'\"", main->input[i]))
 	{

@@ -42,7 +42,11 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
         value = get_var_value(env, start, var_len);
     }
     if (value)
-        return (ft_strlen(value));
+    {
+        size_t len = ft_strlen(value);
+        free(value);
+        return (len);
+    }
     return (0);
 }
 
@@ -91,6 +95,7 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
     {
         ft_strlcpy(*res + *j, value, ft_strlen(value) + 1);
         *j += ft_strlen(value);
+        free(value);
     }
 }
 

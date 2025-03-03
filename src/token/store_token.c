@@ -20,16 +20,16 @@ static int	is_valid(int *array, int token_index)
 	if (array == NULL)
 		return (0);
 	len = 0;
-	while (array[len])
+	while (array[len] != -1)
 		len++;
 	i = 0;
-	
 	while (i < len)
 	{
 		if (array[i] == token_index)
 			return (1);
 		i++;
 	}
+
 	return (0);
 }
 
@@ -46,8 +46,8 @@ t_token_type	determine_token_type(char *token, int token_index,
 		return (TOKEN_REDIRECTION_APPEND);
 	else if (ft_strcmp(token, "<<") == 0 && !is_valid(array, token_index))
 		return (TOKEN_REDIRECTION_HEREDOC);
-	else if ((token_index == 0)|| (token_index > 0
-			&& tokens_list[token_index - 1].type == TOKEN_PIPE))
+	else if ((token_index == 0 && !is_valid(array,token_index))|| (token_index > 0
+			&& tokens_list[token_index - 1].type == TOKEN_PIPE && !is_valid(array, token_index)))
 		return (TOKEN_COMMAND);
 	else
 		return (TOKEN_ARGUMENT);
@@ -113,7 +113,6 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 		{
 			new_token[i].value = NULL;
 			new_token[i].type = TOKEN_ARGUMENT;
-			// i++;
 			continue ;
 		}
 		if (store_token_value(new_token, tokens_list, i))
@@ -123,10 +122,6 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 		}
 		new_token[i].type = determine_token_type(tokens_list[i], i, new_token,
 				array);
-	}
-	for(int i = 0 ; i < token_count; i++)
-	{
-		printf("token[%d]: %s %d\n", i, new_token[i].value, new_token[i].type);
 	}
 	return (new_token);
 }

@@ -5,8 +5,10 @@ char	*append_str(char *dest, size_t *dest_size, const char *src)
 {
 	size_t	src_len;
 	char	*new_ptr;
+	char 	*old_dest;
 
 	src_len = ft_strlen(src);
+	old_dest = dest;
 	new_ptr = ft_realloc(dest, *dest_size, *dest_size + src_len + 1);
 	if (!new_ptr)
 	{

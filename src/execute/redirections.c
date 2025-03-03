@@ -1,6 +1,7 @@
 #include "minishell.h"
 #include "string.h"
 #include <errno.h>
+
 char *append_str(char *dest, size_t *dest_size, const char *src)
 {
 	size_t src_len;
@@ -8,6 +9,9 @@ char *append_str(char *dest, size_t *dest_size, const char *src)
 
 	src_len = ft_strlen(src);
 	new_ptr = ft_realloc(dest, *dest_size, *dest_size + src_len + 1);
+	if (!new_ptr) {
+        free(dest);
+	}
 	if (!new_ptr)
 	{
 		free(dest);
@@ -54,10 +58,16 @@ int redirection_check(t_redirections *redirections)
 	redirections->target = redirections->argv[redirections->j + 1];
 	if (!redirections->target && ft_dprintf(STDERR_FILENO,
 											"Erorr404: syntax error near token `%s'\n", redirections->op))
+	{
+		free_redirections(redirections);
 		exit(EXIT_FAILURE);
+	}
 	choose_flags_fd(redirections, &flags, &fd, &std_fd);
 	if (dup2(fd, std_fd) < 0)
+	{
+		free_redirections(redirections);
 		exit(EXIT_FAILURE);
+	}
 	close(fd);
 	redirections->k = redirections->j;
 	while (redirections->argv[redirections->k + 2])
@@ -76,16 +86,20 @@ void redirection_check_else_if_loop(t_redirections *redirections,
 	{
 		here_doc->line = readline("> ");
 		if (g_signal == 130)
+		{
+			free_here_doc(here_doc);
 			break;
+		}
 		if (!here_doc->line)
 		{
 			ft_dprintf(STDERR_FILENO,
 					   "Erorr404: warning: here-document delimited by EOF\n");
+			free_here_doc(here_doc);		   
 			break;
 		}
 		if (ft_strcmp(here_doc->line, here_doc->target) == 0)
 		{
-			free(here_doc->line);
+			free_here_doc(here_doc);
 			break;
 		}
 		here_doc->current_doc = append_str(here_doc->current_doc,
@@ -98,7 +112,7 @@ void redirection_check_else_if_loop(t_redirections *redirections,
 	{
 		redirections->heredoc_all = append_str(redirections->heredoc_all,
 											   &redirections->heredoc_total_size, here_doc->current_doc);
-		free(here_doc->current_doc);
+		free_here_doc(here_doc);
 	}
 }
 
@@ -111,6 +125,10 @@ int redirection_check_else_if(t_redirections *redirections)
 	if (!here_doc.target)
 	{
 		ft_dprintf(STDERR_FILENO, "Erorr404: syntax error near token `<<'\n");
+		free_redirections(redirections);
+		free_here_doc(&here_doc);
+		*redirections->exit_status = 2;
+		redirections = NULL;
 		return (EXIT_FAILURE);
 	}
 	signal(SIGINT, handle_heredoc_sigint);
@@ -122,6 +140,8 @@ int redirection_check_else_if(t_redirections *redirections)
 		redirections->k++;
 	}
 	redirections->argv[redirections->k] = NULL;
+	free_here_doc(&here_doc);
+	// redirections->argv = ft_free_split(redirections->argv);
 	return (EXIT_SUCCESS);
 }
 void if_redirections_heredoc_all(t_redirections *redirections)
@@ -133,12 +153,14 @@ void if_redirections_heredoc_all(t_redirections *redirections)
 		if (pipe(pipefd) < 0)
 		{
 			perror("Erorr404: pipe");
+			free_redirections(redirections);
 			exit(EXIT_FAILURE);
 		}
 		if (write(pipefd[1], redirections->heredoc_all,
 				  redirections->heredoc_total_size) < 0)
 		{
 			perror("Erorr404: write");
+			free_redirections(redirections);
 			exit(EXIT_FAILURE);
 		}
 		free(redirections->heredoc_all);
@@ -146,13 +168,15 @@ void if_redirections_heredoc_all(t_redirections *redirections)
 		if (dup2(pipefd[0], STDIN_FILENO) < 0)
 		{
 			perror("Erorr404: dup2");
+			free_redirections(redirections);
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[0]);
 	}
+	free_redirections(redirections);
 }
 
-size_t ft_determine_numbber_of_commands(t_execute *execute)
+size_t ft_determine_number_of_commands(t_execute *execute)
 {
 	size_t num_command = 0;
 	size_t i = 0;
@@ -179,7 +203,7 @@ void handle_redirections(t_execute *execute, t_token *tokens)
 	ft_bzero(&redirections, sizeof(t_redirections));
 	redirections.exit_status = execute->exit_status;
 	redirections.argv = execute->commands[execute->i];
-	num_command = ft_determine_numbber_of_commands(execute);
+	num_command = ft_determine_number_of_commands(execute);
 	while (redirections.argv[redirections.j])
 	{
 		if (((!ft_strcmp(redirections.argv[redirections.j], ">")) 

@@ -12,7 +12,7 @@ static int is_valid_operator(char *token, int pos, char **tokens)
     if (ft_strcmp(token, ">") == 0 || ft_strcmp(token, "<") == 0 ||
         ft_strcmp(token, ">>") == 0 || ft_strcmp(token, "<<") == 0) 
         {
-        if (pos == 0 || !tokens[pos+1])
+        if (!tokens[pos+1])
             return (0);
         return (1);
     }

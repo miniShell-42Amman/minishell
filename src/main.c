@@ -13,7 +13,15 @@
 #include "minishell.h"
 
 volatile sig_atomic_t g_signal = 0;
+int skip_space(char *str)
+{
+	int i;
 
+	i = 0;
+	while (str[i] && ft_isspace(str[i]))
+		i++;
+	return (i);
+}
 int start_tokenization(t_main *main)
 {
 	int *array;
@@ -29,10 +37,16 @@ int start_tokenization(t_main *main)
 	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 									array);
-	if (main->tokens_list[0].value && !*main->tokens_list[0].value && !ft_strchr("\'\"",main->input[0]))
+	for(int i = 0; i < main->cmd->arg_count; i++)
+	{
+		if (main->tokens_list[i].value)
+			ft_printf("token[%d]: %s type %d\n", i, main->tokens_list[i].value, main->tokens_list[i].type);
+	}
+	int i = skip_space(main->input);
+	if (main->tokens_list[0].value && !*main->tokens_list[0].value && !ft_strchr("\'\"", main->input[i]))
 	{
 		free(main->tokens_list[0].value);
-		
+
 		int j = -1;
 		while (++j < main->cmd->arg_count - 1)
 			main->tokens_list[j] = main->tokens_list[j + 1];
@@ -48,34 +62,26 @@ int start_tokenization(t_main *main)
 	if (array)
 		free(array);
 	main->exit_status = 0;
+
 	return (EXIT_SUCCESS);
 }
 
-int skip_space(char *str)
-{
-	int i;
-
-	i = 0;
-	while (str[i] && ft_isspace(str[i]))
-		i++;
-	return (i);
-}
 void increment_shell_level(t_env **env_list)
 {
-    char    *shell_level_str;
-    int     shell_level_int;
+	char *shell_level_str;
+	int shell_level_int;
 	char *shell_level_str_new;
 
 	shell_level_str_new = ft_strdup("SHLVL");
-    shell_level_str = get_env_var(*env_list, "SHLVL");
-    if (shell_level_str)
-    {
-        shell_level_int = ft_atoi(shell_level_str);
-        shell_level_int++;
-    }
-    else
+	shell_level_str = get_env_var(*env_list, "SHLVL");
+	if (shell_level_str)
 	{
-        shell_level_int = 1;
+		shell_level_int = ft_atoi(shell_level_str);
+		shell_level_int++;
+	}
+	else
+	{
+		shell_level_int = 1;
 	}
 	update_env(env_list, shell_level_str_new, ft_itoa(shell_level_int));
 }
@@ -118,7 +124,7 @@ int main(int ac, char **av, char **env)
 			break;
 		}
 		if (ft_strlen(main.input) > 0)
-		add_history(main.input);
+			add_history(main.input);
 		i = skip_space(main.input);
 		if (main.input[i] != '\0' && *main.input && !start_tokenization(&main))
 			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);

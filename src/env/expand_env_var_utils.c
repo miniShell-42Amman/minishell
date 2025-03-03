@@ -105,6 +105,7 @@ size_t	calculate_length(const char *token, t_env *env, t_parse_cmd *p)
 	if(p->arr_has_dollar)
 	{
 		free(p->arr_has_dollar);
+		p->arr_has_dollar = NULL;
 	}
 	return (len);
 }

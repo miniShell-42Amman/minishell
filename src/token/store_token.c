@@ -105,7 +105,10 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 
 	new_token = ft_calloc(sizeof(t_token), token_count);
 	if (!new_token)
+	{
+		free_tokens(new_token, token_count);
 		return (NULL);
+	}
 	i = -1;
 	while (++i < token_count)
 	{
@@ -117,7 +120,7 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 		}
 		if (store_token_value(new_token, tokens_list, i))
 		{
-			free_tokens(new_token, i);
+			free_tokens(new_token, token_count);
 			return (NULL);
 		}
 		new_token[i].type = determine_token_type(tokens_list[i], i, new_token,

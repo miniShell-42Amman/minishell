@@ -191,6 +191,7 @@ int init_parse_cmd(t_parse_cmd *parse_cmd, char *input, int *status)
 	}
 	parse_cmd->exit_status = status;
 	free(parse_cmd->trimmed_input);
+	parse_cmd->trimmed_input = NULL;
 	if (!parse_cmd->clean_input)
 		return (EXIT_FAILURE);
 	parse_cmd->buffer = ft_calloc((ft_strlen(parse_cmd->clean_input) + 1), sizeof(char));
@@ -301,34 +302,22 @@ t_cmd *parse_cmd(char *input, t_env *env_list, int *status)
 
 	cmd_result = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd_result)
-		return (NULL);
-	if (init_parse_cmd(&parse_cmd, input, status))
 	{
-		free(cmd_result);
+		*status = 1;
 		return (NULL);
 	}
+	if (init_parse_cmd(&parse_cmd, input, status) && !free_cmd_parse(&parse_cmd, cmd_result))
+		return (NULL);
 	if ((parse_cmd_loop(&parse_cmd, env_list) || if_token_started_three(&parse_cmd, env_list)) && !free_cmd_parse(&parse_cmd, cmd_result))
-	{
-		free(parse_cmd.clean_input);
-		free(parse_cmd.buffer);
 		return (NULL);
-	}
 	if (parse_cmd.in_quotes && !free_cmd_parse(&parse_cmd, cmd_result))
-	{
-		free(parse_cmd.clean_input);
-		free(parse_cmd.buffer);
 		return (NULL);
-	}
 	if (clean_parse_cmd(&parse_cmd) && !free_cmd_parse(&parse_cmd, cmd_result))
-	{
-		free(parse_cmd.clean_input);
-		free(parse_cmd.buffer);
 		return (NULL);
-	}
 	*cmd_result = parse_cmd.cmd;
-	// free(parse_cmd.clean_input);
-	// free(parse_cmd.buffer);
+	free(parse_cmd.buffer);
+	free(parse_cmd.clean_input);
 	// free(parse_cmd.splitter_clean_input);
-	// free(parse_cmd.cmd.args);
+	
 	return (cmd_result);
 }

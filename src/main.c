@@ -13,6 +13,7 @@
 #include "minishell.h"
 
 volatile sig_atomic_t g_signal = 0;
+
 int skip_space(char *str)
 {
 	int i;
@@ -22,6 +23,8 @@ int skip_space(char *str)
 		i++;
 	return (i);
 }
+
+// void ft_free_
 int start_tokenization(t_main *main)
 {
 	int *array;
@@ -37,11 +40,24 @@ int start_tokenization(t_main *main)
 	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 									array);
+									
 	// for(int i = 0; i < main->cmd->arg_count; i++)
 	// {
 	// 	if (main->tokens_list[i].value)
 	// 		ft_printf("token[%d]: %s type %d\n", i, main->tokens_list[i].value, main->tokens_list[i].type);
 	// }
+	if (main->cmd->args)
+	{
+		ft_free_split(main->cmd->args);
+		main->cmd->args = NULL;
+
+	}
+	if (main->cmd->cmd)
+	{
+		free(main->cmd->cmd);
+		main->cmd->cmd = NULL;
+
+	}
 	int i = skip_space(main->input);
 	if (main->tokens_list[0].value && !*main->tokens_list[0].value && !ft_strchr("\'\"", main->input[i]))
 	{
@@ -126,10 +142,14 @@ int main(int ac, char **av, char **env)
 		if (ft_strlen(main.input) > 0)
 			add_history(main.input);
 		i = skip_space(main.input);
+		// if (main.input[i] != '\0' && *main.input && !start_tokenization(&main))
+		// 	start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
 		if (main.input[i] != '\0' && *main.input && !start_tokenization(&main))
-			start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
-		free(main.input);
-		main.input = NULL;
+		{
+				free(main.input);
+				main.input = NULL;
+				start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
+		}
 		free_resources(&main, 0);
 	}
 	free_resources(&main, 1);

@@ -103,7 +103,6 @@ typedef struct s_main
 	t_env *env_list;
 	int exit_status;
 	char *input;
-	char *str;
 } t_main;
 
 typedef struct s_split

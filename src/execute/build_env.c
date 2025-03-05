@@ -124,7 +124,6 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t
     (void)tokens;
     if (!command || !env_list)
     {
-        ft_printf("Error404: command not found\n");
         free_execute(execute, 1);
         // free_tokens(tokens, execute->token_count);
         free(tokens->value);

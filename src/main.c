@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-volatile sig_atomic_t g_signal = 0;
+int g_signal = 0;
 
 int skip_space(char *str)
 {

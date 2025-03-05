@@ -132,6 +132,19 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
         should_free = 1;
         (*token)++;
     }
+    else if (**token == '0')
+    {
+        value = ft_strdup("./minishell");
+        should_free = 1;
+        (*token)++; 
+    }
+    else if (ft_isdigit(**token))
+    {
+        char var_name[2] = {**token, '\0'};
+        value = get_var_value(env, var_name, 1);
+        should_free = 1;
+        (*token)++;
+    }
     else
     {
         if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
@@ -175,9 +188,18 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
         should_free = 1;
         (*t)++;
     }
+    else if (**t == '0')
+    {
+        value = ft_strdup("./minishell");
+        should_free = 1;
+        (*t)++;
+    }
     else if (ft_isdigit(**t))
     {
-        value = ft_itoa(**t - '0');
+        // value = ft_itoa(**t - '0');
+        // char *tmp = ft_itao(**t - '0');
+        char var_name[2] = {**t, '\0'};
+        value = get_var_value(e, var_name, 1);
         should_free = 1;
         (*t)++;
     }

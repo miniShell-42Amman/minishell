@@ -35,7 +35,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-extern volatile sig_atomic_t g_signal;
+// extern volatile sig_atomic_t g_signal;
+extern int g_signal;
 
 typedef struct s_env
 {

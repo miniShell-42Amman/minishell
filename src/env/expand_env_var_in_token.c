@@ -9,22 +9,131 @@ void update_quote_state(char c, bool *squote, bool *dquote)
         *dquote = !*dquote;
 }
 
+// size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
+// {
+//     const char *start;
+//     char *value;
+//     size_t var_len;
+
+//     var_len = 0;
+//     start = *token;
+//     if (**token == '?')
+//     {
+//         value = ft_itoa(*p->exit_status);
+//         (*token)++;
+//     }
+//     else
+//     {
+
+//         if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
+//         {
+//             var_len = p->arr_has_dollar[p->arr_has_dollar_count];
+//             *token += var_len;
+//             p->arr_has_dollar_count++;
+//         }
+//         else
+//         {
+
+//             while (**token && (ft_isalnum(**token) || **token == '_') && **token != '\'')
+//                 (*token)++;
+//         }
+
+//         var_len = *token - start;
+//         value = get_var_value(env, start, var_len);
+//     }
+//     if (value)
+//     {
+//         size_t len = ft_strlen(value);
+
+//             free(value);
+//         return (len);
+//     }
+//     return (0);
+// }
+
+// void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_cmd *p)
+// {
+//     const char *start;
+//     char *value;
+//     size_t var_len;
+//     int should_free = 0;
+
+//     var_len = 0;
+//     (*t)++;
+//     start = *t;
+//     if (**t == '?')
+//     {
+//         value = ft_itoa(*p->exit_status);
+//         should_free = 1;
+//         (*t)++;
+//     }
+
+//     else
+//     {
+//         if(ft_isdigit(**t))
+//         {
+//             value = ft_itoa(**t - '0');
+//             (*t)++;
+//         }
+//         else if(**t == '_')
+//         {
+//             value = get_var_value(e, "_", 1);
+//             (*t)++;
+//         }
+//         else if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
+//         {
+//             var_len = p->arr_has_dollar[p->arr_has_dollar_count];
+//             *t += var_len;
+//             p->arr_has_dollar_count++;
+//         }
+//         else
+//         {
+//             while (**t && (ft_isalnum(**t) || **t == '_') && **t != '\'')
+//                 (*t)++;
+//         }
+//         var_len = (size_t)(*t - start);
+//         value = get_var_value(e, start, var_len);
+//     }
+//     if (value)
+//     {
+//         ft_strlcpy(*res + *j, value, ft_strlen(value) + 1);
+//         *j += ft_strlen(value);
+//         free(value);
+
+//     }
+// }
+
+// int is_dolloar_quote(const char *token)
+// {
+//     int i = 0;
+//     int count = 0;
+//     if (!token || !*token)
+//         return 0;
+//     while (token[i] && token[i] != ' ')
+//     {
+//         if (token[i] == '$')
+//             count++;
+//         i++;
+//     }
+//     return (count);
+// }
 size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
 {
     const char *start;
-    char *value;
+    char *value = NULL;
     size_t var_len;
+    int should_free = 0; 
 
     var_len = 0;
     start = *token;
     if (**token == '?')
     {
         value = ft_itoa(*p->exit_status);
+        should_free = 1;
         (*token)++;
     }
     else
     {
-
         if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
         {
             var_len = p->arr_has_dollar[p->arr_has_dollar_count];
@@ -33,18 +142,18 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
         }
         else
         {
-
             while (**token && (ft_isalnum(**token) || **token == '_') && **token != '\'')
                 (*token)++;
         }
-
         var_len = *token - start;
         value = get_var_value(env, start, var_len);
+        should_free = 0;
     }
     if (value)
     {
         size_t len = ft_strlen(value);
-        free(value);
+        if (should_free)
+            free(value);
         return (len);
     }
     return (0);
@@ -53,8 +162,9 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
 void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_cmd *p)
 {
     const char *start;
-    char *value;
+    char *value = NULL;
     size_t var_len;
+    int should_free = 0;
 
     var_len = 0;
     (*t)++;
@@ -62,40 +172,43 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
     if (**t == '?')
     {
         value = ft_itoa(*p->exit_status);
+        should_free = 1;
         (*t)++;
     }
-
+    else if (ft_isdigit(**t))
+    {
+        value = ft_itoa(**t - '0');
+        should_free = 1;
+        (*t)++;
+    }
+    else if (**t == '_')
+    {
+        value = get_var_value(e, "_", 1);
+        should_free = 0;
+        (*t)++;
+    }
+    else if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
+    {
+        var_len = p->arr_has_dollar[p->arr_has_dollar_count];
+        *t += var_len;
+        p->arr_has_dollar_count++;
+        value = get_var_value(e, start, var_len);
+        should_free = 0;
+    }
     else
     {
-        if(ft_isdigit(**t))
-        {
-            value = ft_itoa(**t - '0');
+        while (**t && (ft_isalnum(**t) || **t == '_') && **t != '\'')
             (*t)++;
-        }
-        else if(**t == '_')
-        {
-            value = get_var_value(e, "_", 1);
-            (*t)++;
-        }
-        else if (p->arr_has_dollar && p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
-        {
-            var_len = p->arr_has_dollar[p->arr_has_dollar_count];
-            *t += var_len;
-            p->arr_has_dollar_count++;
-        }
-        else
-        {
-            while (**t && (ft_isalnum(**t) || **t == '_') && **t != '\'')
-                (*t)++;
-        }
         var_len = (size_t)(*t - start);
         value = get_var_value(e, start, var_len);
+        should_free = 0;
     }
     if (value)
     {
         ft_strlcpy(*res + *j, value, ft_strlen(value) + 1);
         *j += ft_strlen(value);
-        free(value);
+        if (should_free)
+            free(value);
     }
 }
 

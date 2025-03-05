@@ -297,7 +297,8 @@ void execute_command(t_execute *execute, t_token *tokens)
             *execute->exit_status = 126;
         }
         free_execute(execute, 1);
-        free(tokens->value);
+        // free(tokens->value);
+        free_tokens(tokens, execute->token_count);
         
         exit(*execute->exit_status);
     }

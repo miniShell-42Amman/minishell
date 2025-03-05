@@ -13,7 +13,8 @@
 #include "minishell.h"
 t_env *new_node_env(char *key, char *value)
 {
-    t_env *new_node = malloc(sizeof(t_env));
+    // t_env *new_node = malloc(sizeof(t_env));
+	t_env *new_node = ft_calloc(1, sizeof(t_env));
     if (!new_node)
         return (NULL);
     new_node->key = key;
@@ -57,7 +58,8 @@ char	*get_var_value(t_env *env, const char *var, size_t len)
 	size_t	i;
 
 	i = 0;
-	var_name = malloc(len + 1);
+	// var_name = malloc(len + 1);
+	var_name = ft_calloc(len + 1, sizeof(char));
 	if (!var_name)
 		return (NULL);
 	while (i < len)

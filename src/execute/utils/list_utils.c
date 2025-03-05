@@ -19,13 +19,14 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
 
     while (i < envp_count && current != NULL)
     {
-        size_t envp_len;
+        size_t envp_len = 0;
         if (current->has_value && current->value)
             envp_len = ft_strlen(current->key) + ft_strlen(current->value) + 2;
         else if(current->key)
             envp_len = ft_strlen(current->key) + 2;
 
-        (*envp)[i] = malloc(envp_len);
+        // (*envp)[i] = malloc(envp_len);
+        (*envp)[i] = ft_calloc(envp_len, sizeof(char));
         if (!(*envp)[i])
         {
             ft_free_split(*envp);

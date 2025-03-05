@@ -14,6 +14,8 @@
 
 void	free_resources(t_main *main, int flag)
 {
+	if(!main)
+		return ;
 	if (main->input)
 	{
 		free(main->input);

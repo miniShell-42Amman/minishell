@@ -23,14 +23,17 @@ int skip_space(char *str)
 		i++;
 	return (i);
 }
+// void skip_first_cmd(t_main *main)
+// {
 
+// }
 // void ft_free_
 int start_tokenization(t_main *main)
 {
 	int *array;
 
 	array = ft_count_token(main->input);
-	main->cmd = parse_cmd(main->input, main->env_list, &main->exit_status);
+	main->cmd = parse_cmd(main);
 	if (!main->cmd)
 	{
 		free_resources(main, 0);
@@ -40,7 +43,7 @@ int start_tokenization(t_main *main)
 	}
 	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
 									array);
-									
+
 	// for(int i = 0; i < main->cmd->arg_count; i++)
 	// {
 	// 	if (main->tokens_list[i].value)
@@ -50,19 +53,16 @@ int start_tokenization(t_main *main)
 	{
 		ft_free_split(main->cmd->args);
 		main->cmd->args = NULL;
-
 	}
 	if (main->cmd->cmd)
 	{
 		free(main->cmd->cmd);
 		main->cmd->cmd = NULL;
-
 	}
 	int i = skip_space(main->input);
 	if (main->tokens_list[0].value && !*main->tokens_list[0].value && !ft_strchr("\'\"", main->input[i]))
 	{
 		free(main->tokens_list[0].value);
-
 		int j = -1;
 		while (++j < main->cmd->arg_count - 1)
 			main->tokens_list[j] = main->tokens_list[j + 1];
@@ -101,21 +101,57 @@ void increment_shell_level(t_env **env_list)
 	}
 	update_env(env_list, shell_level_str_new, ft_itoa(shell_level_int));
 }
+char *search_command(char *search)
+{
+	char *path = getenv("PATH");
+	char **paths = ft_split(path, ':');
+	char *command;
+	char *tmp;
+	int i = 0;
+	while (paths[i])
+	{
+		tmp = ft_strjoin(paths[i], "/");
+		command = ft_strjoin(tmp, search);
+		if (access(command, F_OK) == 0)
+		{
+			ft_free_split(paths);
+			free(tmp);
+			return command;
+		}
+		free(tmp);
+		free(command);
+		i++;
+	}
+	ft_free_split(paths);
+	return NULL;
+}
+int handle_many_args(int ac, char **av, t_main *main)
+{
+	if (ac > 1)
+	{
+		main->path = search_command(av[1]);
+		if (main->path == NULL)
+			ft_printf("%s: %s: cannot execute binary file\n", av[1], av[1]);
+		else
+			ft_printf("%s: %s\n", av[1], av[1]);
+		free(main->path);
+		main->exit_status = 126;
+		return (EXIT_FAILURE);
+	}
+	main->program_name = av[0];
+	return (EXIT_SUCCESS);
+}
 int main(int ac, char **av, char **env)
 {
 	t_main main;
-	int i;
-	(void)ac;
-	(void)av;
 	ft_bzero(&main, sizeof(t_main));
+	if (handle_many_args(ac, av, &main))
+		return (EXIT_FAILURE);
 	main.exit_status = 0;
 	main.env_list = clone_env(env);
 	increment_shell_level(&main.env_list);
 	if (!main.env_list)
-	{
-		perror("malloc");
 		return (EXIT_FAILURE);
-	}
 	setup_signals();
 	while (1)
 	{
@@ -127,28 +163,26 @@ int main(int ac, char **av, char **env)
 			g_signal = 0;
 		}
 		main.input = readline(PROMPT);
-		if (!main.input)
+		if (!main.input || g_signal == 2000)
 		{
 			ft_printf("exit\n");
 			free(main.input);
 			main.input = NULL;
 			break;
 		}
-		if (ft_strcmp(main.input, "exit") == 0)
-		{
-			free_resources(&main, 1);
-			break;
-		}
+		// if (ft_strcmp(main.input, "exit") == 0)
+		// {
+		// 	free_resources(&main, 1);
+		// 	break;
+		// }
 		if (ft_strlen(main.input) > 0)
 			add_history(main.input);
-		i = skip_space(main.input);
-		// if (main.input[i] != '\0' && *main.input && !start_tokenization(&main))
-		// 	start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
-		if (main.input[i] != '\0' && *main.input && !start_tokenization(&main))
+		main.skip_spaces = skip_space(main.input);
+		if (main.input[main.skip_spaces] != '\0' && *main.input && !start_tokenization(&main))
 		{
-				free(main.input);
-				main.input = NULL;
-				start_execution(main.tokens_list, main.cmd->arg_count, main.env_list, &main.exit_status);
+			free(main.input);
+			main.input = NULL;
+			start_execution(&main);
 		}
 		free_resources(&main, 0);
 	}

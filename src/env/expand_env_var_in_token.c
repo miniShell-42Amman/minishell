@@ -122,7 +122,7 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
     const char *start;
     char *value = NULL;
     size_t var_len;
-    int should_free = 0; 
+    int should_free = 0;
 
     var_len = 0;
     start = *token;
@@ -134,9 +134,9 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
     }
     else if (**token == '0')
     {
-        value = ft_strdup("./minishell");
+        value = ft_strdup(p->program_name);
         should_free = 1;
-        (*token)++; 
+        (*token)++;
     }
     else if (ft_isdigit(**token))
     {
@@ -190,7 +190,7 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
     }
     else if (**t == '0')
     {
-        value = ft_strdup("./minishell");
+        value = ft_strdup(p->program_name);
         should_free = 1;
         (*t)++;
     }
@@ -317,6 +317,15 @@ int is_string_inside_single(const char *token)
         return 0;
     return (parent == '\'') ? 1 : 0;
 }
+int ft_arr_len(char **arr)
+{
+    int i = 0;
+    if (!arr)
+        return 0;
+    while (arr[i])
+        i++;
+    return i;
+}
 
 char *expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *parse_cmd)
 {
@@ -342,8 +351,16 @@ char *expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *
         update_quote_state(*token, &squote, &dquote);
         if (*token == '$' && !is_string_inside_single(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]) && (*(token + 1) != ' ' && *(token + 1) != '\0'))
         {
-            process_variable(&token, env, &result, &j, parse_cmd);
-            continue;
+            if (parse_cmd->index_splitter >= 1 && ft_strnstr(parse_cmd->splitter_clean_input[parse_cmd->index_splitter - 1], "<<", 2))
+            {
+                result[j++] = *token++;
+                continue;
+            }
+            else
+            {
+                process_variable(&token, env, &result, &j, parse_cmd);
+                continue;
+            }
         }
         result[j++] = *token++;
     }

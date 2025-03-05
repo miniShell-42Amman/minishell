@@ -95,6 +95,7 @@ typedef struct s_parse_cmd
 	char token_quote_type;
 	int operator;
 	int *exit_status;
+	char *program_name;
 } t_parse_cmd;
 
 typedef struct s_main
@@ -104,6 +105,9 @@ typedef struct s_main
 	t_env *env_list;
 	int exit_status;
 	char *input;
+	char *program_name;
+	int skip_spaces;
+	char *path;
 } t_main;
 
 typedef struct s_split
@@ -179,8 +183,7 @@ int add_node_to_env(t_env **head, t_env *new_node);
 void free_object(char **object, t_env *head);
 int *ft_count_token(char *input);
 int count_args(char *input);
-t_cmd *parse_cmd(char *input, t_env *env_list,
-				 int *status);
+t_cmd *parse_cmd(t_main *main);
 char *find_env_value(t_env *env_list,
 					 const char *var_name);
 char *expand_env_variables_in_token(const char *token,
@@ -210,8 +213,7 @@ int if_token_started_three(t_parse_cmd *parse_cmd,
 						   t_env *env_list);
 int if_token_started(t_parse_cmd *parse_cmd,
 					 t_env *env_list);
-int init_parse_cmd(t_parse_cmd *parse_cmd,
-				   char *input, int *status);
+int init_parse_cmd(t_parse_cmd *parse_cmd, t_main *main);
 char *get_var_value(t_env *env, const char *var,
 					size_t len);
 size_t calculate_length(const char *token, t_env *env,
@@ -229,9 +231,7 @@ int is_dolloar_quote(const char *token);
 void calculate_dollar_array(t_parse_cmd *p);
 int is_string_inside_single(const char *token);
 char **convert_env_to_list(t_env *env_list);
-void start_execution(t_token *tokens,
-					 size_t token_count, t_env *env_list,
-					 int *status);
+void start_execution(t_main *main);
 char *ft_strtok(char *str, const char *delim);
 int ft_strtok_utils(const char *delim, char **start,
 					char **last);

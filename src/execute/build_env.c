@@ -57,7 +57,7 @@ int init_command(t_token *token, size_t token_count, t_execute *execute)
         execute->commands[execute->i] = ft_calloc(execute->cmd_args[execute->i] + 1, sizeof(char *));
         if (!execute->commands[execute->i])
             return (EXIT_FAILURE);
-        }
+    }
     return (EXIT_SUCCESS);
 }
 
@@ -128,7 +128,7 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t
         // free_tokens(tokens, execute->token_count);
         free(tokens->value);
         *execute->exit_status = 127;
-        exit (*execute->exit_status);
+        exit(*execute->exit_status);
     }
     if (command[0] == '\0')
     {
@@ -198,7 +198,7 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t
 }
 int is_commands(t_execute *execute, int flag)
 {
-    char *customs[] = {"echo", "exit", "env", "pwd", "export", "unset", "cd"};
+    char *customs[] = {"echo", "env", "pwd", "exit", "export", "unset", "cd"};
     int i;
     int max;
 
@@ -206,7 +206,7 @@ int is_commands(t_execute *execute, int flag)
     max = 4;
     if (flag == 1)
     {
-        i = 4;
+        i = 3;
         max = 7;
     }
     else if (flag == 2)
@@ -245,42 +245,44 @@ void execute_builtin(t_execute *execute)
                                       &execute->env_list);
 }
 
-void execute_command(t_execute *execute, t_token *tokens)
+void execute_command(t_execute *execute, t_main *main)
 {
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
     if (execute->i != 0 && dup2(execute->pipe_fds[(execute->i - 1) * 2], STDIN_FILENO) < 0)
     {
-        free_execute(execute,1);
-        free(tokens->value);
+        free_execute(execute, 0);
+        free_resources(main, 1);
+        // free(main->tokens_list->value);
         exit(EXIT_FAILURE);
     }
     if (execute->i != execute->num_cmds - 1 && dup2(execute->pipe_fds[execute->i * 2 + 1], STDOUT_FILENO) < 0)
     {
-        free_execute(execute, 1);
-        free(tokens->value);
+        free_execute(execute, 0);
+        free_resources(main, 1);
+        // free(tokens->value);
         exit(EXIT_FAILURE);
     }
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
-    handle_redirections(execute, tokens);
+    handle_redirections(execute, main->tokens_list);
     if (!is_commands(execute, 2))
     {
         execute_builtin(execute);
-        free_execute(execute, 1);
-        free(tokens->value);
+        free_execute(execute, 0);
+        free_resources(main, 1);
         exit(*execute->exit_status);
     }
-    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute, tokens);
+    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute, main->tokens_list);
     if (!execute->cmd_path)
     {
         if (*execute->exit_status == 126)
             ft_dprintf(2, "Error404: %s: Is a directory\n", execute->commands[execute->i][0]);
         else
             ft_dprintf(2, "Error404: %s: command not found\n", execute->commands[execute->i][0]);
-        free_execute(execute, 1);
-        free(tokens->value);
+        free_execute(execute, 0);
+        free_resources(main, 1);
         exit(*execute->exit_status);
     }
     if (execve(execute->cmd_path, execute->commands[execute->i], execute->envp))
@@ -295,15 +297,13 @@ void execute_command(t_execute *execute, t_token *tokens)
             ft_dprintf(2, "Error404: %s: %s\n", execute->commands[execute->i][0], strerror(errno));
             *execute->exit_status = 126;
         }
-        free_execute(execute, 1);
-        // free(tokens->value);
-        free_tokens(tokens, execute->token_count);
-        
+        free_execute(execute, 0);
+        free_resources(main, 1);
         exit(*execute->exit_status);
     }
 }
 
-int handle_builtins(t_execute *execute)
+int handle_builtins(t_execute *execute, t_main *main)
 {
     if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
         *execute->exit_status = cd(execute->commands[execute->i],
@@ -314,10 +314,17 @@ int handle_builtins(t_execute *execute)
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
         *execute->exit_status = unset(execute->commands[execute->i],
                                       &execute->env_list);
+    else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
+    {
+        *execute->exit_status = ft_exit(execute->commands[execute->i]);
+        free_execute(execute, 0);
+        free_resources(main, 1);
+        exit(*execute->exit_status);
+    }
     return (EXIT_SUCCESS);
 }
 
-int fork_and_execute(t_execute *execute, int *check, t_token *tokens)
+int fork_and_execute(t_execute *execute, t_main *main)
 {
     execute->pids = ft_calloc(execute->num_cmds, sizeof(pid_t));
     if (!execute->pids)
@@ -327,19 +334,19 @@ int fork_and_execute(t_execute *execute, int *check, t_token *tokens)
     {
         if (execute->num_cmds == 1 && is_commands(execute, 1) == EXIT_SUCCESS)
         {
-            handle_builtins(execute);
+            handle_builtins(execute, main);
             execute->i++;
             continue;
         }
         execute->pid = fork();
         if (execute->pid < 0)
         {
-            // free_execute(execute, 1);
-            *check = 1;
+            free_execute(execute, 1);
+            main->exit_status = 1;
             return (EXIT_FAILURE);
         }
         if (execute->pid == 0)
-            execute_command(execute, tokens);
+            execute_command(execute, main);
         else
             execute->pids[execute->i] = execute->pid;
         execute->i++;
@@ -368,7 +375,7 @@ void close_pipes_and_wait(t_execute *execute)
                 *execute->exit_status = (status >> 8) & 0xFF;
             else
                 *execute->exit_status = 128 + (status & 0x7F);
-            // free_execute(execute, 1);    
+            // free_execute(execute, 1);
         }
     }
 }
@@ -425,7 +432,7 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
     size_t i;
     int num_command;
     int tmp = dup(STDIN_FILENO);
-    if(tmp < 0)
+    if (tmp < 0)
     {
         perror("dup");
         return (EXIT_FAILURE);
@@ -439,13 +446,12 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
         redirections.j = 0;
         while (redirections.argv[redirections.j])
         {
-            if(token[num_command].value && token[num_command].type == TOKEN_PIPE)
+            if (token[num_command].value && token[num_command].type == TOKEN_PIPE)
                 num_command++;
-            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 
-                && token[num_command].type != TOKEN_ARGUMENT)
+            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && token[num_command].type != TOKEN_ARGUMENT)
             {
                 signal(SIGINT, handle_heredoc_sigint);
-                if (redirection_check_else_if(&redirections,execute) != EXIT_SUCCESS)
+                if (redirection_check_else_if(&redirections, execute) != EXIT_SUCCESS)
                     return (EXIT_FAILURE);
                 if (g_signal == 130)
                 {
@@ -454,7 +460,7 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
                     break;
                 }
             }
-            else 
+            else
             {
                 redirections.j++;
                 num_command++;
@@ -473,37 +479,37 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
     return (EXIT_SUCCESS);
 }
 
-void start_execution(t_token *tokens, size_t token_count, t_env *env_list, int *status)
+void start_execution(t_main *main)
 {
     t_execute execute;
     int check_pipes = 0;
     ft_bzero(&execute, sizeof(t_execute));
-    execute.env_list = env_list;
-    execute.envp = convert_env_to_list(env_list);
-    execute.exit_status = status;
+    execute.env_list = main->env_list;
+    execute.envp = convert_env_to_list(main->env_list);
+    execute.exit_status = &main->exit_status;
     *execute.exit_status = 0;
-    execute.num_cmds = calculate_number_operations(tokens, token_count) + 1;
+    execute.num_cmds = calculate_number_operations(main->tokens_list, main->cmd->arg_count) + 1;
     execute.num_pipes = execute.num_cmds - 1;
-    if (fill_commands(tokens, token_count, &execute) || !execute.cmd_args)
+    if (fill_commands(main->tokens_list, main->cmd->arg_count, &execute) || !execute.cmd_args)
     {
-        *status = 1;
+        main->exit_status = 1;
         return;
     }
-    if (preprocess_heredocs(&execute, tokens) != EXIT_SUCCESS)
+    if (preprocess_heredocs(&execute, main->tokens_list) != EXIT_SUCCESS)
     {
-        *status = 130;
+        main->exit_status = 130;
         return;
     }
 
     if (create_pipes(&execute, &check_pipes))
     {
-        *status = 1;
+        main->exit_status = 1;
         return;
     }
 
-    if (fork_and_execute(&execute, &check_pipes, tokens))
+    if (fork_and_execute(&execute, main))
     {
-        *status = 1;
+        main->exit_status = 1;
         return;
     }
     close_pipes_and_wait(&execute);

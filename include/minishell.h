@@ -96,6 +96,7 @@ typedef struct s_parse_cmd
 	int operator;
 	int *exit_status;
 	char *program_name;
+	bool must_splitter;
 } t_parse_cmd;
 
 typedef struct s_main
@@ -272,10 +273,15 @@ char **smart_split(const char *str);
 void handle_heredoc_sigint(int signum);
 void setup_signals(void);
 void handle_sigint(int signum);
-// void if_current_document(t_redirections *redirections,
-// 						 t_here_document *here_d);
 size_t ft_determine_number_of_commands(t_execute *execute);
 void free_redirections(t_redirections *redirections);
 void free_here_doc(t_here_document *here_doc);
+void increment_shell_level(t_env **env_list);
+char *search_command(char *search);
+int handle_many_args(int ac, char **av, t_main *main);
+int help_loop(t_main *main);
+void loop_main(t_main *main);
+int skip_space(char *str);
+int start_tokenization(t_main *main);
 
 #endif

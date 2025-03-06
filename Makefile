@@ -5,34 +5,37 @@ NAME = minishell
 LIBFT_DIR = ./Libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-SRC = 	src/main.c 							\
-	   	src/env/get_env.c 					\
-	   	src/env/expand_env_var_utils.c 		\
-		src/free_resources/free_env.c 		\
-		src/token/ft_count_token.c 			\
-		src/token/ft_count_args.c			\
-		src/token/token.c 					\
-		src/env/expand_env_var_in_token.c 	\
-		src/env/expand_env_utils_second.c 	\
-		src/free_resources/free_main.c		\
-		src/token/store_token.c 			\
-		src/token/token_utils.c			 	\
-		src/free_resources/free_parse.c		\
-		src/execute/build_env.c				\
-		src/execute/utils/ft_strtok.c		\
-		src/execute/utils/list_utils.c		\
-		src/execute/utils/free_execute.c	\
-		src/builtins/echo.c					\
-		src/builtins/cd.c					\
-		src/builtins/pwd.c					\
-		src/builtins/env.c					\
-		src/builtins/export.c				\
-		src/builtins/unset.c				\
-		src/execute/redirections.c			\
-		src/builtins/export_utils.c			\
-		src/builtins/exit.c					\
-		src/signal/handle_signal.c			\
-		src/execute/utils/free_redirections.c\
+SRC = 	src/main.c 								\
+	   	src/env/get_env.c 						\
+	   	src/env/expand_env_var_utils.c 			\
+		src/free_resources/free_env.c 			\
+		src/token/ft_count_token.c 				\
+		src/token/ft_count_args.c				\
+		src/token/token.c 						\
+		src/env/expand_env_var_in_token.c 		\
+		src/env/expand_env_utils_second.c 		\
+		src/free_resources/free_main.c			\
+		src/token/store_token.c 				\
+		src/token/token_utils.c			 		\
+		src/free_resources/free_parse.c			\
+		src/execute/build_env.c					\
+		src/execute/utils/ft_strtok.c			\
+		src/execute/utils/list_utils.c			\
+		src/execute/utils/free_execute.c		\
+		src/builtins/echo.c						\
+		src/builtins/cd.c						\
+		src/builtins/pwd.c						\
+		src/builtins/env.c						\
+		src/builtins/export.c					\
+		src/builtins/unset.c					\
+		src/execute/redirections.c				\
+		src/builtins/export_utils.c				\
+		src/builtins/exit.c						\
+		src/signal/handle_signal.c				\
+		src/execute/utils/free_redirections.c	\
+		src/utils/helper_main.c					\
+		src/env/handle_env.c					\
+
 
 
 OBJ_DIR = obj

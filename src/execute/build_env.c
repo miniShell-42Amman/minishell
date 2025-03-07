@@ -115,18 +115,17 @@ int is_directory(const char *path)
         return 0;
     return S_ISDIR(statbuf.st_mode);
 }
-char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t_token *tokens)
+char *resolve_command_path(char *command, t_execute *execute, t_main *main)
 {
     char *path_copy;
     char *path_token;
     char *full_path;
     char *path;
-    (void)tokens;
-    if (!command || !env_list)
+
+    if (!command || !main->env_list)
     {
-        free_execute(execute, 1);
-        // free_tokens(tokens, execute->token_count);
-        free(tokens->value);
+        free_execute(execute, 0);
+        free_resources(main, 1);
         *execute->exit_status = 127;
         exit(*execute->exit_status);
     }
@@ -150,13 +149,15 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t
         }
         return (*execute->exit_status = 127, NULL);
     }
-    path = find_env_value(env_list, "PATH");
+    path = find_env_value(main->env_list, "PATH");
     if (!path)
         return (NULL);
     path_copy = ft_strdup(path);
     if (!path_copy)
     {
         perror("strdup");
+        free_execute(execute, 0);
+        free_resources(main, 1);
         exit(EXIT_FAILURE);
     }
     path_token = ft_strtok(path_copy, ":");
@@ -167,6 +168,8 @@ char *resolve_command_path(char *command, t_env *env_list, t_execute *execute, t
         {
             free(path_copy);
             perror("malloc");
+            free_execute(execute, 0);
+            free_resources(main, 1);
             exit(EXIT_FAILURE);
         }
         ft_strlcpy(full_path, path_token, ft_strlen(path_token) + 1);
@@ -274,7 +277,7 @@ void execute_command(t_execute *execute, t_main *main)
         free_resources(main, 1);
         exit(*execute->exit_status);
     }
-    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute->env_list, execute, main->tokens_list);
+    execute->cmd_path = resolve_command_path(execute->commands[execute->i][0], execute, main);
     if (!execute->cmd_path)
     {
         if (*execute->exit_status == 126)

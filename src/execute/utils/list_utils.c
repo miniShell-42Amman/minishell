@@ -24,15 +24,12 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
             envp_len = ft_strlen(current->key) + ft_strlen(current->value) + 2;
         else if(current->key)
             envp_len = ft_strlen(current->key) + 2;
-
-        // (*envp)[i] = malloc(envp_len);
         (*envp)[i] = ft_calloc(envp_len, sizeof(char));
         if (!(*envp)[i])
         {
             ft_free_split(*envp);
             return (EXIT_FAILURE);
         }
-        
         ft_strlcpy((*envp)[i], current->key, envp_len);
         if (current->has_value && current->value)
         {
@@ -40,10 +37,7 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
             ft_strlcat((*envp)[i], current->value, envp_len);
         }
         else
-        {
             ft_strlcat((*envp)[i], "=", envp_len);
-        }
-        
         current = current->next;
         i++;
     }

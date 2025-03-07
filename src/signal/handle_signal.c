@@ -1,12 +1,22 @@
 #include "minishell.h"
 
+// void handle_sigint(int signum)
+// {
+// 	(void)signum;
+// 	ft_printf("\n");
+// 	// rl_replace_line("", 0);
+// 	rl_on_new_line();
+// }
 void handle_sigint(int signum)
 {
-	(void)signum;
-	ft_printf("\n");
-	// rl_replace_line("", 0);
-	rl_on_new_line();
+    (void)signum;
+    write(1, "\n", 1);
+    // rl_replace_line("", 0);
+    rl_on_new_line();
+    rl_redisplay();
+    g_signal = 130;
 }
+
 void setup_signals(void)
 {
 	struct sigaction sa_int, sa_quit;

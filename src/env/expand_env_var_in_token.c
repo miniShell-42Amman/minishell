@@ -15,7 +15,7 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
     char *value = NULL;
     size_t var_len;
     int should_free = 0;
-    int must_splitter = 0;
+    // int must_splitter = 0;
     var_len = 0;
     start = *token;
     if (**token == '?')
@@ -53,31 +53,15 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
         var_len = *token - start;
         value = get_var_value(env, start, var_len);
         if (ft_strchr(value, ' '))
-            must_splitter = 1;
+            p->must_splitter = 1;
         should_free = 0;
     }
     if (value)
     {
-        if (must_splitter)
-        {
-            char **splitter = ft_split(value, ' ');
-            int i = 0;
-            while (splitter[i])
-            {
-                var_len += ft_strlen(splitter[i]);
-                if (splitter[i + 1])
-                    var_len++;
-                i++;
-            }
-            ft_free_split(splitter);
-        }
-        else
-        {
             size_t len = ft_strlen(value);
             if (should_free)
                 free(value);
             return (len);
-        }
     }
     return (0);
 }

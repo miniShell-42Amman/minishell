@@ -66,6 +66,7 @@ int redirection_check(t_redirections *redirections)
 	choose_flags_fd(redirections, &flags, &fd, &std_fd);
 	if (dup2(fd, std_fd) < 0)
 	{
+		perror("Erorr404: dup2");
 		free_redirections(redirections);
 		exit(EXIT_FAILURE);
 	}

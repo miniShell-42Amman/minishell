@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 22:25:54 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/01 23:05:00 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/07 04:57:45 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ int unset(char **args, t_env **env_list)
 
     if (!args[1])
         return (0);
-
+    // t_env *temp = *env_list;
+    // while (temp)
+    // {
+    //     ft_printf("before key: %s, value: %s\n", temp->key, temp->value);
+    //     temp = temp->next;
+    // }
     while (args[i])
     {
         if (!is_valid_env_name(args[i]))
@@ -60,6 +65,7 @@ int unset(char **args, t_env **env_list)
                 current->has_value = 0;   
                 free(current->key);
                 free(current->value);
+                free(current);
                 current = NULL;
                 break;
             }
@@ -68,6 +74,13 @@ int unset(char **args, t_env **env_list)
         }
         i++;
     }
+    
+    // t_env *temps = *env_list;
+    // while (temps)
+    // {
+    //     ft_printf("Afteerererere key: %s, value: %s\n", temps->key, temps->value);
+    //     temps = temps->next;
+    // }
     
     return (exit_status);
 }

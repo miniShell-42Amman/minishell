@@ -241,46 +241,46 @@ int if_token_started(t_parse_cmd *parse_cmd, t_env *env_list)
 		else
 			parse_cmd->cmd.args[parse_cmd->i++] = expand_env_variables_in_token(parse_cmd->buffer,
 																				env_list, parse_cmd);
-		if (!parse_cmd->cmd.args[parse_cmd->i - 1])
-			return (EXIT_FAILURE);
-		if (parse_cmd->must_splitter)
-		{
-			char **splitter = ft_split(parse_cmd->cmd.args[parse_cmd->i - 1], ' ');
-			if (!splitter)
-				return (EXIT_FAILURE);
+		// if (!parse_cmd->cmd.args[parse_cmd->i - 1])
+		// 	return (EXIT_FAILURE);
+		// if (parse_cmd->must_splitter)
+		// {
+		// 	char **splitter = ft_split(parse_cmd->cmd.args[parse_cmd->i - 1], ' ');
+		// 	if (!splitter)
+		// 		return (EXIT_FAILURE);
 
-			int split_count = ft_array_size(splitter);
-			ft_printf("split_count: %d\n", split_count);
-			
-			if (split_count > 1)
-			{
-				char **new_args = ft_calloc(parse_cmd->cmd.arg_count + split_count, sizeof(char *));
-				if (!new_args)
-				{
-					ft_free_split(splitter);
-					return (EXIT_FAILURE);
-				}
-				int new_idx = 0;
-				for (int j = 0; j < parse_cmd->i - 1; j++)
-					new_args[new_idx++] = parse_cmd->cmd.args[j];
-				for (int j = 0; j < split_count; j++)
-					new_args[new_idx++] = ft_strdup(splitter[j]);
-				for (int j = parse_cmd->i; j < parse_cmd->cmd.arg_count; j++)
-				{
-					new_args[new_idx++] = parse_cmd->cmd.args[j];
-					ft_printf("new_args[%d]: %s\n", new_idx - 1, parse_cmd->cmd.args[j]);
-				}
-				ft_free_split(parse_cmd->cmd.args);
-				parse_cmd->cmd.args = new_args;
-				parse_cmd->cmd.arg_count = parse_cmd->cmd.arg_count + split_count - 1;
-				parse_cmd->i += split_count - 1;
-			}
+		// 	int split_count = ft_array_size(splitter);
+		// 	ft_printf("split_count: %d\n", split_count);
+		
+		// 	if (split_count > 1)
+		// 	{
+		// 		char **new_args = ft_calloc(parse_cmd->cmd.arg_count + split_count, sizeof(char *));
+		// 		if (!new_args)
+		// 		{
+		// 			ft_free_split(splitter);
+		// 			return (EXIT_FAILURE);
+		// 		}
+		// 		int new_idx = 0;
+		// 		for (int j = 0; j < parse_cmd->i - 1; j++)
+		// 			new_args[new_idx++] = parse_cmd->cmd.args[j];
+		// 		for (int j = 0; j < split_count; j++)
+		// 			new_args[new_idx++] = ft_strdup(splitter[j]);
+		// 		for (int j = parse_cmd->i; j < parse_cmd->cmd.arg_count; j++)
+		// 		{
+		// 			new_args[new_idx++] = parse_cmd->cmd.args[j];
+		// 			ft_printf("new_args[%d]: %s\n", new_idx - 1, parse_cmd->cmd.args[j]);
+		// 		}
+		// 		ft_free_split(parse_cmd->cmd.args);
+		// 		parse_cmd->cmd.args = new_args;
+		// 		parse_cmd->cmd.arg_count = parse_cmd->cmd.arg_count + split_count - 1;
+		// 		parse_cmd->i += split_count - 1;
+		// 	}
 
-			ft_free_split(splitter);
-			parse_cmd->must_splitter = 0;
-			for(int i = 0; i < parse_cmd->cmd.arg_count; i++)
-				printf("args[%d]: %s\n", i, parse_cmd->cmd.args[i]);
-		}
+		// 	ft_free_split(splitter);
+		// 	parse_cmd->must_splitter = 0;
+		// 	for(int i = 0; i < parse_cmd->cmd.arg_count; i++)
+		// 		printf("args[%d]: %s\n", i, parse_cmd->cmd.args[i]);
+		// }
 		parse_cmd->j = 0;
 		parse_cmd->token_started = false;
 		parse_cmd->token_quote_type = '\0';
@@ -331,39 +331,39 @@ int if_token_started_three(t_parse_cmd *parse_cmd, t_env *env_list)
 			parse_cmd->buffer, env_list, parse_cmd);
 	}
 
-	if (!parse_cmd->cmd.args[parse_cmd->i - 1])
-		return (EXIT_FAILURE);
-	if (parse_cmd->must_splitter)
-	{
-		char **splitter = ft_split(parse_cmd->cmd.args[parse_cmd->i - 1], ' ');
-		if (!splitter)
-			return (EXIT_FAILURE);
+	// if (!parse_cmd->cmd.args[parse_cmd->i - 1])
+	// 	return (EXIT_FAILURE);
+	// if (parse_cmd->must_splitter)
+	// {
+	// 	char **splitter = ft_split(parse_cmd->cmd.args[parse_cmd->i - 1], ' ');
+	// 	if (!splitter)
+	// 		return (EXIT_FAILURE);
 
-		int split_count = ft_array_size(splitter);
-		if (split_count > 1)
-		{
-			char **new_args = ft_calloc(parse_cmd->cmd.arg_count + split_count, sizeof(char *));
-			if (!new_args)
-			{
-				ft_free_split(splitter);
-				return (EXIT_FAILURE);
-			}
-			int new_idx = 0;
-			for (int j = 0; j < parse_cmd->i - 1; j++)
-				new_args[new_idx++] = parse_cmd->cmd.args[j];
-			for (int j = 0; j < split_count; j++)
-				new_args[new_idx++] = ft_strdup(splitter[j]);
-			for (int j = parse_cmd->i; j < parse_cmd->cmd.arg_count; j++)
-				new_args[new_idx++] = parse_cmd->cmd.args[j];
-			ft_free_split(parse_cmd->cmd.args);
-			parse_cmd->cmd.args = new_args;
-			parse_cmd->cmd.arg_count = parse_cmd->cmd.arg_count + split_count - 1;
-			parse_cmd->i += split_count - 1;
-		}
+	// 	int split_count = ft_array_size(splitter);
+	// 	if (split_count > 1)
+	// 	{
+	// 		char **new_args = ft_calloc(parse_cmd->cmd.arg_count + split_count, sizeof(char *));
+	// 		if (!new_args)
+	// 		{
+	// 			ft_free_split(splitter);
+	// 			return (EXIT_FAILURE);
+	// 		}
+	// 		int new_idx = 0;
+	// 		for (int j = 0; j < parse_cmd->i - 1; j++)
+	// 			new_args[new_idx++] = parse_cmd->cmd.args[j];
+	// 		for (int j = 0; j < split_count; j++)
+	// 			new_args[new_idx++] = ft_strdup(splitter[j]);
+	// 		for (int j = parse_cmd->i; j < parse_cmd->cmd.arg_count; j++)
+	// 			new_args[new_idx++] = parse_cmd->cmd.args[j];
+	// 		ft_free_split(parse_cmd->cmd.args);
+	// 		parse_cmd->cmd.args = new_args;
+	// 		parse_cmd->cmd.arg_count = parse_cmd->cmd.arg_count + split_count - 1;
+	// 		parse_cmd->i += split_count - 1;
+	// 	}
 
-		ft_free_split(splitter);
-		parse_cmd->must_splitter = 0;
-	}
+	// 	ft_free_split(splitter);
+	// 	parse_cmd->must_splitter = 0;
+	// }
 	parse_cmd->j = 0;
 	parse_cmd->token_started = false;
 	parse_cmd->token_quote_type = '\0';

@@ -90,13 +90,6 @@ int ft_check_parse_cmd(t_parse_cmd *parse_cmd)
 	return (EXIT_FAILURE);
 }
 
-static int print_syntax_error(char *token, int *status)
-{
-    ft_printf("syntax error near unexpected token `%s'\n", token);
-    *status = 2;
-    return (EXIT_FAILURE);
-}
-
 int is_duplicate_operator_series(t_token *t, int count, int *status)
 {
 	int i;

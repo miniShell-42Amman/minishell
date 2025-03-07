@@ -34,7 +34,7 @@ void	free_env_list(t_env *env_list)
 		free(head);
 		head = NULL;
 	}
-	// free(env_list);
+	free(env_list);
 }
 
 void	free_object(char **object, t_env *head)

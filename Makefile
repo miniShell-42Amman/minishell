@@ -35,7 +35,11 @@ SRC = 	src/main.c 								\
 		src/execute/utils/free_redirections.c	\
 		src/utils/helper_main.c					\
 		src/env/handle_env.c					\
-
+		src/token/disassimble_args.c			\
+		src/utils/smart_split.c					\
+		src/utils/ft_printf_error.c				\
+		src/token/init_parse_cmd.c				\
+		src/token/utils_disassimble.c			\
 
 
 OBJ_DIR = obj

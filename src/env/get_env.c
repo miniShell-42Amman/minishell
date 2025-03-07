@@ -20,7 +20,7 @@ int	create_node(t_env **node)
 	(*node)->key = NULL;
 	(*node)->value = NULL;
 	(*node)->next = NULL;
-	(*node)->has_value = true;
+	(*node)->has_value = false;
 	return (EXIT_SUCCESS);
 }
 

@@ -51,7 +51,6 @@ typedef struct s_cmd
 	char *cmd;
 	char **args;
 	int arg_count;
-
 } t_cmd;
 
 typedef enum e_token_type
@@ -96,7 +95,7 @@ typedef struct s_parse_cmd
 	int operator;
 	int *exit_status;
 	char *program_name;
-	bool must_splitter;
+	size_t *must_splitter;
 } t_parse_cmd;
 
 typedef struct s_main
@@ -146,9 +145,9 @@ typedef struct s_execute
 	int j;
 	size_t arg_index;
 	char *cmd_path;
-	t_env *env_list;
 	int *exit_status;
 	int token_count;
+	t_env *env_list;
 } t_execute;
 
 typedef struct s_redirections
@@ -173,6 +172,13 @@ typedef struct s_here_document
 	size_t current_size;
 	char *target;
 } t_here_document;
+
+typedef struct s_fd_flags
+{
+	int flags;
+	int fd;
+	int std_fd;
+} t_fd_flags;
 
 int create_node(t_env **node);
 int init_values(t_env *new_node, char **object);
@@ -215,6 +221,8 @@ int if_token_started_three(t_parse_cmd *parse_cmd,
 int if_token_started(t_parse_cmd *parse_cmd,
 					 t_env *env_list);
 int init_parse_cmd(t_parse_cmd *parse_cmd, t_main *main);
+
+int init_parse_cmd_too(t_parse_cmd *parse_cmd);
 char *get_var_value(t_env *env, const char *var,
 					size_t len);
 size_t calculate_length(const char *token, t_env *env,
@@ -251,7 +259,7 @@ int export(char **args, int arg_count, t_env **env);
 int unset(char **args, t_env **env_list);
 t_env *new_node_env(char *key, char *value);
 void add_new_node(t_env **head, t_env *new_node);
-void handle_redirections(t_execute *execute, t_token *tokens);
+void handle_redirections(t_execute *execute, t_main *main);
 char *get_env_var(t_env *env, const char *key);
 void ft_sort_arr(char **arr, int size);
 void update_existing_env(t_env *tmp, char *v);
@@ -260,13 +268,12 @@ void add_new_env(t_env **env, char *k, char *v);
 char *remove_quotes(char *str);
 int ft_exit(char **args);
 int redirection_check_else_if(t_redirections *redirections,
-							  t_execute *execute);
-void if_redirections_heredoc_all(t_redirections *redirections);
-void redirection_check_else_if_loop(t_redirections *redirections,
-									t_here_document *here_doc, t_execute *execute);
-int redirection_check(t_redirections *redirections);
-void choose_flags_fd(t_redirections *redirections,
-					 int *flags, int *fd, int *std_fd);
+							  t_execute *execute, t_main *main);
+void if_redirections_heredoc_all(t_redirections *redirections, t_main *main, t_execute *execute);
+int redirection_check_else_if_loop(t_redirections *redirections,
+									t_here_document *here_doc, t_execute *execute, t_main *main);
+int redirection_check(t_redirections *redirections, t_main *main, t_execute *execute);
+void choose_flags_fd(t_redirections *redirections,t_fd_flags *fd_flags, t_main *main, t_execute *execute);
 char *append_str(char *dest, size_t *dest_size,
 				 const char *src);
 char **smart_split(const char *str);
@@ -283,5 +290,11 @@ int help_loop(t_main *main);
 void loop_main(t_main *main);
 int skip_space(char *str);
 int start_tokenization(t_main *main);
+int	disassemble_args(t_parse_cmd *p);
+size_t ft_array_size(char **array);
+int count_quoted_words(const char *str);;
+void ft_perror_free_exit(char *msg,t_execute *execute,t_main *main, t_redirections *redirections);
+int print_syntax_error(char *token, int *status);
+size_t	count_new_args(t_parse_cmd *p);
 
 #endif

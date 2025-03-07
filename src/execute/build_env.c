@@ -226,7 +226,7 @@ int is_commands(t_execute *execute, int flag)
     return (EXIT_FAILURE);
 }
 
-void execute_builtin(t_execute *execute)
+void execute_builtin(t_execute *execute, t_main *main)
 {
     *execute->exit_status = 0;
     if (ft_strcmp(execute->commands[execute->i][0], "echo") == 0)
@@ -239,13 +239,13 @@ void execute_builtin(t_execute *execute)
         pwd();
     else if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
         *execute->exit_status = cd(execute->commands[execute->i],
-                                   execute->cmd_args[execute->i], &execute->env_list);
+                                   execute->cmd_args[execute->i], &main->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
         *execute->exit_status = export(execute->commands[execute->i],
-                                       execute->cmd_args[execute->i], &execute->env_list);
+                                       execute->cmd_args[execute->i], &main->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
         *execute->exit_status = unset(execute->commands[execute->i],
-                                      &execute->env_list);
+                                      &main->env_list);
 }
 
 void execute_command(t_execute *execute, t_main *main)
@@ -269,10 +269,10 @@ void execute_command(t_execute *execute, t_main *main)
     execute->j = -1;
     while (++execute->j < 2 * execute->num_pipes)
         close(execute->pipe_fds[execute->j]);
-    handle_redirections(execute, main->tokens_list);
+    handle_redirections(execute, main);
     if (!is_commands(execute, 2))
     {
-        execute_builtin(execute);
+        execute_builtin(execute, main);
         free_execute(execute, 0);
         free_resources(main, 1);
         exit(*execute->exit_status);
@@ -310,13 +310,13 @@ int handle_builtins(t_execute *execute, t_main *main)
 {
     if (ft_strcmp(execute->commands[execute->i][0], "cd") == 0)
         *execute->exit_status = cd(execute->commands[execute->i],
-                                   execute->cmd_args[execute->i], &execute->env_list);
+                                   execute->cmd_args[execute->i], &main->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "export") == 0)
         *execute->exit_status = export(execute->commands[execute->i],
-                                       execute->cmd_args[execute->i], &execute->env_list);
+                                       execute->cmd_args[execute->i], &main->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "unset") == 0)
         *execute->exit_status = unset(execute->commands[execute->i],
-                                      &execute->env_list);
+                                      &main->env_list);
     else if (ft_strcmp(execute->commands[execute->i][0], "exit") == 0)
     {
         *execute->exit_status = ft_exit(execute->commands[execute->i]);
@@ -429,7 +429,7 @@ void close_pipes_and_wait(t_execute *execute)
 //     redirections.argv = NULL;
 //     return (EXIT_SUCCESS);
 // }
-int preprocess_heredocs(t_execute *execute, t_token *token)
+int preprocess_heredocs(t_execute *execute, t_main *main)
 {
     t_redirections redirections;
     size_t i;
@@ -449,12 +449,12 @@ int preprocess_heredocs(t_execute *execute, t_token *token)
         redirections.j = 0;
         while (redirections.argv[redirections.j])
         {
-            if (token[num_command].value && token[num_command].type == TOKEN_PIPE)
+            if (main->tokens_list[num_command].value && main->tokens_list[num_command].type == TOKEN_PIPE)
                 num_command++;
-            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && token[num_command].type != TOKEN_ARGUMENT)
+            if (ft_strcmp(redirections.argv[redirections.j], "<<") == 0 && main->tokens_list[num_command].type != TOKEN_ARGUMENT)
             {
                 signal(SIGINT, handle_heredoc_sigint);
-                if (redirection_check_else_if(&redirections, execute) != EXIT_SUCCESS)
+                if (redirection_check_else_if(&redirections, execute, main) != EXIT_SUCCESS)
                     return (EXIT_FAILURE);
                 if (g_signal == 130)
                 {
@@ -487,7 +487,6 @@ void start_execution(t_main *main)
     t_execute execute;
     int check_pipes = 0;
     ft_bzero(&execute, sizeof(t_execute));
-    execute.env_list = main->env_list;
     execute.envp = convert_env_to_list(main->env_list);
     execute.exit_status = &main->exit_status;
     *execute.exit_status = 0;
@@ -498,7 +497,7 @@ void start_execution(t_main *main)
         main->exit_status = 1;
         return;
     }
-    if (preprocess_heredocs(&execute, main->tokens_list) != EXIT_SUCCESS)
+    if (preprocess_heredocs(&execute, main) != EXIT_SUCCESS)
     {
         main->exit_status = 130;
         return;

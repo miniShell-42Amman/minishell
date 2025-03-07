@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helper_main.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/07 21:56:49 by lalhindi          #+#    #+#             */
+/*   Updated: 2025/03/07 21:57:13 by lalhindi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	handle_many_args(int ac, char **av, t_main *main)
@@ -19,11 +31,6 @@ int	handle_many_args(int ac, char **av, t_main *main)
 
 int	help_loop(t_main *main)
 {
-	// if (g_signal)
-	// {
-	// 	main->exit_status = g_signal;
-	// 	g_signal = 0;
-	// }
 	main->input = readline(PROMPT);
 	if (!main->input)
 	{
@@ -33,11 +40,10 @@ int	help_loop(t_main *main)
 		return (EXIT_FAILURE);
 	}
 	if (g_signal == 130)
-    {
+	{
 		main->exit_status = g_signal;
-        g_signal = 0;
-    }
-
+		g_signal = 0;
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -45,18 +51,15 @@ void	loop_main(t_main *main)
 {
 	while (1)
 	{
-
 		free_resources(main, 0);
 		if (help_loop(main))
 			break ;
-		
 		if (ft_strlen(main->input) == 0)
 		{
 			free(main->input);
 			main->input = NULL;
-			continue;
+			continue ;
 		}
-		// if (ft_strlen(main->input) > 0)
 		add_history(main->input);
 		main->skip_spaces = skip_space(main->input);
 		if (main->input[main->skip_spaces] != '\0' && *main->input
@@ -67,7 +70,6 @@ void	loop_main(t_main *main)
 			start_execution(main);
 		}
 		free_resources(main, 0);
-
 	}
 }
 

@@ -12,15 +12,16 @@
 
 #include "minishell.h"
 
-int g_signal = 0;
+int		g_signal = 0;
 
-void get_value_store_token(t_main *main, int *array)
+void	get_value_store_token(t_main *main, int *array)
 {
-	int j;
+	int	j;
 
-	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count, array);
+	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count,
+			array);
 	if (main->tokens_list[0].value && !*main->tokens_list[0].value
-		&&!ft_strchr("\'\"", main->input[skip_space(main->input)]))
+		&& !ft_strchr("\'\"", main->input[skip_space(main->input)]))
 	{
 		free(main->tokens_list[0].value);
 		j = -1;
@@ -31,9 +32,10 @@ void get_value_store_token(t_main *main, int *array)
 	}
 }
 
-int start_tokenization(t_main *main)
+int	start_tokenization(t_main *main)
 {
-	int *array;
+	int	*array;
+
 	array = ft_count_token(main->input);
 	main->cmd = parse_cmd(main);
 	if (!main->cmd)
@@ -45,7 +47,8 @@ int start_tokenization(t_main *main)
 	}
 	get_value_store_token(main, array);
 	if (!main->cmd->arg_count || !main->tokens_list[0].value
-		|| is_duplicate_operator_series(main->tokens_list, main->cmd->arg_count, &main->exit_status))
+		|| is_duplicate_operator_series(main->tokens_list, main->cmd->arg_count,
+			&main->exit_status))
 	{
 		free_resources(main, 0);
 		free(array);
@@ -57,9 +60,10 @@ int start_tokenization(t_main *main)
 	return (EXIT_SUCCESS);
 }
 
-int main(int ac, char **av, char **env)
+int	main(int ac, char **av, char **env)
 {
-	t_main main;
+	t_main	main;
+
 	ft_bzero(&main, sizeof(t_main));
 	if (handle_many_args(ac, av, &main))
 		return (EXIT_FAILURE);

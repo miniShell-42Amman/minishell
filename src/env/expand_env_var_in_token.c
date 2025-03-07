@@ -52,8 +52,6 @@ size_t handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
         }
         var_len = *token - start;
         value = get_var_value(env, start, var_len);
-        if (ft_strchr(value, ' '))
-            p->must_splitter = 1;
         should_free = 0;
     }
     if (value)
@@ -106,8 +104,10 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
         *t += var_len;
         p->arr_has_dollar_count++;
         value = get_var_value(e, start, var_len);
-        if (ft_strchr(value, ' '))
-            p->must_splitter = 1;
+        if (value && *value && ft_strchr(value, ' '))
+            p->must_splitter[p->index_splitter] = (size_t)1;
+        else
+            p->must_splitter[p->index_splitter] = (size_t)0;    
         should_free = 0;
     }
     else
@@ -116,8 +116,10 @@ void process_variable(const char **t, t_env *e, char **res, size_t *j, t_parse_c
             (*t)++;
         var_len = (size_t)(*t - start);
         value = get_var_value(e, start, var_len);
-        if(ft_strchr(value, ' '))
-            p->must_splitter = 1;
+        if(*value && ft_strchr(value, ' '))
+            p->must_splitter[p->index_splitter] = (size_t)1;
+        else 
+            p->must_splitter[p->index_splitter] = (size_t)0;    
         should_free = 0;
     }
     if (value)
@@ -232,7 +234,6 @@ char *expand_env_variables_in_token(const char *token, t_env *env, t_parse_cmd *
     if (!token || !env)
         return (ft_strdup(""));
     parse_cmd->arr_has_dollar_count = 0;
-    parse_cmd->must_splitter = 0;
     result = ft_calloc(calculate_length(token, env, parse_cmd) + 1, sizeof(char));
     parse_cmd->arr_has_dollar_count = 0;
     if (parse_cmd->splitter_clean_input[parse_cmd->index_splitter] && is_dolloar_quote(token) == is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter]) && is_dolloar_quote(token) > 0)

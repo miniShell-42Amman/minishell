@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 21:45:29 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/24 08:12:14 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/07 23:16:40 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,22 @@ static char	*get_target_dir(char **args, t_env *env)
 	return (args[1]);
 }
 
+int cd_if(char **args, char **target, t_env **env)
+{
+	*target = NULL;
+	
+	*target = get_target_dir(args, *env);
+	if (!*target)
+	{
+		if (args[1])
+			print_cd_error("cd", "OLDPWD not set");
+		else
+			print_cd_error("cd", "HOME not set");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
 int	cd(char **args, int arg_count, t_env **env)
 {
 	char	oldpwd[PATH_MAX];
@@ -69,15 +85,8 @@ int	cd(char **args, int arg_count, t_env **env)
 	if (!getcwd(oldpwd, sizeof(oldpwd)) && print_cd_error("cd",
 			"failed to get current directory"))
 		return (1);
-	target = get_target_dir(args, *env);
-	if (!target)
-	{
-		if (args[1])
-			print_cd_error("cd", "OLDPWD not set");
-		else
-			print_cd_error("cd", "HOME not set");
-		return (1);
-	}
+	if (cd_if(args, &target, env) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	if (ft_strcmp(oldpwd, target) == 0)
 		return (0);
 	if (chdir(target) != 0 && print_cd_error("cd",

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 22:25:54 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/07 04:57:45 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/07 14:40:50 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,6 @@ int unset(char **args, t_env **env_list)
 
     if (!args[1])
         return (0);
-    // t_env *temp = *env_list;
-    // while (temp)
-    // {
-    //     ft_printf("before key: %s, value: %s\n", temp->key, temp->value);
-    //     temp = temp->next;
-    // }
     while (args[i])
     {
         if (!is_valid_env_name(args[i]))
@@ -61,10 +55,11 @@ int unset(char **args, t_env **env_list)
                 if (prev)
                     prev->next = current->next;
                 else
-                        **env_list = *current->next;
-                current->has_value = 0;   
+                    *env_list = current->next;
                 free(current->key);
+                current->key = NULL;
                 free(current->value);
+                current->value = NULL;
                 free(current);
                 current = NULL;
                 break;
@@ -74,13 +69,11 @@ int unset(char **args, t_env **env_list)
         }
         i++;
     }
-    
-    // t_env *temps = *env_list;
-    // while (temps)
-    // {
-    //     ft_printf("Afteerererere key: %s, value: %s\n", temps->key, temps->value);
-    //     temps = temps->next;
-    // }
-    
+    t_env *tmp = *env_list;
+    for (int i = 0; tmp; i++)
+    {
+        ft_printf("unset: %d: %s=%s\n", i, tmp->key, tmp->value);
+        tmp = tmp->next;
+    }
     return (exit_status);
 }

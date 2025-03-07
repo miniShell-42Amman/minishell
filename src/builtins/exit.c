@@ -1,8 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 00:09:27 by oissa             #+#    #+#             */
+/*   Updated: 2025/03/08 00:37:06 by oissa            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 static int	is_numeric(const char *str)
 {
-	int	i = 0;
+	int	i;
+
+	i = 0;
 	if (!str)
 		return (0);
 	if (str[i] == '-' || str[i] == '+')
@@ -18,26 +32,26 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-int ft_exit(char **args)
+int	ft_exit(char **args)
 {
-	int		argc;
+	int	argc;
 
 	argc = 0;
 	while (args[argc])
 		argc++;
-
 	if (argc == 1)
-		return(0);
+		return (0);
 	else if (argc == 2)
 	{
 		if (!is_numeric(args[1]))
 		{
-			ft_dprintf(STDERR_FILENO, "Error404: exit: %s: numeric argument required\n", args[1]);
-			return(2);
+			ft_dprintf(STDERR_FILENO,
+				"Error404: exit: %s: numeric argument required\n", args[1]);
+			return (2);
 		}
 		else
-			return(ft_atoi(args[1]));
+			return (ft_atoi(args[1]));
 	}
 	ft_dprintf(STDERR_FILENO, "exit: too many arguments\n");
-	return(1);
+	return (1);
 }

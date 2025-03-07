@@ -212,7 +212,10 @@ int is_string_inside_single(const char *token)
     }
     if (quote_count % 2 != 0)
         return 0;
-    return (parent == '\'') ? 1 : 0;
+    if (parent == '\'')
+        return 1;
+    else
+        return 0;
 }
 int ft_arr_len(char **arr)
 {

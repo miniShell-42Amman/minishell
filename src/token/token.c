@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/07 23:18:37 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/08 02:33:11 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,21 +92,53 @@ int parse_cmd_loop(t_parse_cmd *parse_cmd, t_env *env_list)
 	return (EXIT_SUCCESS);
 }
 
-int parse_disassemble_args(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
+int is_string_inside_double(char *str)
 {
+	int i;
+	bool squote;
+	bool dquote;
+
+	i = 0;
+	squote = false;
+	dquote = false;
+	while (str[i])
+	{
+		if (str[i] == '\'' && !dquote)
+			squote = !squote;
+		else if (str[i] == '\"' && !squote)
+			dquote = !dquote;
+		i++;
+	}
+	return (dquote);
+}
+
+int parse_disassemble_args(t_parse_cmd *parse_cmd, t_cmd *cmd_result, t_main *main)
+{
+	int i;
+	char **split;
+
 	parse_cmd->must_splitter[parse_cmd->index_splitter + 1] = (size_t)-1;
+	split = smart_split(main->input);
+	i = -1;
+	while (++i <= parse_cmd->index_splitter)
+	{
+		if (parse_cmd->must_splitter[i] == 1)
+		{
+			if (i == 0 || ((i > 0 && (split[i - 1] && ft_strchr(split[i - 1], '|'))) || split[i][0] != '"'))
+				parse_cmd->must_splitter[i] = 1;
+			else
+				parse_cmd->must_splitter[i] = 0;
+		}
+	}
+	ft_free_split(split);
 	if (disassemble_args(parse_cmd) != EXIT_SUCCESS)
 	{
 		free_cmd_parse(parse_cmd, cmd_result);
 		return (EXIT_FAILURE);
 	}
 	*cmd_result = parse_cmd->cmd;
-	free(parse_cmd->buffer);
-	free(parse_cmd->clean_input);
-	free(parse_cmd->must_splitter);
 	return (EXIT_SUCCESS);
 }
-
 t_cmd *parse_cmd(t_main *main)
 {
 	t_parse_cmd parse_cmd;
@@ -127,7 +159,10 @@ t_cmd *parse_cmd(t_main *main)
 		return (NULL);
 	if (clean_parse_cmd(&parse_cmd) && !free_cmd_parse(&parse_cmd, cmd_result))
 		return (NULL);
-	if (parse_disassemble_args(&parse_cmd, cmd_result) == EXIT_FAILURE)
+	if (parse_disassemble_args(&parse_cmd, cmd_result, main) == EXIT_FAILURE)
 		return (NULL);
+	free(parse_cmd.buffer);
+	free(parse_cmd.clean_input);
+	free(parse_cmd.must_splitter);
 	return (cmd_result);
 }

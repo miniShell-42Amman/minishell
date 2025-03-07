@@ -40,6 +40,7 @@ void	echo(char **args)
 {
 	int	i;
 	int	new_line;
+
 	i = 1;
 	new_line = 1;
 	if (!args[1])
@@ -47,7 +48,6 @@ void	echo(char **args)
 		ft_printf("\n");
 		return ;
 	}
-	
 	while (args[i] && check_n_flag(args[i]))
 	{
 		new_line = 0;

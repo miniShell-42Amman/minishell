@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 21:45:29 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/07 23:16:40 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/08 00:08:10 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,7 @@ void	set_env_var(t_env **env, const char *key, const char *value)
 	add_new_node(env, new_node_env(ft_strdup(key), ft_strdup(value)));
 }
 
-int	print_cd_error(const char *cmd, const char *arg)
-{
-	ft_dprintf(2, "⚠️  Error404 ⚠️ : %s: %s\n", cmd, arg);
-	return (1);
-}
-
-static int	update_pwd(t_env **env, const char *oldpwd)
+int	update_pwd(t_env **env, const char *oldpwd)
 {
 	char	cwd[PATH_MAX];
 
@@ -50,7 +44,7 @@ static int	update_pwd(t_env **env, const char *oldpwd)
 	return (0);
 }
 
-static char	*get_target_dir(char **args, t_env *env)
+char	*get_target_dir(char **args, t_env *env)
 {
 	if (!args[1])
 		return (get_env_var(env, "HOME"));
@@ -59,10 +53,9 @@ static char	*get_target_dir(char **args, t_env *env)
 	return (args[1]);
 }
 
-int cd_if(char **args, char **target, t_env **env)
+int	cd_if(char **args, char **target, t_env **env)
 {
 	*target = NULL;
-	
 	*target = get_target_dir(args, *env);
 	if (!*target)
 	{

@@ -29,7 +29,7 @@ SRC = 	src/main.c 								\
 		src/builtins/export.c					\
 		src/builtins/unset.c					\
 		src/execute/redirections.c				\
-		src/builtins/export_utils.c				\
+		src/builtins/utils/export_utils.c		\
 		src/builtins/exit.c						\
 		src/signal/handle_signal.c				\
 		src/execute/utils/free_redirections.c	\
@@ -40,6 +40,7 @@ SRC = 	src/main.c 								\
 		src/utils/ft_printf_error.c				\
 		src/token/init_parse_cmd.c				\
 		src/token/utils_disassimble.c			\
+		src/builtins/utils/cd_utils.c			\
 
 
 OBJ_DIR = obj

@@ -50,7 +50,7 @@ static int	print_export(t_env *env)
 
 static int	handle_invalid_key(char *arg)
 {
-	ft_dprintf(2,"export: `%s': not a valid identifier\n", arg);
+	ft_dprintf(2, "export: `%s': not a valid identifier\n", arg);
 	return (1);
 }
 

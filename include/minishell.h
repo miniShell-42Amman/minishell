@@ -180,6 +180,16 @@ typedef struct s_fd_flags
 	int std_fd;
 } t_fd_flags;
 
+typedef struct s_unset
+{
+	t_env	*current;
+	t_env	*prev;
+	int		i;
+	int		exit_status;
+	char	**args;
+	t_env	**env_list;
+} t_unset;
+
 int create_node(t_env **node);
 int init_values(t_env *new_node, char **object);
 t_env *clone_env(char **env);
@@ -296,5 +306,10 @@ int count_quoted_words(const char *str);;
 void ft_perror_free_exit(char *msg,t_execute *execute,t_main *main, t_redirections *redirections);
 int print_syntax_error(char *token, int *status);
 size_t	count_new_args(t_parse_cmd *p);
+void	set_env_var(t_env **env, const char *key, const char *value);
+int	print_cd_error(const char *cmd, const char *arg);
+int	update_pwd(t_env **env, const char *oldpwd);
+char	*get_target_dir(char **args, t_env *env);
+int	cd_if(char **args, char **target, t_env **env);
 
 #endif

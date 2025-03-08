@@ -78,24 +78,15 @@ static int	store_token_value(t_token *new_token, char **tokens_list, int i)
 	return (EXIT_SUCCESS);
 }
 
-void	free_tokens(t_token *tokens, int token_count)
+int if_loop(char **tokens_list, int i, t_token *new_token)
 {
-	int	i;
-
-	i = 0;
-	if (!tokens)
-		return ;
-	while (i < token_count)
+	if (tokens_list[i] == NULL)
 	{
-		if (tokens[i].value)
-		{
-			free(tokens[i].value);
-			tokens[i].value = NULL;
-		}
-		i++;
+		new_token[i].value = NULL;
+		new_token[i].type = TOKEN_ARGUMENT;
+		return (EXIT_SUCCESS);
 	}
-	free(tokens);
-	tokens = NULL;
+	return (EXIT_FAILURE);
 }
 
 t_token	*store_token(char **tokens_list, int token_count, int *array)
@@ -112,19 +103,15 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 	i = -1;
 	while (++i < token_count)
 	{
-		if (tokens_list[i] == NULL)
-		{
-			new_token[i].value = NULL;
-			new_token[i].type = TOKEN_ARGUMENT;
-			continue ;
-		}
+		if (!if_loop(tokens_list, i, new_token))
+			continue;
 		if (store_token_value(new_token, tokens_list, i))
 		{
 			free_tokens(new_token, token_count);
 			return (NULL);
 		}
-		new_token[i].type = determine_token_type(tokens_list[i], i, new_token,
-				array);
+		new_token[i].type = determine_token_type(tokens_list[i], i,
+				new_token, array);
 	}
 	return (new_token);
 }

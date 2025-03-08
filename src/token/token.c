@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 02:33:11 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/08 22:30:09 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ int parse_disassemble_args(t_parse_cmd *parse_cmd, t_cmd *cmd_result, t_main *ma
 	*cmd_result = parse_cmd->cmd;
 	return (EXIT_SUCCESS);
 }
+
 t_cmd *parse_cmd(t_main *main)
 {
 	t_parse_cmd parse_cmd;

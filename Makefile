@@ -41,6 +41,11 @@ SRC = 	src/main.c 								\
 		src/token/init_parse_cmd.c				\
 		src/token/utils_disassimble.c			\
 		src/builtins/utils/cd_utils.c			\
+		src/utils/expand_utils.c				\
+		src/expand/calculate_length.c			\
+		src/expand/process_variable.c			\
+		src/expand/process_variable_function.c	\
+		src/expand/handle_var_length.c			\
 
 
 OBJ_DIR = obj

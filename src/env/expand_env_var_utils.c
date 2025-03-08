@@ -6,7 +6,7 @@
 /*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 17:16:48 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/15 17:16:48 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/08 17:45:43 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,39 +80,4 @@ char	*get_var_value(t_env *env, const char *var, size_t len)
 	}
 	free(var_name);
 	return (NULL);
-}
-
-size_t	calculate_length(const char *token, t_env *env, t_parse_cmd *p)
-{
-	size_t	len;
-	bool	squote;
-	bool	dquote;
-
-	len = 0;
-	squote = false;
-	dquote = false;
-	if (*p->splitter_clean_input && p->splitter_clean_input[p->index_splitter]
-		&& is_dolloar_quote(token) == is_dolloar_quote(p->splitter_clean_input[p->index_splitter])
-		&& is_dolloar_quote(token) > 0)
-		calculate_dollar_array(p);
-	while (*token)
-	{
-		update_quote_state(*token, &squote, &dquote);
-		if (*token == '$'
-			&& !is_string_inside_single(p->splitter_clean_input[p->index_splitter])
-			&& (*(token + 1) != ' ' && *(token + 1) != '\0'))
-		{
-			token++;
-			len += handle_var_length(&token, env, p);
-			continue ;
-		}
-		len++;
-		token++;
-	}
-	if (p->arr_has_dollar)
-	{
-		free(p->arr_has_dollar);
-		p->arr_has_dollar = NULL;
-	}
-	return (len);
 }

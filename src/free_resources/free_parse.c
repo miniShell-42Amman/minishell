@@ -12,6 +12,26 @@
 
 #include "minishell.h"
 
+void	free_tokens(t_token *tokens, int token_count)
+{
+	int	i;
+
+	i = 0;
+	if (!tokens)
+		return ;
+	while (i < token_count)
+	{
+		if (tokens[i].value)
+		{
+			free(tokens[i].value);
+			tokens[i].value = NULL;
+		}
+		i++;
+	}
+	free(tokens);
+	tokens = NULL;
+}
+
 int	free_cmd_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
 {
 	if (parse_cmd->clean_input)

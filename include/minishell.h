@@ -190,6 +190,19 @@ typedef struct s_unset
 	t_env	**env_list;
 } t_unset;
 
+
+typedef struct s_expand_env
+{
+	const char	*token;
+	t_env		*env;
+	t_parse_cmd	*parse_cmd;
+	char *result;
+	size_t		j;
+	bool		squote;
+	bool		dquote;	
+	
+}t_expand_env;
+
 int create_node(t_env **node);
 int init_values(t_env *new_node, char **object);
 t_env *clone_env(char **env);

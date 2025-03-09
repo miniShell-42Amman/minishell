@@ -37,11 +37,9 @@ int get_value_store_token(t_main *main, int *array)
 			return (EXIT_FAILURE);
 		}
 		for (int j = 0; j < original_arg_count - 1; j++)
-			new_tokens[j] = main->tokens_list[j + 1];
-		if(main->tokens_list[main->cmd->arg_count - 1].value)	
 		{
-			free(main->tokens_list[main->cmd->arg_count - 1].value);
-			main->tokens_list[main->cmd->arg_count - 1].value = NULL;
+			printf("main->tokens_list[%d].value: %s\n", j, main->tokens_list[j].value);
+			new_tokens[j] = main->tokens_list[j + 1];
 		}
 		main->tokens_list = new_tokens;
 		main->cmd->arg_count = original_arg_count - 1;

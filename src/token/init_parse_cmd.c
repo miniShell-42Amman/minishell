@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 22:46:31 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/07 22:51:55 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/08 23:11:27 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ int	init_parse_cmd(t_parse_cmd *parse_cmd, t_main *main)
 	parse_cmd->trimmed_input = ft_strtrim(main->input, " \t\n");
 	parse_cmd->clean_input = ft_strdup(parse_cmd->trimmed_input);
 	parse_cmd->splitter_clean_input = smart_split(parse_cmd->clean_input);
-	parse_cmd->must_splitter = ft_calloc(ft_array_size(parse_cmd->splitter_clean_input)
-			+ 1, sizeof(size_t));
+	parse_cmd->must_splitter = ft_calloc(ft_array_size(
+				parse_cmd->splitter_clean_input) + 1, sizeof(size_t));
 	if (!parse_cmd->splitter_clean_input)
 	{
 		free(parse_cmd->clean_input);

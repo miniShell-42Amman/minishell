@@ -15,7 +15,8 @@
 void	free_env_list(t_env *env_list)
 {
 	t_env	*head;
-	if(!env_list)
+
+	if (!env_list)
 		return ;
 	while (env_list)
 	{

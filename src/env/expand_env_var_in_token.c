@@ -1,135 +1,70 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand_env_var_in_token.c                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 18:00:52 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 23:04:10 by oissa            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-size_t	handle_var_length(const char **token, t_env *env, t_parse_cmd *p)
+static void	count_dollars(t_parse_cmd *p, int *j)
 {
-	const char	*start;
-	char		*value;
-	size_t		var_len;
-	int			should_free;
-	char var_name[2] = {**token, '\0'};
-	size_t		len;
-
-	value = NULL;
-	should_free = 0;
-	var_len = 0;
-	start = *token;
-	if (**token == '?')
-	{
-		value = ft_itoa(*p->exit_status);
-		should_free = 1;
-		(*token)++;
-	}
-	else if (**token == '0')
-	{
-		value = ft_strdup(p->program_name);
-		should_free = 1;
-		(*token)++;
-	}
-	else if (ft_isdigit(**token))
-	{
-		value = get_var_value(env, var_name, 1);
-		should_free = 1;
-		(*token)++;
-	}
-	else
-	{
-		if (p->arr_has_dollar
-			&& p->arr_has_dollar[p->arr_has_dollar_count] != (size_t)-1)
-		{
-			var_len = p->arr_has_dollar[p->arr_has_dollar_count];
-			*token += var_len;
-			p->arr_has_dollar_count++;
-		}
-		else
-		{
-			while (**token && (ft_isalnum(**token) || **token == '_')
-				&& **token != '\'')
-				(*token)++;
-		}
-		var_len = *token - start;
-		value = get_var_value(env, start, var_len);
-		should_free = 0;
-	}
-	if (value)
-	{
-		len = ft_strlen(value);
-		if (should_free)
-			free(value);
-		return (len);
-	}
-	return (0);
-}
-
-void	calculate_dollar_array(t_parse_cmd *p)
-{
-	int		i;
-	int		j;
-	size_t	help;
+	int	i;
 
 	i = 0;
-	j = 0;
+	*j = 0;
 	while (p->splitter_clean_input[p->index_splitter][i])
 	{
 		if (p->splitter_clean_input[p->index_splitter][i] == '$')
-		{
-			j++;
-		}
+			(*j)++;
 		i++;
 	}
-	p->arr_has_dollar = malloc(sizeof(size_t) * (j + 1));
-	if (!p->arr_has_dollar)
-		return ;
+}
+
+static void	process_dollars(t_parse_cmd *p, int *j, size_t *help)
+{
+	int	i;
+
 	i = 0;
-	j = 0;
-	help = 0;
+	*j = 0;
+	*help = 0;
 	while (p->splitter_clean_input[p->index_splitter][i])
 	{
 		if (p->splitter_clean_input[p->index_splitter][i] == '$')
 		{
 			if (p->splitter_clean_input[p->index_splitter][i + 1] == '?')
 			{
-				p->arr_has_dollar[j++] = 1;
+				p->arr_has_dollar[(*j)++] = 1;
 				i += 2;
 				continue ;
 			}
-			help = 0;
+			*help = 0;
 			i++;
-			while (p->splitter_clean_input[p->index_splitter][i + help]
-				&& (ft_isalnum(p->splitter_clean_input[p->index_splitter][i
-						+ help]) || p->splitter_clean_input[p->index_splitter][i
-					+ help] == '_'))
-			{
-				help++;
-			}
-			p->arr_has_dollar[j++] = help;
+			while (p->splitter_clean_input[p->index_splitter][i + *help]
+				&& (ft_isalnum(p->splitter_clean_input[p->index_splitter][i + *help])
+					|| p->splitter_clean_input[p->index_splitter][i + *help] == '_'))
+				(*help)++;
+			p->arr_has_dollar[(*j)++] = *help;
 		}
 		else
-		{
 			i++;
-		}
 	}
+}
+
+void		calculate_dollar_array(t_parse_cmd *p)
+{
+	int		j;
+	size_t	help;
+
+	count_dollars(p, &j);
+	p->arr_has_dollar = malloc(sizeof(size_t) * (j + 1));
+	if (!p->arr_has_dollar)
+		return ;
+	process_dollars(p, &j, &help);
 	p->arr_has_dollar[j] = (size_t)-1;
 }
-int	is_string_inside_single(const char *token)
+
+int			is_string_inside_single(const char *token)
 {
 	int		i;
-	int		quote_count;
+	int		qc;
 	char	parent;
 
 	i = 0;
-	quote_count = 0;
+	qc = 0;
 	parent = 0;
 	if (!token)
 		return (0);
@@ -137,78 +72,83 @@ int	is_string_inside_single(const char *token)
 	{
 		if (token[i] == '\'' || token[i] == '"')
 		{
-			if (parent == 0)
+			if (!parent)
 				parent = token[i];
 			else if (parent == token[i])
 				parent = 0;
-			quote_count++;
+			qc++;
 		}
 		i++;
 	}
-	if (quote_count % 2 != 0)
+	if (qc % 2 != 0)
 		return (0);
-	if (parent == '\'')
-		return (1);
-	else
-		return (0);
+	return (parent == '\'');
 }
 
-
-void expand_loop(t_expand_env *expand_env)
+static void	handle_heredoc_case(t_expand_env *ex)
 {
-	while (*expand_env->token)
+	if (ex->parse_cmd->index_splitter >= 1 && ft_strnstr(
+			ex->parse_cmd->splitter_clean_input[
+			ex->parse_cmd->index_splitter - 1], "<<", 2))
 	{
-		update_quote_state(*expand_env->token, &expand_env->squote, &expand_env->dquote);
-		if (*expand_env->token == '$'
-			&& !is_string_inside_single(expand_env->parse_cmd->splitter_clean_input[expand_env->parse_cmd->index_splitter])
-			&& (*(expand_env->token + 1) != ' '
-			&& *(expand_env->token + 1) != '\0'))
-		{
-			if (expand_env->parse_cmd->index_splitter >= 1
-				&& ft_strnstr(expand_env->parse_cmd->splitter_clean_input
-					[expand_env->parse_cmd->index_splitter - 1], "<<", 2))
-			{
-				expand_env->result[expand_env->j++] = *expand_env->token++;
-				continue ;
-			}
-			else
-			{
-				process_variable(expand_env);
-				continue ;
-			}
-		}
-		expand_env->result[expand_env->j++] = *expand_env->token++;
+		ex->result[ex->j++] = *ex->token++;
+		return ;
+	}
+	process_variable(ex);
+}
+
+static void	process_expansion(t_expand_env *ex)
+{
+	const char	*input;
+
+	input = ex->parse_cmd->splitter_clean_input[
+		ex->parse_cmd->index_splitter];
+	update_quote_state(*ex->token, &ex->squote, &ex->dquote);
+	if (*ex->token == '$' && !is_string_inside_single(input)
+		&& *(ex->token + 1) != ' ' && *(ex->token + 1) != '\0')
+		handle_heredoc_case(ex);
+	else
+		ex->result[ex->j++] = *ex->token++;
+}
+
+void		expand_loop(t_expand_env *ex)
+{
+	while (*ex->token)
+		process_expansion(ex);
+}
+
+static void	cleanup_dollar_array(t_parse_cmd *p)
+{
+	if (p->arr_has_dollar)
+	{
+		free(p->arr_has_dollar);
+		p->arr_has_dollar = NULL;
 	}
 }
 
-char	*expand_env_variables_in_token(const char *token, t_env *env,
-		t_parse_cmd *parse_cmd)
+char		*expand_env_variables_in_token(const char *token, t_env *env,
+				t_parse_cmd *p)
 {
-	t_expand_env	expand_env;
-	
-	ft_bzero(&expand_env, sizeof(t_expand_env));
-	expand_env.token = token;
-	expand_env.env = env;
-	expand_env.parse_cmd = parse_cmd;
+	t_expand_env	ex;
+	const char		*input;
+
+	ft_bzero(&ex, sizeof(ex));
+	ex.token = token;
+	ex.env = env;
+	ex.parse_cmd = p;
 	if (!token || !env)
 		return (ft_strdup(""));
-	parse_cmd->arr_has_dollar_count = 0;
-	expand_env.result = ft_calloc(calculate_length(&expand_env) + 1,
-			sizeof(char));
-	expand_env.parse_cmd->arr_has_dollar_count = 0;
-	if (parse_cmd->splitter_clean_input[parse_cmd->index_splitter]
-		&& is_dolloar_quote(token) == is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter])
+	p->arr_has_dollar_count = 0;
+	input = p->splitter_clean_input[p->index_splitter];
+	ex.result = ft_calloc(calculate_length(&ex) + 1, sizeof(char));
+	if (input && is_dolloar_quote(token) == is_dolloar_quote(input)
 		&& is_dolloar_quote(token) > 0)
-		calculate_dollar_array(parse_cmd);
-	if (!expand_env.result)
+		calculate_dollar_array(p);
+	if (!ex.result)
 		return (NULL);
-	expand_loop(&expand_env);	
-	parse_cmd->arr_has_dollar_count = 0;
-	if (parse_cmd->arr_has_dollar)
-	{
-		free(parse_cmd->arr_has_dollar);
-		parse_cmd->arr_has_dollar = NULL;
-	}
-	expand_env.result[expand_env.j] = '\0';
-	return (expand_env.result);
+	expand_loop(&ex);
+	p->arr_has_dollar_count = 0;
+	cleanup_dollar_array(p);
+	ex.result[ex.j] = '\0';
+	return (ex.result);
 }

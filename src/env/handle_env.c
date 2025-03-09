@@ -12,11 +12,11 @@
 
 #include "minishell.h"
 
-void increment_shell_level(t_env **env_list)
+void	increment_shell_level(t_env **env_list)
 {
-	char *shell_level_str;
-	int shell_level_int;
-	char *shell_level_str_new;
+	char	*shell_level_str;
+	int		shell_level_int;
+	char	*shell_level_str_new;
 
 	shell_level_str_new = ft_strdup("SHLVL");
 	shell_level_str = get_env_var(*env_list, "SHLVL");
@@ -32,13 +32,17 @@ void increment_shell_level(t_env **env_list)
 	update_env(env_list, shell_level_str_new, ft_itoa(shell_level_int));
 }
 
-char *search_command(char *search)
+char	*search_command(char *search)
 {
-	char *path = getenv("PATH");
-	char **paths = ft_split(path, ':');
-	char *command;
-	char *tmp;
-	int i = 0;
+	char	*path;
+	char	**paths;
+	char	*command;
+	char	*tmp;
+	int		i;
+
+	path = getenv("PATH");
+	paths = ft_split(path, ':');
+	i = 0;
 	while (paths[i])
 	{
 		tmp = ft_strjoin(paths[i], "/");
@@ -47,12 +51,12 @@ char *search_command(char *search)
 		{
 			ft_free_split(paths);
 			free(tmp);
-			return command;
+			return (command);
 		}
 		free(tmp);
 		free(command);
 		i++;
 	}
 	ft_free_split(paths);
-	return NULL;
+	return (NULL);
 }

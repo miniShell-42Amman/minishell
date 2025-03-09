@@ -38,6 +38,7 @@ SRC = 	src/main.c 								\
 		src/token/disassimble_args.c			\
 		src/utils/smart_split.c					\
 		src/utils/ft_printf_error.c				\
+		src/utils/token_helper.c				\
 		src/token/init_parse_cmd.c				\
 		src/token/utils_disassimble.c			\
 		src/builtins/utils/cd_utils.c			\

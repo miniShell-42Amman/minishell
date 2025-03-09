@@ -54,7 +54,6 @@ int	free_cmd_parse(t_parse_cmd *parse_cmd, t_cmd *cmd_result)
 		free_command(cmd_result);
 		cmd_result = NULL;
 	}
-
 	return (EXIT_SUCCESS);
 }
 
@@ -64,15 +63,15 @@ t_cmd	ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 	*parse_cmd->exit_status = 2;
 	if (parse_cmd->clean_input)
 		free(parse_cmd->clean_input);
-	if(parse_cmd->cmd.args)
+	if (parse_cmd->cmd.args)
 		ft_free_split(parse_cmd->cmd.args);
-	if(parse_cmd->splitter_clean_input)
+	if (parse_cmd->splitter_clean_input)
 		ft_free_split(parse_cmd->splitter_clean_input);
 	if (parse_cmd->cmd.cmd)
 		free(parse_cmd->cmd.cmd);
 	if (parse_cmd->buffer)
 		free(parse_cmd->buffer);
-	if(parse_cmd->arr_has_dollar)
+	if (parse_cmd->arr_has_dollar)
 		free(parse_cmd->arr_has_dollar);
 	parse_cmd->clean_input = NULL;
 	parse_cmd->cmd.args = NULL;
@@ -96,9 +95,9 @@ int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 		parse_cmd->cmd.cmd = NULL;
 	if (parse_cmd->clean_input)
 		free(parse_cmd->clean_input);
-	if(parse_cmd->splitter_clean_input)
+	if (parse_cmd->splitter_clean_input)
 		ft_free_split(parse_cmd->splitter_clean_input);
-	if(parse_cmd->arr_has_dollar)
+	if (parse_cmd->arr_has_dollar)
 		free(parse_cmd->arr_has_dollar);
 	if (parse_cmd->buffer)
 		free(parse_cmd->buffer);
@@ -121,11 +120,13 @@ void	free_command(t_cmd *cmd)
 	{
 		i = -1;
 		while (++i < cmd->arg_count)
+		{
 			if (cmd->args[i])
 			{
 				free(cmd->args[i]);
 				cmd->args[i] = NULL;
 			}
+		}
 		if (cmd->args)
 		{
 			free(cmd->args);

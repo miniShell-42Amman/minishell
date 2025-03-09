@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   calculate_length.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:45:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 22:55:12 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/09 00:53:23 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int if_check_for_loop(t_expand_env *expand, const char **token, size_t *len)
 		&& ((*( *token + 1)) != ' ' && (*( *token + 1)) != '\0'))
 	{
 		(*token)++;
-		*len += handle_var_length(token, expand->env, expand->parse_cmd);
+		*len += handle_var_length(token, expand);
 		return (EXIT_SUCCESS);
 	}
 	return (EXIT_FAILURE);	

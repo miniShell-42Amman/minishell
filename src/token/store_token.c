@@ -29,7 +29,6 @@ static int	is_valid(int *array, int token_index)
 			return (1);
 		i++;
 	}
-
 	return (0);
 }
 
@@ -46,8 +45,9 @@ t_token_type	determine_token_type(char *token, int token_index,
 		return (TOKEN_REDIRECTION_APPEND);
 	else if (ft_strcmp(token, "<<") == 0 && !is_valid(array, token_index))
 		return (TOKEN_REDIRECTION_HEREDOC);
-	else if ((token_index == 0 && !is_valid(array,token_index))|| (token_index > 0
-			&& tokens_list[token_index - 1].type == TOKEN_PIPE && !is_valid(array, token_index)))
+	else if ((token_index == 0 && !is_valid(array, token_index))
+		|| (token_index > 0 && tokens_list[token_index - 1].type == TOKEN_PIPE
+			&& !is_valid(array, token_index)))
 		return (TOKEN_COMMAND);
 	else
 		return (TOKEN_ARGUMENT);
@@ -78,7 +78,7 @@ static int	store_token_value(t_token *new_token, char **tokens_list, int i)
 	return (EXIT_SUCCESS);
 }
 
-int if_loop(char **tokens_list, int i, t_token *new_token)
+int	if_loop(char **tokens_list, int i, t_token *new_token)
 {
 	if (tokens_list[i] == NULL)
 	{
@@ -104,14 +104,14 @@ t_token	*store_token(char **tokens_list, int token_count, int *array)
 	while (++i < token_count)
 	{
 		if (!if_loop(tokens_list, i, new_token))
-			continue;
+			continue ;
 		if (store_token_value(new_token, tokens_list, i))
 		{
 			free_tokens(new_token, token_count);
 			return (NULL);
 		}
-		new_token[i].type = determine_token_type(tokens_list[i], i,
-				new_token, array);
+		new_token[i].type = determine_token_type(tokens_list[i], i, new_token,
+				array);
 	}
 	return (new_token);
 }

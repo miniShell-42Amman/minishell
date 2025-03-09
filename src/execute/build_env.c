@@ -199,6 +199,7 @@ char *resolve_command_path(char *command, t_execute *execute, t_main *main)
     free(path_copy);
     return (*execute->exit_status = 127, NULL);
 }
+
 int is_commands(t_execute *execute, int flag)
 {
     char *customs[] = {"echo", "env", "pwd", "exit", "export", "unset", "cd"};

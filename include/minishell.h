@@ -238,7 +238,7 @@ int					init_parse_cmd_too(t_parse_cmd *parse_cmd);
 char				*get_var_value(t_env *env, const char *var, size_t len);
 size_t				calculate_length(t_expand_env *expand);
 void				update_quote_state(char c, bool *squote, bool *dquote);
-size_t				handle_var_length(const char **token, t_env *env, t_parse_cmd *p);
+size_t				handle_var_length(const char **token, t_expand_env *expand);
 void				process_variable(t_expand_env *expand_env);
 void				free_resources(t_main *main, int flag);
 int	is_duplicate_operator_series(t_token *token,
@@ -328,5 +328,7 @@ char				*var_get_var_value(t_expand_env *expand,
 						const char *var_name);
 char				*get_data(t_expand_env *expand, t_var_func func,
 						const char *var_name, int *should_free);
-
+int	is_dollar_inside_quote(const char *str);
+void free_part_parse_cmd(t_parse_cmd *parse_cmd);
+void reset_parse_cmd(t_parse_cmd *parse_cmd);
 #endif

@@ -1,54 +1,4 @@
 #include "minishell.h"
-void	calculate_dollar_array(t_parse_cmd *p)
-{
-	int		i;
-	int		j;
-	size_t	help;
-
-	i = 0;
-	j = 0;
-	while (p->splitter_clean_input[p->index_splitter][i])
-	{
-		if (p->splitter_clean_input[p->index_splitter][i] == '$')
-		{
-			j++;
-		}
-		i++;
-	}
-	p->arr_has_dollar = malloc(sizeof(size_t) * (j + 1));
-	if (!p->arr_has_dollar)
-		return ;
-	i = 0;
-	j = 0;
-	help = 0;
-	while (p->splitter_clean_input[p->index_splitter][i])
-	{
-		if (p->splitter_clean_input[p->index_splitter][i] == '$')
-		{
-			if (p->splitter_clean_input[p->index_splitter][i + 1] == '?')
-			{
-				p->arr_has_dollar[j++] = 1;
-				i += 2;
-				continue ;
-			}
-			help = 0;
-			i++;
-			while (p->splitter_clean_input[p->index_splitter][i + help]
-				&& (ft_isalnum(p->splitter_clean_input[p->index_splitter][i
-						+ help]) || p->splitter_clean_input[p->index_splitter][i
-					+ help] == '_'))
-			{
-				help++;
-			}
-			p->arr_has_dollar[j++] = help;
-		}
-		else
-		{
-			i++;
-		}
-	}
-	p->arr_has_dollar[j] = (size_t)-1;
-}
 
 int	is_string_inside_single(const char *token)
 {
@@ -73,12 +23,7 @@ int	is_string_inside_single(const char *token)
 		}
 		i++;
 	}
-	if (quote_count % 2 != 0)
-		return (0);
-	if (parent == '\'')
-		return (1);
-	else
-		return (0);
+	return (quote_count % 2 != 0 && parent == '\'');
 }
 
 
@@ -121,6 +66,7 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 	if (!token || !env)
 		return (ft_strdup(""));
 	parse_cmd->arr_has_dollar_count = 0;
+	printf("calculate_length(&expand_env) = %zu\n", calculate_length(&expand_env));
 	expand_env.result = ft_calloc(calculate_length(&expand_env) + 1,
 			sizeof(char));
 	expand_env.parse_cmd->arr_has_dollar_count = 0;

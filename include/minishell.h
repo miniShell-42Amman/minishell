@@ -213,7 +213,7 @@ t_token_type	determine_token_type(char *token,
 									int *array);
 t_token	*store_token(char **tokens_list,
 						int token_count,
-						int *array);
+						int *array,t_main *main);
 void				free_tokens(t_token *tokens, int token_count);
 int					ft_is_operator(const char *str);
 void				skip_whitespace(const char *input, int *i, int len);

@@ -16,42 +16,49 @@ int g_signal = 0;
 
 int get_value_store_token(t_main *main, int *array)
 {
-	int original_arg_count;
-	t_token *new_tokens;
+    // int original_arg_count;
+    // t_token *new_tokens;
 
-	main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count, array);
-	if (!main->tokens_list)
-		return (EXIT_FAILURE);
-	if (main->tokens_list[0].value && !*main->tokens_list[0].value &&
-		!ft_strchr("\'\"", main->input[skip_space(main->input)]))
-	{
-		free(main->tokens_list[0].value);
-		main->tokens_list[0].value = NULL;
+    main->tokens_list = store_token(main->cmd->args, main->cmd->arg_count, array, main);
+    if (!main->tokens_list)
+        return (EXIT_FAILURE);
 
-		original_arg_count = main->cmd->arg_count;
-		new_tokens = malloc((original_arg_count - 1) * sizeof(t_token));
-		if (!new_tokens)
-		{
-			main->exit_status = 1;
-			free_tokens(main->tokens_list, original_arg_count);
-			return (EXIT_FAILURE);
-		}
-		for (int j = 0; j < original_arg_count - 1; j++)
-		{
-			printf("main->tokens_list[%d].value: %s\n", j, main->tokens_list[j].value);
-			new_tokens[j] = main->tokens_list[j + 1];
-		}
-		main->tokens_list = new_tokens;
-		main->cmd->arg_count = original_arg_count - 1;
-		if (main->cmd->arg_count > 0)
-			main->tokens_list[0].type = TOKEN_COMMAND;
-		main->exit_status = 0;
-	}
-	for (int i = 0; i < main->cmd->arg_count; i++)
-	{
-		printf("main->tokens_list[%d].value: %s\n", i, main->tokens_list[i].value);
-	}
-	return (EXIT_SUCCESS);
+    // if (main->tokens_list[0].value && !*main->tokens_list[0].value &&
+    //     !ft_strchr("\'\"", main->input[skip_space(main->input)]))
+    // {
+    //     free(main->tokens_list[0].value);
+    //     main->tokens_list[0].value = NULL;
+
+    //     original_arg_count = main->cmd->arg_count;
+
+    //     // Allocate new array with size reduced by 1
+    //     new_tokens = malloc((original_arg_count - 1) * sizeof(t_token));
+    //     if (!new_tokens)
+    //     {
+    //         free_tokens(main->tokens_list, original_arg_count); // Free original tokens
+    //         main->exit_status = 1;
+    //         return (EXIT_FAILURE);
+    //     }
+
+    //     // Copy tokens starting from index 1 (skip the first empty token)
+    //     for (int j = 0; j < original_arg_count - 1; j++)
+    //         new_tokens[j] = main->tokens_list[j + 1];
+
+    //     // Free the original tokens array (does NOT free token values)
+    //     free(main->tokens_list);
+
+    //     // Update main struct to use the new tokens
+    //     main->tokens_list = new_tokens;
+    //     main->cmd->arg_count = original_arg_count - 1;
+
+    //     // Set first token as command if args exist
+    //     if (main->cmd->arg_count > 0)
+    //         main->tokens_list[0].type = TOKEN_COMMAND;
+
+    //     main->exit_status = 0;
+    // }
+
+    return (EXIT_SUCCESS);
 }
 
 // int get_value_store_token(t_main *main, int *array)

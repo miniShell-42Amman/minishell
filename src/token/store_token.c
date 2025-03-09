@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   store_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 17:30:37 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/16 14:56:12 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/09 21:43:41 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	is_valid(int *array, int token_index)
+static int is_valid(int *array, int token_index)
 {
-	int	len;
-	int	i;
+	int len;
+	int i;
 
 	if (array == NULL)
 		return (0);
@@ -32,8 +32,8 @@ static int	is_valid(int *array, int token_index)
 	return (0);
 }
 
-t_token_type	determine_token_type(char *token, int token_index,
-		t_token *tokens_list, int *array)
+t_token_type determine_token_type(char *token, int token_index,
+								  t_token *tokens_list, int *array)
 {
 	if (ft_strcmp(token, "|") == 0 && !is_valid(array, token_index))
 		return (TOKEN_PIPE);
@@ -45,17 +45,15 @@ t_token_type	determine_token_type(char *token, int token_index,
 		return (TOKEN_REDIRECTION_APPEND);
 	else if (ft_strcmp(token, "<<") == 0 && !is_valid(array, token_index))
 		return (TOKEN_REDIRECTION_HEREDOC);
-	else if ((token_index == 0 && !is_valid(array, token_index))
-		|| (token_index > 0 && tokens_list[token_index - 1].type == TOKEN_PIPE
-			&& !is_valid(array, token_index)))
+	else if ((token_index == 0 && !is_valid(array, token_index)) || (token_index > 0 && tokens_list[token_index - 1].type == TOKEN_PIPE && !is_valid(array, token_index)))
 		return (TOKEN_COMMAND);
 	else
 		return (TOKEN_ARGUMENT);
 }
 
-static int	store_token_value(t_token *new_token, char **tokens_list, int i)
+static int store_token_value(t_token *new_token, char **tokens_list, int i)
 {
-	int	j;
+	int j;
 
 	if (tokens_list[i] == NULL)
 	{
@@ -78,7 +76,7 @@ static int	store_token_value(t_token *new_token, char **tokens_list, int i)
 	return (EXIT_SUCCESS);
 }
 
-int	if_loop(char **tokens_list, int i, t_token *new_token)
+int if_loop(char **tokens_list, int i, t_token *new_token)
 {
 	if (tokens_list[i] == NULL)
 	{
@@ -89,29 +87,36 @@ int	if_loop(char **tokens_list, int i, t_token *new_token)
 	return (EXIT_FAILURE);
 }
 
-t_token	*store_token(char **tokens_list, int token_count, int *array)
+t_token *store_token(char **tokens_list, int token_count, int *array, t_main *main)
 {
-	t_token	*new_token;
-	int		i;
-
-	new_token = ft_calloc(sizeof(t_token), token_count);
-	if (!new_token)
-	{
-		free_tokens(new_token, token_count);
-		return (NULL);
-	}
-	i = -1;
-	while (++i < token_count)
-	{
-		if (!if_loop(tokens_list, i, new_token))
-			continue ;
-		if (store_token_value(new_token, tokens_list, i))
-		{
-			free_tokens(new_token, token_count);
-			return (NULL);
-		}
-		new_token[i].type = determine_token_type(tokens_list[i], i, new_token,
-				array);
-	}
-	return (new_token);
+    t_token *new_token;
+    int     i;
+    if (tokens_list[0] && tokens_list[0][0] == '\0' &&
+        !ft_strchr("\'\"", main->input[skip_space(main->input)]))
+    {
+		free(tokens_list[0]);
+        int original_arg_count = main->cmd->arg_count;
+        for (int j = 0; j < original_arg_count - 1; j++)
+            tokens_list[j] = tokens_list[j + 1];
+        tokens_list[original_arg_count - 1] = NULL;
+        main->cmd->arg_count = original_arg_count - 1;	
+        token_count = main->cmd->arg_count;
+    }
+    if (token_count <= 0)
+        return (NULL);
+    new_token = ft_calloc(token_count, sizeof(t_token));
+    if (!new_token)
+        return (NULL);
+    for (i = 0; i < token_count; i++)
+    {
+        if (!if_loop(tokens_list, i, new_token))
+            continue;
+        if (store_token_value(new_token, tokens_list, i))
+        {
+            free_tokens(new_token, token_count);
+            return (NULL);
+        }
+        new_token[i].type = determine_token_type(tokens_list[i], i, new_token, array);
+    }
+    return (new_token);
 }

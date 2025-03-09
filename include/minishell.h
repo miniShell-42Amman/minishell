@@ -331,4 +331,7 @@ char				*get_data(t_expand_env *expand, t_var_func func,
 int	is_dollar_inside_quote(const char *str);
 void free_part_parse_cmd(t_parse_cmd *parse_cmd);
 void reset_parse_cmd(t_parse_cmd *parse_cmd);
+// void	count_dollars(t_parse_cmd *p, int *j);
+// void	process_dollars(t_parse_cmd *p, int *j, size_t *help);
+// void	cleanup_dollar_array(t_parse_cmd *p);
 #endif

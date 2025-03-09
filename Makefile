@@ -47,6 +47,7 @@ SRC = 	src/main.c 								\
 		src/expand/process_variable.c			\
 		src/expand/process_variable_function.c	\
 		src/expand/handle_var_length.c			\
+		src/env/utils/dollar_fncs.c				\
 
 
 OBJ_DIR = obj

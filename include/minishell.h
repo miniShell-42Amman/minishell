@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 extern int g_signal;
 
@@ -189,6 +191,14 @@ typedef struct s_expand_env
 	const char *start;
 } t_expand_env;
 
+typedef struct s_resolve_command_path
+{
+	char	*path_copy;
+	char	*path_token;
+	char	*full_path;
+	char	*path;
+}			t_resolve_command_path;
+
 typedef char *(*t_var_func)(t_expand_env *expand, const char *var_name);
 
 int create_node(t_env **node);
@@ -333,7 +343,29 @@ void free_part_parse_cmd(t_parse_cmd *parse_cmd);
 void reset_parse_cmd(t_parse_cmd *parse_cmd);
 void remove_empty_first_token(char **tokens_list, int *token_count,
 							  t_main *main);
-// void	count_dollars(t_parse_cmd *p, int *j);
-// void	process_dollars(t_parse_cmd *p, int *j, size_t *help);
-// void	cleanup_dollar_array(t_parse_cmd *p);
+size_t calculate_number_operations(t_token *tokens, size_t token_count);
+void exit_error(char *message, t_execute *execute);
+int is_directory(const char *path);
+int is_commands(t_execute *execute, int flag);
+char *resolve_command_path(char *command, t_execute *execute, t_main *main);
+char	*handle_valid_path(t_resolve_command_path *resolve_cmd,
+	t_execute *execute);
+void	git_data_for_resolve_cmd(t_resolve_command_path *resolve_cmd,
+		char *command,
+		t_main *main,
+		t_execute *execute);
+void	dup_and_check(t_resolve_command_path *resolve_cmd, t_execute *execute,
+			t_main *main);
+char	*handle_absolute_or_relative_path(char *command, t_execute *execute);
+int	check_command_resolve(char *command, t_execute *execute, t_main *main);
+int create_pipes(t_execute *execute, int *check);
+int fork_and_execute(t_execute *execute, t_main *main);
+void close_pipes_and_wait(t_execute *execute);
+void execute_builtin(t_execute *execute, t_main *main);
+int handle_builtins(t_execute *execute, t_main *main);
+void execute_command(t_execute *execute, t_main *main);
+int init_command(t_token *token, size_t token_count, t_execute *execute);
+int fill_commands(t_token *token, size_t token_count, t_execute *execute);
+int preprocess_heredocs(t_execute *execute, t_main *main);
+
 #endif

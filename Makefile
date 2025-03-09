@@ -49,6 +49,13 @@ SRC = 	src/main.c 								\
 		src/expand/handle_var_length.c			\
 		src/env/utils/dollar_fncs.c				\
 		src/token/token_utils_second.c			\
+		src/execute/utils/utils_execute.c		\
+		src/execute/resolve_command_path.c		\
+		src/execute/resolve_cmd_path_utils.c	\
+		src/execute/pipe_and_fork.c				\
+		src/execute/utils/execute_builtin.c		\
+		src/execute/full_and_init_cmd.c			\
+		src/execute/preprocess_heredocs.c		\
 
 
 OBJ_DIR = obj

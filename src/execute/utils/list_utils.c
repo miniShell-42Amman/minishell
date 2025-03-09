@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   list_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 22:23:35 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/09 22:24:22 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/10 00:19:27 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int ft_list_size(t_env *env_list)
+int	ft_list_size(t_env *env_list)
 {
-	int count;
-	t_env *current;
+	int		count;
+	t_env	*current;
 
 	count = 0;
 	current = env_list;
@@ -26,9 +26,10 @@ int ft_list_size(t_env *env_list)
 	}
 	return (count);
 }
-int allocate_env_entry(char ***envp, t_env *current, int i)
+
+int	allocate_env_entry(char ***envp, t_env *current, int i)
 {
-	size_t envp_len;
+	size_t	envp_len;
 
 	envp_len = 0;
 	if (current->has_value && current->value)
@@ -52,10 +53,10 @@ int allocate_env_entry(char ***envp, t_env *current, int i)
 	return (EXIT_SUCCESS);
 }
 
-int fill_env_list(char ***envp, t_env *env_list, int envp_count)
+int	fill_env_list(char ***envp, t_env *env_list, int envp_count)
 {
-	int i;
-	t_env *current;
+	int		i;
+	t_env	*current;
 
 	i = 0;
 	current = env_list;
@@ -70,18 +71,19 @@ int fill_env_list(char ***envp, t_env *env_list, int envp_count)
 	return (EXIT_SUCCESS);
 }
 
-char **convert_env_to_list(t_env *env_list)
+char	**convert_env_to_list(t_env *env_list)
 {
-	int env_count = ft_list_size(env_list);
-	char **envp = ft_calloc(env_count + 1, sizeof(char *));
+	int		env_count;
+	char	**envp;
 
+	env_count = ft_list_size(env_list);
+	envp = ft_calloc(env_count + 1, sizeof(char *));
 	if (!envp)
 	{
 		ft_free_split(envp);
 		perror("minishell: malloc error");
 		return (NULL);
 	}
-
 	if (fill_env_list(&envp, env_list, env_count))
 	{
 		ft_free_split(envp);

@@ -66,7 +66,6 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 	if (!token || !env)
 		return (ft_strdup(""));
 	parse_cmd->arr_has_dollar_count = 0;
-	printf("calculate_length(&expand_env) = %zu\n", calculate_length(&expand_env));
 	expand_env.result = ft_calloc(calculate_length(&expand_env) + 1,
 			sizeof(char));
 	expand_env.parse_cmd->arr_has_dollar_count = 0;

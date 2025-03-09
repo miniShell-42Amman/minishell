@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_variable.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 22:24:23 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 22:39:23 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/09 22:17:27 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	array_has_dolloar(t_expand_env *e, char **value, size_t *var_len,
 {
 	if (e->parse_cmd->arr_has_dollar
 		&& e->parse_cmd->arr_has_dollar[
-			e->parse_cmd->arr_has_dollar_count] != (size_t) - 1)
+			e->parse_cmd->arr_has_dollar_count] != (size_t)-1)
 	{
 		*var_len = e->parse_cmd->arr_has_dollar[
 			e->parse_cmd->arr_has_dollar_count];
@@ -62,18 +62,26 @@ void	if_value(t_expand_env *expand, char **value, int *should_free)
 	}
 }
 
+static void	init_values_process_variable(t_expand_env *expand, char var_name[],
+		char **value, int *should_free)
+{
+	var_name[0] = *expand->token;
+	var_name[1] = '\0';
+	*value = NULL;
+	*should_free = 0;
+	expand->token++;
+	expand->start = expand->token;
+}
+
 void	process_variable(t_expand_env *expand)
 {
 	char	*value;
 	size_t	var_len;
 	int		should_free;
-	char	var_name[2] = {*expand->token, '\0'};
-	
-	value = NULL;
-	should_free = 0;
+	char	var_name[2];
+
+	init_values_process_variable(expand, var_name, &value, &should_free);
 	var_len = 0;
-	expand->token++;
-	expand->start = expand->token;
 	if (*expand->token == '?')
 		value = get_data(expand, var_ft_itoa, var_name, &should_free);
 	else if (*expand->token == '0')

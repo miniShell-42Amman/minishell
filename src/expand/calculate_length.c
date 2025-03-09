@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:45:32 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/09 00:53:23 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/09 22:15:05 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,18 @@ void	free_dollar_array(t_parse_cmd *parse_cmd)
 	}
 }
 
-int if_check_for_loop(t_expand_env *expand, const char **token, size_t *len)
+int	if_check_for_loop(t_expand_env *expand, const char **token, size_t *len)
 {
 	if (**token == '$'
-		&& !is_string_inside_single(
-			expand->parse_cmd->splitter_clean_input[
+		&& !is_string_inside_single(expand->parse_cmd->splitter_clean_input[
 				expand->parse_cmd->index_splitter])
-		&& ((*( *token + 1)) != ' ' && (*( *token + 1)) != '\0'))
+		&& ((*(*token + 1)) != ' ' && (*(*token + 1)) != '\0'))
 	{
 		(*token)++;
 		*len += handle_var_length(token, expand);
 		return (EXIT_SUCCESS);
 	}
-	return (EXIT_FAILURE);	
+	return (EXIT_FAILURE);
 }
 
 size_t	calculate_length(t_expand_env *expand)

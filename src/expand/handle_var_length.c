@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 01:04:30 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/09 01:06:49 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/09 22:15:22 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ void	function_else_check(const char **token, t_expand_env *expand,
 		size_t *var_len)
 {
 	if (expand->parse_cmd->arr_has_dollar
-		&& expand->parse_cmd->arr_has_dollar
-		[expand->parse_cmd->arr_has_dollar_count] != (size_t)-1)
+		&& expand->parse_cmd->arr_has_dollar[
+			expand->parse_cmd->arr_has_dollar_count] != (size_t)-1)
 	{
-		*var_len = expand->parse_cmd->arr_has_dollar
-		[expand->parse_cmd->arr_has_dollar_count];
+		*var_len = expand->parse_cmd->arr_has_dollar[
+			expand->parse_cmd->arr_has_dollar_count];
 		*token += *var_len;
 		expand->parse_cmd->arr_has_dollar_count++;
 	}
@@ -38,7 +38,7 @@ size_t	handle_special_cases(const char **token, t_expand_env *expand,
 		char **value)
 {
 	char	var_name[2];
-	
+
 	var_name[0] = **token;
 	var_name[1] = '\0';
 	if (**token == '?')

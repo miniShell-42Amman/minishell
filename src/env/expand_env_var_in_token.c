@@ -1,4 +1,54 @@
 #include "minishell.h"
+void	calculate_dollar_array(t_parse_cmd *p)
+{
+	int		i;
+	int		j;
+	size_t	help;
+
+	i = 0;
+	j = 0;
+	while (p->splitter_clean_input[p->index_splitter][i])
+	{
+		if (p->splitter_clean_input[p->index_splitter][i] == '$')
+		{
+			j++;
+		}
+		i++;
+	}
+	p->arr_has_dollar = malloc(sizeof(size_t) * (j + 1));
+	if (!p->arr_has_dollar)
+		return ;
+	i = 0;
+	j = 0;
+	help = 0;
+	while (p->splitter_clean_input[p->index_splitter][i])
+	{
+		if (p->splitter_clean_input[p->index_splitter][i] == '$')
+		{
+			if (p->splitter_clean_input[p->index_splitter][i + 1] == '?')
+			{
+				p->arr_has_dollar[j++] = 1;
+				i += 2;
+				continue ;
+			}
+			help = 0;
+			i++;
+			while (p->splitter_clean_input[p->index_splitter][i + help]
+				&& (ft_isalnum(p->splitter_clean_input[p->index_splitter][i
+						+ help]) || p->splitter_clean_input[p->index_splitter][i
+					+ help] == '_'))
+			{
+				help++;
+			}
+			p->arr_has_dollar[j++] = help;
+		}
+		else
+		{
+			i++;
+		}
+	}
+	p->arr_has_dollar[j] = (size_t)-1;
+}
 
 int	is_string_inside_single(const char *token)
 {
@@ -6,12 +56,12 @@ int	is_string_inside_single(const char *token)
 	int		quote_count;
 	char	parent;
 
-	i = -1;
+	i = 0;
 	quote_count = 0;
 	parent = 0;
 	if (!token)
 		return (0);
-	while (token[i++])
+	while (token[i])
 	{
 		if (token[i] == '\'' || token[i] == '"')
 		{
@@ -21,18 +71,16 @@ int	is_string_inside_single(const char *token)
 				parent = 0;
 			quote_count++;
 		}
+		i++;
 	}
-	return (quote_count % 2 != 0 && parent == '\'');
+	if (quote_count % 2 != 0)
+		return (0);
+	if (parent == '\'')
+		return (1);
+	else
+		return (0);
 }
-static void reset_arr_dollar(t_parse_cmd *parse_cmd)
-{
-	parse_cmd->arr_has_dollar_count = 0;
-	if (parse_cmd->arr_has_dollar)
-	{
-		free(parse_cmd->arr_has_dollar);
-		parse_cmd->arr_has_dollar = NULL;
-	}
-}
+
 
 void expand_loop(t_expand_env *expand_env)
 {
@@ -65,7 +113,7 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 		t_parse_cmd *parse_cmd)
 {
 	t_expand_env	expand_env;
-
+	
 	ft_bzero(&expand_env, sizeof(t_expand_env));
 	expand_env.token = token;
 	expand_env.env = env;
@@ -83,7 +131,12 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 	if (!expand_env.result)
 		return (NULL);
 	expand_loop(&expand_env);	
-	reset_arr_dollar(parse_cmd);
+	parse_cmd->arr_has_dollar_count = 0;
+	if (parse_cmd->arr_has_dollar)
+	{
+		free(parse_cmd->arr_has_dollar);
+		parse_cmd->arr_has_dollar = NULL;
+	}
 	expand_env.result[expand_env.j] = '\0';
 	return (expand_env.result);
 }

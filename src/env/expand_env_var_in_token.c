@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expand_env_var_in_token.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/10 02:40:35 by lalhindi          #+#    #+#             */
+/*   Updated: 2025/03/10 02:49:25 by lalhindi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	is_string_inside_single(const char *token)
@@ -23,34 +35,45 @@ int	is_string_inside_single(const char *token)
 		}
 		i++;
 	}
-	return (quote_count % 2 != 0 && parent == '\'');
+	if (quote_count % 2 != 0 && parent == '\'')
+		return (1);
+	return (0);
 }
 
-
-void expand_loop(t_expand_env *expand_env)
+void	expand_loop(t_expand_env *exenv)
 {
-	while (*expand_env->token)
+	while (*exenv->token)
 	{
-		update_quote_state(*expand_env->token, &expand_env->squote, &expand_env->dquote);
-		if (*expand_env->token == '$'
-			&& !is_string_inside_single(expand_env->parse_cmd->splitter_clean_input[expand_env->parse_cmd->index_splitter])
-			&& (*(expand_env->token + 1) != ' '
-			&& *(expand_env->token + 1) != '\0'))
+		update_quote_state(*exenv->token, &exenv->squote,
+			&exenv->dquote);
+		if (*exenv->token == '$' && !is_string_inside_single(
+				exenv->parse_cmd->splitter_clean_input[
+					exenv->parse_cmd->index_splitter])
+			&& (*(exenv->token + 1) != ' ' && *(exenv->token + 1) != '\0'))
 		{
-			if (expand_env->parse_cmd->index_splitter >= 1
-				&& ft_strnstr(expand_env->parse_cmd->splitter_clean_input
-					[expand_env->parse_cmd->index_splitter - 1], "<<", 2))
+			if (exenv->parse_cmd->index_splitter >= 1 && ft_strnstr(
+					exenv->parse_cmd->splitter_clean_input[
+						exenv->parse_cmd->index_splitter - 1], "<<", 2))
 			{
-				expand_env->result[expand_env->j++] = *expand_env->token++;
+				exenv->result[exenv->j++] = *exenv->token++;
 				continue ;
 			}
 			else
 			{
-				process_variable(expand_env);
+				process_variable(exenv);
 				continue ;
 			}
 		}
-		expand_env->result[expand_env->j++] = *expand_env->token++;
+		exenv->result[exenv->j++] = *exenv->token++;
+	}
+}
+
+void	free_arr_has_dollar(t_parse_cmd *parse_cmd)
+{
+	if (parse_cmd->arr_has_dollar)
+	{
+		free(parse_cmd->arr_has_dollar);
+		parse_cmd->arr_has_dollar = NULL;
 	}
 }
 
@@ -58,7 +81,7 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 		t_parse_cmd *parse_cmd)
 {
 	t_expand_env	expand_env;
-	
+
 	ft_bzero(&expand_env, sizeof(t_expand_env));
 	expand_env.token = token;
 	expand_env.env = env;
@@ -70,18 +93,15 @@ char	*expand_env_variables_in_token(const char *token, t_env *env,
 			sizeof(char));
 	expand_env.parse_cmd->arr_has_dollar_count = 0;
 	if (parse_cmd->splitter_clean_input[parse_cmd->index_splitter]
-		&& is_dolloar_quote(token) == is_dolloar_quote(parse_cmd->splitter_clean_input[parse_cmd->index_splitter])
+		&& is_dolloar_quote(token) == is_dolloar_quote(
+			parse_cmd->splitter_clean_input[parse_cmd->index_splitter])
 		&& is_dolloar_quote(token) > 0)
 		calculate_dollar_array(parse_cmd);
 	if (!expand_env.result)
 		return (NULL);
-	expand_loop(&expand_env);	
+	expand_loop(&expand_env);
 	parse_cmd->arr_has_dollar_count = 0;
-	if (parse_cmd->arr_has_dollar)
-	{
-		free(parse_cmd->arr_has_dollar);
-		parse_cmd->arr_has_dollar = NULL;
-	}
+	free_arr_has_dollar(parse_cmd);
 	expand_env.result[expand_env.j] = '\0';
 	return (expand_env.result);
 }

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections_utils.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/10 02:25:24 by lalhindi          #+#    #+#             */
+/*   Updated: 2025/03/10 02:25:35 by lalhindi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -5,7 +16,7 @@ char	*append_str(char *dest, size_t *dest_size, const char *src)
 {
 	size_t	src_len;
 	char	*new_ptr;
-	char 	*old_dest;
+	char	*old_dest;
 
 	src_len = ft_strlen(src);
 	old_dest = dest;
@@ -55,7 +66,7 @@ int	redirection_check(t_redirections *redirections)
 	redirections->target = redirections->argv[redirections->j + 1];
 	if (!redirections->target && ft_dprintf(STDERR_FILENO,
 			"Erorr404: syntax error near token `%s'\n", redirections->op))
-				exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	choose_flags_fd(redirections, &flags, &fd, &std_fd);
 	if (dup2(fd, std_fd) < 0)
 	{

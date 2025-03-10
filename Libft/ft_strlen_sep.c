@@ -23,7 +23,7 @@ int	ft_strlen_sep(char *str, int c, bool *has_value)
 		if (str[i] == c)
 		{
 			*has_value = true;
-			break;
+			break ;
 		}
 		i++;
 	}

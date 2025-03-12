@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 17:32:19 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/15 17:32:19 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/12 23:33:03 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,4 +36,6 @@ void	free_resources(t_main *main, int flag)
 		free_command(main->cmd);
 		main->cmd = NULL;
 	}
+	if (main->fd && flag)
+		close(main->fd);
 }

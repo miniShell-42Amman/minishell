@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 00:09:27 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 00:37:06 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/12 21:48:44 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,12 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-int	ft_exit(char **args)
+int	ft_exit(char **args, int *must_exit)
 {
 	int	argc;
 
 	argc = 0;
+	*must_exit = 1;
 	while (args[argc])
 		argc++;
 	if (argc == 1)
@@ -53,5 +54,6 @@ int	ft_exit(char **args)
 			return (ft_atoi(args[1]));
 	}
 	ft_dprintf(STDERR_FILENO, "exit: too many arguments\n");
+	*must_exit = 0;
 	return (1);
 }

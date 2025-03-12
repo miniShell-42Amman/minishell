@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/10 03:15:51 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/12 23:31:35 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # define _DEFAULT_SOURCE
 # define WARING_EOF "Erorr404: warning: here-document delimited by EOF\n"
 # define EXIT_BREAK 2
+# define EXIT_CONTINUE 3
 
 # include "libft.h"
 # include <errno.h>
@@ -110,6 +111,7 @@ typedef struct s_main
 	char			*program_name;
 	int				skip_spaces;
 	char			*path;
+	int				fd;
 }					t_main;
 
 typedef struct s_split
@@ -288,7 +290,7 @@ void				update_existing_env(t_env *tmp, char *v);
 void				update_env(t_env **env, char *k, char *v);
 void				add_new_env(t_env **env, char *k, char *v);
 char				*remove_quotes(char *str);
-int					ft_exit(char **args);
+int					ft_exit(char **args, int *must_exit);
 int					redirection_check_else_if(t_redirections *redirections,
 						t_execute *execute, t_main *main);
 void				if_redirections_heredoc_all(t_redirections *redirections,
@@ -310,7 +312,8 @@ void				free_redirections(t_redirections *redirections);
 void				free_here_doc(t_here_document *here_doc);
 void				increment_shell_level(t_env **env_list);
 char				*search_command(char *search);
-int					handle_many_args(int ac, char **av, t_main *main);
+int					handle_many_args(int ac, char **av, char **env,
+						t_main *main);
 int					help_loop(t_main *main);
 void				loop_main(t_main *main);
 int					skip_space(char *str);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_parse.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 19:06:49 by oissa             #+#    #+#             */
-/*   Updated: 2025/02/14 19:06:49 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/12 23:24:14 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ t_cmd	ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 		ft_free_split(parse_cmd->cmd.args);
 	if (parse_cmd->splitter_clean_input)
 		ft_free_split(parse_cmd->splitter_clean_input);
+	if (parse_cmd->must_splitter)
+		free(parse_cmd->must_splitter);
 	if (parse_cmd->cmd.cmd)
 		free(parse_cmd->cmd.cmd);
 	if (parse_cmd->buffer)
@@ -79,6 +81,7 @@ t_cmd	ft_free_parse_cmd(t_parse_cmd *parse_cmd)
 	parse_cmd->cmd.cmd = NULL;
 	parse_cmd->buffer = NULL;
 	parse_cmd->arr_has_dollar = NULL;
+	parse_cmd->must_splitter = NULL;
 	return (parse_cmd->cmd);
 }
 
@@ -100,7 +103,7 @@ int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 	if (parse_cmd->arr_has_dollar)
 		free(parse_cmd->arr_has_dollar);
 	if (parse_cmd->buffer)
-		free(parse_cmd->buffer);
+		free(parse_cmd->buffer);	
 	parse_cmd->clean_input = NULL;
 	parse_cmd->arr_has_dollar = NULL;
 	parse_cmd->buffer = NULL;

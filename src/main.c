@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:43:46 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/10 02:49:15 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/12 21:02:44 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	main(int ac, char **av, char **env)
 	t_main	main;
 
 	ft_bzero(&main, sizeof(t_main));
-	if (handle_many_args(ac, av, &main))
+	if (handle_many_args(ac, av, env, &main))
 		return (EXIT_FAILURE);
 	main.env_list = clone_env(env);
 	increment_shell_level(&main.env_list);

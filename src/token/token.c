@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/08 23:41:05 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/12 23:20:22 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,5 +130,6 @@ t_cmd	*parse_cmd(t_main *main)
 	if (parse_disassemble_args(&parse_cmd, cmd_result, main))
 		return (NULL);
 	free_part_parse_cmd(&parse_cmd);
+	
 	return (cmd_result);
 }

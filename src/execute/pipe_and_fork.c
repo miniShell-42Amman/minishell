@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_and_fork.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:26:58 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/10 00:30:18 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/12 22:17:53 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,14 @@ void	free_and_exit_status(t_execute *execute, t_main *main)
 	main->exit_status = 1;
 }
 
+int	start_cmd_main_proses(t_execute *execute, t_main *main)
+{
+	if (handle_builtins(execute, main) == 10)
+		return (EXIT_FAILURE);
+	execute->i++;
+	return (EXIT_CONTINUE);
+}
+
 int	fork_and_execute(t_execute *execute, t_main *main)
 {
 	execute->pids = ft_calloc(execute->num_cmds, sizeof(pid_t));
@@ -49,8 +57,8 @@ int	fork_and_execute(t_execute *execute, t_main *main)
 	{
 		if (execute->num_cmds == 1 && is_commands(execute, 1) == EXIT_SUCCESS)
 		{
-			handle_builtins(execute, main);
-			execute->i++;
+			if (start_cmd_main_proses(execute, main) == EXIT_FAILURE)
+				return (EXIT_FAILURE);
 			continue ;
 		}
 		execute->pid = fork();

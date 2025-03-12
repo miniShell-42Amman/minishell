@@ -64,30 +64,41 @@ OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 RED = \033[0;31m
 RESET = \033[0m
+N		=	\033[m
+R		=	\033[0;31m
+G		=	\033[0;32m
+Y		=	\033[0;33m
+B		=	\033[0;34m
+P		=	\033[0;35m
+T		=	\033[0;36m
+
 
 all: $(LIBFT) $(NAME)
 
 $(LIBFT):
-	@$(MAKE) -C $(LIBFT_DIR)
+	@$(MAKE) -C $(LIBFT_DIR) --no-print-directory
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
+	@printf "$(R)%b $(Y)%10b $(G)%-34b $(R)%b$(R)\n" "#" "compiling" "$@"
+
 
 # -lreadline 
 $(NAME): $(LIBFT) $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) -lreadline 
 	@echo "$(RED)#################################################$(RESET)"
 	@echo "$(RED)#        💀💀💀 minishell ready 💀💀💀          #$(RESET)"
+	@echo "$(RED)#      💻💻💻  Credit by Loiy & Omar 💻💻💻	#$(RESET)"
 	@echo "$(RED)#################################################$(RESET)"
 
 clean: 
 	@$(RM) -r $(OBJ_DIR)
-	@$(MAKE) -C $(LIBFT_DIR) clean
+	@$(MAKE) -C $(LIBFT_DIR) clean --no-print-directory
 
 fclean: clean
 	@$(RM) $(NAME)
-	@$(MAKE) -C $(LIBFT_DIR) fclean
+	@$(MAKE) -C $(LIBFT_DIR) fclean --no-print-directory
 
 re: fclean all
 

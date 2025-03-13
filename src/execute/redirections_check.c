@@ -6,28 +6,14 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:11:02 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 22:15:45 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:40:49 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	shift_redirections_argv(t_redirections *redirections)
-{
-	int	k;
-
-	k = redirections->j;
-	while (redirections->argv[k + 2])
-	{
-		redirections->argv[k] = redirections->argv[k + 2];
-		k++;
-	}
-	redirections->argv[k] = NULL;
-	redirections->j -= 2; // تعديل المؤشر لتعويض العناصر المحذوفة
-}
-
 int	redirection_check(t_redirections *redirections, t_main *main,
-		t_execute *execute,int i)
+		t_execute *execute, int i)
 {
 	t_fd_flags	fd_flags;
 

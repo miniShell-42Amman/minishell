@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:23:26 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 22:12:54 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:53:32 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,46 +74,12 @@ void	if_redirections_heredoc_all(t_redirections *redirections, t_main *main,
 		if (write(pipefd[1], redirections->heredoc_all,
 				redirections->heredoc_total_size) < 0)
 			ft_perror_free_exit("write error", execute, main, redirections);
-		close(pipefd[1]); // Only close, don't free here
+		close(pipefd[1]);
 		if (dup2(pipefd[0], STDIN_FILENO) < 0)
 			ft_perror_free_exit("dup2 error", execute, main, redirections);
 		close(pipefd[0]);
 	}
 	free_redirections(redirections);
-}
-
-size_t	ft_determine_number_of_commands(t_execute *execute)
-{
-	size_t	num_command;
-	size_t	i;
-	size_t	n_commands;
-
-	i = 0;
-	n_commands = 0;
-	num_command = 0;
-	while (i < execute->i)
-	{
-		while (execute->commands[i][n_commands])
-		{
-			n_commands++;
-		}
-		if (execute->i > 0)
-			num_command++;
-		num_command += n_commands;
-		n_commands = 0;
-		i++;
-	}
-	return (num_command);
-}
-
-int	count_arg(char **argv)
-{
-	int	i;
-
-	i = 0;
-	while (argv[i])
-		i++;
-	return (i);
 }
 
 void	process_redirection(t_redirections *r, t_main *main, t_execute *ex,
@@ -138,65 +104,30 @@ void	process_redirection(t_redirections *r, t_main *main, t_execute *ex,
 	}
 }
 
-int is_redirection(char *str)
-{
-	if (ft_strcmp(str, ">") == 0 || ft_strcmp(str, ">>") == 0
-		|| ft_strcmp(str, "<") == 0 || ft_strcmp(str, "<<") == 0)
-		return (1);
-	return (0);
-}
-
-static void	clean_arguments(t_execute *execute, t_redirections *r)
-{
-	char	**new_argv;
-	int		i;
-	int		k;
-
-	new_argv = ft_calloc(count_arg(r->argv) + 1, sizeof(char *));
-	if (!new_argv) return;
-
-	i = -1;
-	k = 0;
-	while (r->argv[++i])
-	{
-		if (is_redirection(r->argv[i]) && r->argv[i + 1])
-		{
-			i++;
-			continue;
-		}
-		new_argv[k++] = ft_strdup(r->argv[i]);
-	}
-	execute->commands[execute->i] = new_argv;
-}
-
 void	handle_redirections(t_execute *execute, t_main *main)
 {
 	t_redirections	redirections;
-	// int				num_command;
+	int				num_command;
 	int				i;
 
 	i = 0;
 	ft_bzero(&redirections, sizeof(t_redirections));
 	redirections.exit_status = execute->exit_status;
 	redirections.argv = execute->commands[execute->i];
-	// num_command = ft_determine_number_of_commands(execute);
+	num_command = ft_determine_number_of_commands(execute);
 	while (redirections.argv[i])
 	{
-		if (is_redirection(redirections.argv[i]))
+		if (is_redirection(redirections.argv[i])
+			&& main->tokens_list[num_command + i].type != TOKEN_ARGUMENT)
 		{
-			if (!redirections.argv[i + 1])
-			{
-				ft_dprintf(2, "Syntax error near token '%s'\n", redirections.argv[i]);
-				*execute->exit_status = 258;
-				break;
-			}
+			if (check_target_redirecion(&redirections, execute,
+					i) == EXIT_BREAK)
+				break ;
 			process_redirection(&redirections, main, execute, i);
 			i += 2;
 		}
 		else
-		{
 			i++;
-		}
 	}
 	clean_arguments(execute, &redirections);
 	if_redirections_heredoc_all(&redirections, main, execute);

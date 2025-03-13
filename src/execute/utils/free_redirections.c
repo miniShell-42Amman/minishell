@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 22:21:13 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/09 22:21:36 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:39:40 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,6 @@ void	free_redirections(t_redirections *redirections)
 	{
 		free(redirections->heredoc_all);
 		redirections->heredoc_all = NULL;
-	}
-	if (redirections->op)
-	{
-		free(redirections->op);
-		redirections->op = NULL;
-	}
-	if (redirections->target)
-	{
-		free(redirections->target);
-		redirections->target = NULL;
 	}
 	if (redirections->current_doc)
 	{

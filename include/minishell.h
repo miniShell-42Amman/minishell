@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 21:38:38 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:54:57 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -407,5 +407,8 @@ void				loop_get_next_line(t_main *main);
 int					check_shell_args(char **av, char **env, t_main *main);
 void				errno_massage(t_execute *execute);
 int					ft_count_redirections(char *argv);
-
+void				clean_arguments(t_execute *execute, t_redirections *r);
+int					is_redirection(char *str);
+int					check_target_redirecion(t_redirections *redirections,
+						t_execute *execute, int i);
 #endif

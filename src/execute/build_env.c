@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   build_env.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 21:49:48 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/10 00:10:58 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/13 02:39:13 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ void	execute_part(t_execute *execute, t_main *main)
 		{
 			ft_dprintf(2, "Error404: command not found");
 			*execute->exit_status = 127;
+		}
+		else if (errno == EACCES)
+		{
+			ft_dprintf(2, "Error404: %s: Permission denied\n",
+				execute->commands[execute->i][0]);
+			*execute->exit_status = 126;
 		}
 		else
 		{

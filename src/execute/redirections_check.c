@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:11:02 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/10 02:24:57 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 02:32:36 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ int	redirection_check(t_redirections *redirections, t_main *main,
 	if (!redirections->target && ft_dprintf(STDERR_FILENO,
 			"Erorr404: syntax error near token `%s'\n", redirections->op))
 	{
-		free_redirections(redirections);
+		free_execute(execute, 0);
+		free_resources(main, 1);
+		*redirections->exit_status = 2;
 		exit(EXIT_FAILURE);
 	}
 	choose_flags_fd(redirections, &fd_flags, main, execute);

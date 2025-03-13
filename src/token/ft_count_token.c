@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 23:11:00 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/08 23:11:02 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 00:08:51 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,21 @@
 
 static int	is_valid_operator(char *token, int pos, char **tokens)
 {
+	(void)pos;
+	(void)tokens;
 	if (ft_strchr(token, '\'') || ft_strchr(token, '"'))
 		return (0);
 	if (ft_strcmp(token, "|") == 0)
 	{
-		if (pos == 0 || !tokens[pos + 1])
-			return (0);
+		// if (pos == 0 || !tokens[pos + 1])
+		// 	return (0);
 		return (1);
 	}
 	if (ft_strcmp(token, ">") == 0 || ft_strcmp(token, "<") == 0
 		|| ft_strcmp(token, ">>") == 0 || ft_strcmp(token, "<<") == 0)
 	{
-		if (!tokens[pos + 1])
-			return (0);
+		// if (!tokens[pos + 1])
+		// 	return (0);
 		return (1);
 	}
 	return (1);

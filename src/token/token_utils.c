@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 23:51:03 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/08 23:51:05 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 03:41:19 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,8 @@ int	is_duplicate_operator_series(t_token *t, int count, int *status)
 		if (t[i].type == 6 && t[i + 1].type == 6)
 			return (print_syntax_error("|", status));
 	}
-	if (t[i].type == 6)
-		return (print_syntax_error("|", status));
+	if (t[i].type == 6 || t[i].type == 5
+		|| t[i].type == 4 || t[i].type == 3 || t[i].type == 2)
+		return (print_syntax_error(t[i].value, status));
 	return (EXIT_SUCCESS);
 }

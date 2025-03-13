@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/12 23:31:35 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 02:10:13 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,7 @@ typedef struct s_redirections
 	size_t			current_size;
 	char			*line;
 	int				*exit_status;
+	int				start_index;
 }					t_redirections;
 
 typedef struct s_here_document
@@ -353,8 +354,7 @@ char				*resolve_command_path(char *command, t_execute *execute,
 						t_main *main);
 char				*handle_valid_path(t_resolve_command_path *resolve_cmd,
 						t_execute *execute);
-void				git_data_for_resolve_cmd(
-						t_resolve_command_path *resolve_cmd,
+void				git_data_for_resolve_cmd(t_resolve_command_path *resolve_cmd,
 						char *command, t_main *main, t_execute *execute);
 void				dup_and_check(t_resolve_command_path *resolve_cmd,
 						t_execute *execute, t_main *main);
@@ -391,4 +391,16 @@ int					handle_heredoc_target(t_here_document *here_doc);
 int					handle_heredoc_eof(t_here_document *here_doc);
 int					handle_heredoc_signal(t_here_document *here_doc,
 						t_redirections *redirections);
+int					if_global_signal(int *tmp);
+int					get_num_tokens(char **command);
+int					*compute_start_indices(t_execute *execute);
+int					check_for_cmp(t_redirections *redirections,
+						t_execute *execute, t_main *main);
+int					loop_heredoc(t_redirections *redirections,
+						t_execute *execute, t_main *main);
+void				init_redirections(t_redirections *redirections,
+						t_execute *execute, int i, int start_index);
+int					free_and_close(int **start_indices, int *tmp);
+int					preprocess_heredocs(t_execute *execute, t_main *main);
+
 #endif

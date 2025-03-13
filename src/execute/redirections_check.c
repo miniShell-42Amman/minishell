@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:11:02 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 02:32:36 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 22:15:45 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,25 @@
 
 void	shift_redirections_argv(t_redirections *redirections)
 {
-	while (redirections->argv[redirections->k + 2])
+	int	k;
+
+	k = redirections->j;
+	while (redirections->argv[k + 2])
 	{
-		redirections->argv[redirections->k] = redirections->argv[redirections->k
-			+ 2];
-		redirections->k++;
+		redirections->argv[k] = redirections->argv[k + 2];
+		k++;
 	}
+	redirections->argv[k] = NULL;
+	redirections->j -= 2; // تعديل المؤشر لتعويض العناصر المحذوفة
 }
 
 int	redirection_check(t_redirections *redirections, t_main *main,
-		t_execute *execute)
+		t_execute *execute,int i)
 {
 	t_fd_flags	fd_flags;
 
-	redirections->op = redirections->argv[redirections->j];
-	redirections->target = redirections->argv[redirections->j + 1];
+	redirections->op = redirections->argv[i];
+	redirections->target = redirections->argv[i + 1];
 	if (!redirections->target && ft_dprintf(STDERR_FILENO,
 			"Erorr404: syntax error near token `%s'\n", redirections->op))
 	{
@@ -38,16 +42,12 @@ int	redirection_check(t_redirections *redirections, t_main *main,
 		exit(EXIT_FAILURE);
 	}
 	choose_flags_fd(redirections, &fd_flags, main, execute);
-	if (dup2(fd_flags.fd, fd_flags.std_fd) < 0)
+	if (fd_flags.fd != -1)
 	{
-		perror("Erorr404: dup2");
-		free_redirections(redirections);
-		exit(EXIT_FAILURE);
+		if (dup2(fd_flags.fd, fd_flags.std_fd) == -1)
+			ft_perror_free_exit("dup2 error", execute, main, redirections);
+		close(fd_flags.fd);
 	}
-	close(fd_flags.fd);
-	redirections->k = redirections->j;
-	shift_redirections_argv(redirections);
-	redirections->argv[redirections->k] = NULL;
 	return (EXIT_SUCCESS);
 }
 

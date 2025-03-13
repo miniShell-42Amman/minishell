@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 17:20:27 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/13 21:38:38 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,7 @@ int					redirection_check_else_if_loop(t_redirections *redirections,
 						t_here_document *here_doc, t_execute *execute,
 						t_main *main);
 int					redirection_check(t_redirections *redirections,
-						t_main *main, t_execute *execute);
+						t_main *main, t_execute *execute, int i);
 void				choose_flags_fd(t_redirections *redirections,
 						t_fd_flags *fd_flags, t_main *main, t_execute *execute);
 char				*append_str(char *dest, size_t *dest_size, const char *src);
@@ -380,7 +380,7 @@ int					redirection_check_else_if_loop(t_redirections *redirections,
 						t_here_document *here_doc, t_execute *execute,
 						t_main *main);
 int					redirection_check(t_redirections *redirections,
-						t_main *main, t_execute *execute);
+						t_main *main, t_execute *execute, int i);
 void				choose_flags_fd(t_redirections *redirections,
 						t_fd_flags *fd_flags, t_main *main, t_execute *execute);
 void				if_redirections_heredoc_all(t_redirections *redirections,

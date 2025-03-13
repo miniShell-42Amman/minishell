@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:23:26 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 03:35:05 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:20:09 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <errno.h>
 
 char	*append_str(char *dest, size_t *dest_size, const char *src)
 {
@@ -107,21 +106,7 @@ size_t	ft_determine_number_of_commands(t_execute *execute)
 	}
 	return (num_command);
 }
-int ft_count_redirections(char *argv)
-{
-	int i;
-	int count;
 
-	i = 0;
-	count = 0;
-	while (argv[i])
-	{
-		if (argv[i] == '>')
-			count++;
-		i++;
-	}
-	return (count);
-}
 void	handle_redirections(t_execute *execute, t_main *main)
 {
 	t_redirections	redirections;
@@ -133,22 +118,19 @@ void	handle_redirections(t_execute *execute, t_main *main)
 	num_command = ft_determine_number_of_commands(execute);
 	while (redirections.argv[redirections.j])
 	{
-		if (((!ft_strcmp(redirections.argv[redirections.j], ">") ||
-			!ft_strcmp(redirections.argv[redirections.j], ">>") ||
-			!ft_strcmp(redirections.argv[redirections.j], "<")) &&
-			main->tokens_list[num_command + redirections.j].type != TOKEN_ARGUMENT &&
-			redirection_check(&redirections, main, execute) == 0))
-		{
-			redirections.j += 2;
-			continue;
-		}
-		else if ((!ft_strcmp(redirections.argv[redirections.j], "<<") &&
-			main->tokens_list[num_command + redirections.j].type != TOKEN_ARGUMENT &&
-			redirection_check_else_if(&redirections, execute, main) == 0))
-		{
-			redirections.j += 2;
-			continue;
-		}
+		if (((!ft_strcmp(redirections.argv[redirections.j], ">")
+					|| !ft_strcmp(redirections.argv[redirections.j], ">>")
+					|| !ft_strcmp(redirections.argv[redirections.j], "<"))
+				&& main->tokens_list[num_command
+					+ redirections.j].type != TOKEN_ARGUMENT
+				&& redirection_check(&redirections, main, execute) == 0))
+			continue ;
+		else if ((!ft_strcmp(redirections.argv[redirections.j], "<<")
+				&& main->tokens_list[num_command
+					+ redirections.j].type != TOKEN_ARGUMENT
+				&& redirection_check_else_if(&redirections, execute,
+					main) == 0))
+			continue ;
 		redirections.j++;
 	}
 	if_redirections_heredoc_all(&redirections, main, execute);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   preprocess_heredocs.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:49:00 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/13 02:07:45 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:15:36 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	init_redirections(t_redirections *redirections, t_execute *execute,
 	redirections->start_index = start_index;
 }
 
-int free_and_close(int **start_indices, int *tmp)
+int	free_and_close(int **start_indices, int *tmp)
 {
 	free(*start_indices);
 	close(*tmp);

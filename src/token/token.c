@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 18:18:01 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/12 23:20:22 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 16:39:21 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,5 @@ t_cmd	*parse_cmd(t_main *main)
 	if (parse_disassemble_args(&parse_cmd, cmd_result, main))
 		return (NULL);
 	free_part_parse_cmd(&parse_cmd);
-	
 	return (cmd_result);
 }

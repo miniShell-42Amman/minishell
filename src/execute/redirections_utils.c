@@ -3,14 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   redirections_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:25:24 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/10 02:25:35 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:20:16 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	ft_count_redirections(char *argv)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	while (argv[i])
+	{
+		if (argv[i] == '>')
+			count++;
+		i++;
+	}
+	return (count);
+}
 
 char	*append_str(char *dest, size_t *dest_size, const char *src)
 {

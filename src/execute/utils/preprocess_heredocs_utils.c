@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   preprocess_heredocs_utils.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 02:06:52 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/13 02:08:41 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:10:25 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ int	get_num_tokens(char **command)
 
 int	*compute_start_indices(t_execute *execute)
 {
-	int	*start_indices;
-	int	current_start;
-	int	num_tokens;
+	int		*start_indices;
+	int		current_start;
+	int		num_tokens;
 	size_t	i;
 
 	start_indices = malloc(execute->num_cmds * sizeof(int));
@@ -70,7 +70,8 @@ int	check_for_cmp(t_redirections *redirections, t_execute *execute,
 		&& main->tokens_list[token_index].type != TOKEN_ARGUMENT)
 	{
 		signal(SIGINT, handle_heredoc_sigint);
-		if (redirection_check_else_if(redirections, execute, main) != EXIT_SUCCESS)
+		if (redirection_check_else_if(redirections, execute, main)
+			!= EXIT_SUCCESS)
 			return (EXIT_FAILURE);
 		if (g_signal == 130)
 		{

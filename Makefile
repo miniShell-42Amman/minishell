@@ -59,6 +59,8 @@ SRC = 	src/main.c 								\
 		src/execute/handle_heredoc.c			\
 		src/execute/redirections_check.c		\
 		src/execute/utils/preprocess_heredocs_utils.c	\
+		src/utils/handle_for_sh_file.c			\
+		src/execute/utils/errno_massage.c		\
 
 OBJ_DIR = obj
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))

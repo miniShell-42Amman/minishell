@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 02:10:13 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:20:27 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,7 +354,8 @@ char				*resolve_command_path(char *command, t_execute *execute,
 						t_main *main);
 char				*handle_valid_path(t_resolve_command_path *resolve_cmd,
 						t_execute *execute);
-void				git_data_for_resolve_cmd(t_resolve_command_path *resolve_cmd,
+void				git_data_for_resolve_cmd(
+						t_resolve_command_path *resolve_cmd,
 						char *command, t_main *main, t_execute *execute);
 void				dup_and_check(t_resolve_command_path *resolve_cmd,
 						t_execute *execute, t_main *main);
@@ -402,5 +403,9 @@ void				init_redirections(t_redirections *redirections,
 						t_execute *execute, int i, int start_index);
 int					free_and_close(int **start_indices, int *tmp);
 int					preprocess_heredocs(t_execute *execute, t_main *main);
+void				loop_get_next_line(t_main *main);
+int					check_shell_args(char **av, char **env, t_main *main);
+void				errno_massage(t_execute *execute);
+int					ft_count_redirections(char *argv);
 
 #endif

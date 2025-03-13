@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_parse.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
+/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 19:06:49 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/12 23:24:14 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:08:12 by oissa            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int	clean_parse_cmd(t_parse_cmd *parse_cmd)
 	if (parse_cmd->arr_has_dollar)
 		free(parse_cmd->arr_has_dollar);
 	if (parse_cmd->buffer)
-		free(parse_cmd->buffer);	
+		free(parse_cmd->buffer);
 	parse_cmd->clean_input = NULL;
 	parse_cmd->arr_has_dollar = NULL;
 	parse_cmd->buffer = NULL;

@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   preprocess_heredocs.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/09 23:49:00 by oissa             #+#    #+#             */
-/*   Updated: 2025/03/13 17:15:36 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/16 03:44:54 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	loop_heredoc(t_redirections *redirections, t_execute *execute,
-		t_main *main)
+int	loop_heredoc(t_redirections *redirections, t_execute *execute, t_main *main)
 {
 	int	result;
 
@@ -70,5 +69,6 @@ int	preprocess_heredocs(t_execute *execute, t_main *main)
 	free(start_indices);
 	close(tmp);
 	signal(SIGINT, handle_sigint);
+	if_redirections_heredoc_all(&redirections, main, execute);
 	return (EXIT_SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:04:56 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/10 02:09:19 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/16 03:47:52 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	handle_heredoc_signal(t_here_document *here_doc,
 {
 	if (g_signal == 130)
 	{
-		free_here_doc(here_doc);
+		free_here_doc(here_doc, 1);
 		free_redirections(redirections);
 		return (1);
 	}
@@ -30,7 +30,7 @@ int	handle_heredoc_eof(t_here_document *here_doc)
 	{
 		ft_dprintf(STDERR_FILENO,
 			"Erorr404: warning: here-document delimited by EOF\n");
-		free_here_doc(here_doc);
+		free_here_doc(here_doc, 0);
 		return (1);
 	}
 	return (0);
@@ -40,7 +40,7 @@ int	handle_heredoc_target(t_here_document *here_doc)
 {
 	if (ft_strcmp(here_doc->line, here_doc->target) == 0)
 	{
-		free_here_doc(here_doc);
+		free_here_doc(here_doc, 0);
 		return (1);
 	}
 	return (0);
@@ -58,7 +58,7 @@ int	append_heredoc_line(t_here_document *here_doc, t_redirections *redirections,
 		perror("Erorr404: realloc");
 		free_redirections(redirections);
 		free_resources(main, 1);
-		free_here_doc(here_doc);
+		free_here_doc(here_doc, 1);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);

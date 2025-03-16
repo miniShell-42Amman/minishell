@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:11:02 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/14 00:40:49 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/16 03:49:00 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	redirection_check_else_if_loop(t_redirections *redirections,
 	{
 		redirections->heredoc_all = append_str(redirections->heredoc_all,
 				&redirections->heredoc_total_size, here_doc->current_doc);
-		free_here_doc(here_doc);
+		free_here_doc(here_doc, 0);
 	}
 	return (EXIT_SUCCESS);
 }
@@ -71,7 +71,7 @@ int	redirection_check_else_if(t_redirections *redirections, t_execute *execute,
 	{
 		ft_dprintf(STDERR_FILENO, "Erorr404: syntax error near token `<<'\n");
 		free_redirections(redirections);
-		free_here_doc(&here_doc);
+		free_here_doc(&here_doc, 0);
 		*redirections->exit_status = 2;
 		redirections = NULL;
 		return (EXIT_FAILURE);
@@ -81,6 +81,6 @@ int	redirection_check_else_if(t_redirections *redirections, t_execute *execute,
 			main) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	cleanup_redirections_argv(redirections);
-	free_here_doc(&here_doc);
+	free_here_doc(&here_doc, 1);
 	return (EXIT_SUCCESS);
 }

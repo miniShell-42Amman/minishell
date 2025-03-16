@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oissa <oissa@student.42amman.com>          +#+  +:+       +#+        */
+/*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:25:24 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/13 17:20:16 by oissa            ###   ########.fr       */
+/*   Updated: 2025/03/16 03:48:09 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

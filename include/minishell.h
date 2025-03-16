@@ -6,7 +6,7 @@
 /*   By: lalhindi <lalhindi@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 02:55:17 by lalhindi          #+#    #+#             */
-/*   Updated: 2025/03/14 00:54:57 by lalhindi         ###   ########.fr       */
+/*   Updated: 2025/03/16 03:46:45 by lalhindi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,7 +310,7 @@ void				setup_signals(void);
 void				handle_sigint(int signum);
 size_t				ft_determine_number_of_commands(t_execute *execute);
 void				free_redirections(t_redirections *redirections);
-void				free_here_doc(t_here_document *here_doc);
+void				free_here_doc(t_here_document *here_doc, int flag);
 void				increment_shell_level(t_env **env_list);
 char				*search_command(char *search);
 int					handle_many_args(int ac, char **av, char **env,
